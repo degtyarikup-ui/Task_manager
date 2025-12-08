@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
+import { getTelegramUser } from '../utils/telegram';
 import {
     Moon,
     Bell,
@@ -22,11 +23,12 @@ export const Profile: React.FC = () => {
     const totalProjects = projects.length;
     const totalClients = clients.length;
 
-    // Fake User Data (in a real app this would come from auth)
+    // Get user data from Telegram
+    const telegramUser = getTelegramUser();
     const user = {
-        name: 'Сергей',
-        email: 'sergei@example.com',
-        initials: 'С'
+        name: telegramUser?.first_name || 'Пользователь',
+        email: telegramUser?.username ? `@${telegramUser.username}` : 'Telegram User',
+        initials: telegramUser?.first_name?.[0] || 'П'
     };
 
     const [confirmConfig, setConfirmConfig] = useState({
