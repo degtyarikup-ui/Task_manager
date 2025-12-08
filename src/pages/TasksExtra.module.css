@@ -1,0 +1,148 @@
+/* Priority Overrides - Higher Specificity */
+.priorityLow {
+    color: var(--color-text-secondary);
+}
+
+.toolBtn.priorityLow.active {
+    background-color: var(--color-text-secondary);
+    color: white;
+    border-color: var(--color-text-secondary);
+}
+
+.priorityMedium {
+    color: var(--color-warning);
+}
+
+.toolBtn.priorityMedium.active {
+    background-color: var(--color-warning);
+    color: white;
+    border-color: var(--color-warning);
+}
+
+.priorityHigh {
+    color: var(--color-danger);
+}
+
+.toolBtn.priorityHigh.active {
+    background-color: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
+}
+
+.statusContainer {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Badge colors for list items */
+.badgeLow {
+    background-color: rgba(142, 142, 147, 0.15) !important;
+    color: var(--color-text-secondary) !important;
+}
+
+.badgeMedium {
+    background-color: rgba(255, 159, 10, 0.15) !important;
+    color: var(--color-warning) !important;
+}
+
+.badgeHigh {
+    background-color: rgba(255, 59, 48, 0.15) !important;
+    color: var(--color-danger) !important;
+}
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px 0;
+    margin-top: 24px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.toolbar::-webkit-scrollbar {
+    display: none;
+}
+
+.toolBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    cursor: pointer;
+}
+
+.toolBtn:active {
+    transform: scale(0.96);
+    background-color: var(--bg-input);
+}
+
+.toolBtnActive {
+    background-color: var(--bg-chip-active);
+    color: var(--color-chip-text-active);
+    border-color: transparent;
+}
+
+.toolIcon {
+    opacity: 0.7;
+}
+
+.toolBtn.active .toolIcon {
+    opacity: 1;
+}
+
+.dateInputWrapper {
+    position: relative;
+    display: inline-flex;
+    /* Keep it inline with other tools */
+}
+
+
+
+.priorityBtn {
+    padding: 8px 12px;
+}
+
+.detailsRow {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.3s ease;
+    background: #F9F9F9;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.metaBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: var(--bg-input);
+    /* Используем переменную вместо #F2F2F7 */
+    color: var(--color-text-secondary);
+    margin-top: 6px;
+    margin-right: 6px;
+}
+
+.taskMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}

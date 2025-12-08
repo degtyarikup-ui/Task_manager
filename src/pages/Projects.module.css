@@ -1,0 +1,80 @@
+.container {
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.addButton {
+    background-color: var(--color-text-primary);
+    color: var(--bg-card);
+    padding: 10px 20px;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.addButton:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.addButton:active {
+    transform: scale(0.98);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-text-secondary);
+}
+
+/* Form Styles Mapping */
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btnCancel {
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.btnSubmit {
+    background-color: var(--color-accent);
+    color: white;
+    padding: 10px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: opacity 0.2s;
+}
+
+.btnSubmit:hover {
+    opacity: 0.9;
+}

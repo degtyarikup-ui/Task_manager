@@ -1,0 +1,14 @@
+.appContainer {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-app);
+    overflow: hidden;
+}
+
+.mainContent {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    /* Add padding if needed inside the pages effectively */
+}

@@ -1,0 +1,96 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+    background: var(--bg-card);
+    width: 280px;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    text-align: center;
+    animation: scaleIn 0.2s ease-out;
+}
+
+.content {
+    padding: 20px 16px;
+}
+
+.title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.message {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.actions {
+    display: flex;
+    border-top: 1px solid var(--color-border);
+}
+
+.button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    font-size: 17px;
+    cursor: pointer;
+    border-right: 1px solid var(--color-border);
+    color: var(--color-accent);
+    font-weight: 400;
+}
+
+.button:last-child {
+    border-right: none;
+}
+
+.button:active {
+    background-color: var(--bg-input);
+}
+
+.danger {
+    color: #FF3B30;
+    font-weight: 600;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
