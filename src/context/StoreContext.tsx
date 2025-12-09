@@ -15,6 +15,7 @@ interface StoreContextType extends AppState {
     addClient: (client: Omit<Client, 'id'>) => void;
     updateClient: (id: string, client: Partial<Client>) => void;
     deleteClient: (id: string) => void;
+    reorderClients: (clients: Client[]) => void;
 
     toggleTheme: () => void;
     toggleLanguage: () => void;
@@ -321,6 +322,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         await supabase.from('clients').delete().eq('id', id);
     };
 
+    const reorderClients = (newOrder: Client[]) => {
+        setState(prev => ({ ...prev, clients: newOrder }));
+    };
+
     return (
         <StoreContext.Provider value={{
             ...state,
@@ -333,6 +338,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             addClient,
             updateClient,
             deleteClient,
+            reorderClients,
             toggleTheme,
             toggleLanguage,
             isLoading

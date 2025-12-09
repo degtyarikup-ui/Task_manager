@@ -8,9 +8,28 @@ import styles from './Clients.module.css';
 import formStyles from '../components/ui/Form.module.css';
 import type { Client } from '../types';
 import { generateAvatarColor, getInitials } from '../utils/colors';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
+import { haptic } from '../utils/haptics';
 
 export const Clients: React.FC = () => {
-    const { clients, addClient, updateClient, deleteClient, language } = useStore();
+    const { clients, addClient, updateClient, deleteClient, reorderClients, language } = useStore();
+
+    const onDragEnd = (result: DropResult) => {
+        if (!result.destination) return;
+        if (result.destination.index === 0) return; // Index 0 is reserved
+
+        const sourceIndex = result.source.index - 1;
+        const destIndex = result.destination.index - 1;
+
+        if (sourceIndex < 0 || destIndex < 0) return;
+
+        const newOrder = Array.from(clients);
+        const [moved] = newOrder.splice(sourceIndex, 1);
+        newOrder.splice(destIndex, 0, moved);
+
+        reorderClients(newOrder);
+        haptic.selection();
+    };
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -117,30 +136,64 @@ export const Clients: React.FC = () => {
                 <p className={styles.subtitle}>{clients.length} {getClientCountLabel(clients.length)}</p>
             </header>
 
-            <div className={styles.grid}>
-                {/* Add Client Card */}
-                <div className={`${styles.card} ${styles.addCard}`} onClick={handleCreate}>
-                    <div className={`${styles.avatar} ${styles.addAvatar}`}>
-                        <Plus size={32} />
-                    </div>
-                    <div className={styles.name}>{t('addClient')}</div>
-                </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="clients-list" direction="horizontal">
+                    {(provided) => (
+                        <div
+                            className={styles.grid}
+                            ref={provided.innerRef}
+                            {...provided.droppableProps}
+                        >
+                            <Draggable draggableId="add-btn" index={0} isDragDisabled={true}>
+                                {(provided) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`${styles.card} ${styles.addCard}`}
+                                        onClick={handleCreate}
+                                        style={provided.draggableProps.style}
+                                    >
+                                        <div className={`${styles.avatar} ${styles.addAvatar}`}>
+                                            <Plus size={32} />
+                                        </div>
+                                        <div className={styles.name}>{t('addClient')}</div>
+                                    </div>
+                                )}
+                            </Draggable>
 
-                {/* Existing Clients */}
-                {clients.map(client => (
-                    <div
-                        key={client.id}
-                        className={styles.card}
-                        onClick={() => handleEdit(client)}
-                    >
-                        <div className={styles.avatar} style={{ background: generateAvatarColor(client.name) }}>
-                            {getInitials(client.name)}
+                            {clients.map((client, index) => (
+                                <Draggable key={client.id} draggableId={client.id} index={index + 1}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            className={styles.card}
+                                            onClick={() => {
+                                                if (!snapshot.isDragging) handleEdit(client);
+                                            }}
+                                            style={{
+                                                ...provided.draggableProps.style,
+                                                transform: snapshot.isDragging ? provided.draggableProps.style?.transform : undefined,
+                                                opacity: snapshot.isDragging ? 0.8 : 1,
+                                                zIndex: snapshot.isDragging ? 1000 : 1,
+                                            }}
+                                        >
+                                            <div className={styles.avatar} style={{ background: generateAvatarColor(client.name) }}>
+                                                {getInitials(client.name)}
+                                            </div>
+                                            <div className={styles.name}>{client.name}</div>
+                                            {client.contact && <div className={styles.contact}>{client.contact}</div>}
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
                         </div>
-                        <div className={styles.name}>{client.name}</div>
-                        {client.contact && <div className={styles.contact}>{client.contact}</div>}
-                    </div>
-                ))}
-            </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
 
             <Modal
                 isOpen={isModalOpen}
