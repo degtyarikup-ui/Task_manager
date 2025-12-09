@@ -79,8 +79,7 @@ export const Profile: React.FC = () => {
 
     const handleOpenWallet = () => {
         const link = `https://app.tonkeeper.com/transfer/${WALLET_ADDRESS}`;
-        // @ts-ignore
-        const tg = window.Telegram?.WebApp;
+        const tg = (window as any).Telegram?.WebApp;
 
         if (tg && tg.openLink) {
             tg.openLink(link);
@@ -90,8 +89,7 @@ export const Profile: React.FC = () => {
     };
 
     const handleSupport = () => {
-        // @ts-ignore
-        const tg = window.Telegram?.WebApp;
+        const tg = (window as any).Telegram?.WebApp;
         if (tg && tg.openTelegramLink) {
             tg.openTelegramLink(SUPPORT_LINK);
         } else {

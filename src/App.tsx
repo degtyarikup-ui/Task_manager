@@ -11,6 +11,15 @@ function AppContent() {
   const { theme } = useStore();
 
   useEffect(() => {
+    // @ts-ignore
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg) {
+      tg.expand();
+      tg.ready();
+    }
+  }, []); // Run once on mount
+
+  useEffect(() => {
     // Cast to any to avoid TypeScript errors with incomplete definitions
     // @ts-ignore
     const tg = (window as any).Telegram?.WebApp;

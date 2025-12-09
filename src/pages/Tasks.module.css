@@ -1,5 +1,5 @@
 .container {
-    padding: calc(12px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(36px + env(safe-area-inset-top)) 24px 120px;
     /* Bottom padding for FAB and bottom nav */
     max-width: 600px;
     margin: 0 auto;
@@ -111,8 +111,8 @@
 
 .fab {
     position: fixed;
-    bottom: 96px;
-    /* Поднимаем выше меню (80px меню + 16px отступ) */
+    bottom: calc(120px + env(safe-area-inset-bottom));
+    /* Поднял выше меню */
     right: 24px;
     width: 56px;
     height: 56px;
