@@ -49,7 +49,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setUserId(uid);
 
         // Load Theme
-        if (isTelegramWebApp()) {
+        const savedTheme = localStorage.getItem('user_theme') as 'light' | 'dark' | null;
+        if (savedTheme) {
+            setState(prev => ({ ...prev, theme: savedTheme }));
+        } else if (isTelegramWebApp()) {
             setState(prev => ({ ...prev, theme: getTelegramTheme() }));
         }
     }, []);
@@ -139,10 +142,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }, [state.theme]);
 
     const toggleTheme = () => {
-        setState(prev => ({
-            ...prev,
-            theme: prev.theme === 'light' ? 'dark' : 'light'
-        }));
+        setState(prev => {
+            const newTheme = prev.theme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('user_theme', newTheme);
+            return {
+                ...prev,
+                theme: newTheme
+            };
+        });
     };
 
     const toggleLanguage = () => {
