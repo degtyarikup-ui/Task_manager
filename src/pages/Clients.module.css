@@ -58,7 +58,8 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #007AFF, #5856D6);
+    background-color: var(--bg-input);
+    /* Dynamic gradient applied inline */
     color: white;
     font-size: 24px;
     font-weight: 600;
