@@ -11,18 +11,19 @@ function AppContent() {
   const { theme } = useStore();
 
   useEffect(() => {
+    // Cast to any to avoid TypeScript errors with incomplete definitions
     // @ts-ignore
-    const tg = window.Telegram?.WebApp;
+    const tg = (window as any).Telegram?.WebApp;
     if (tg) {
       // Set header color to match app background
       const color = theme === 'dark' ? '#000000' : '#F5F5F7';
 
       // We set the header color. If it's light, Telegram automatically makes status bar icons dark.
-      tg.setHeaderColor(color);
-      tg.setBackgroundColor(color);
+      if (tg.setHeaderColor) tg.setHeaderColor(color);
+      if (tg.setBackgroundColor) tg.setBackgroundColor(color);
 
       // Expand to full height if needed, though viewport meta handles it mostly
-      tg.expand();
+      if (tg.expand) tg.expand();
     }
   }, [theme]);
 
