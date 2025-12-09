@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Settings } from 'lucide-react';
+import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -297,14 +297,11 @@ export const Tasks: React.FC = () => {
         setIsNewListModalOpen(true);
     };
 
-    const handleEditList = () => {
-        const projectToEdit = projects.find(p => p.id === activeTab);
-        if (projectToEdit) {
-            setEditingList(projectToEdit);
-            setNewListName(projectToEdit.title);
-            setListStatus(projectToEdit.status);
-            setIsNewListModalOpen(true);
-        }
+    const handleEditList = (project: Project) => {
+        setEditingList(project);
+        setNewListName(project.title);
+        setListStatus(project.status);
+        setIsNewListModalOpen(true);
     };
 
     const handleSaveList = (e: React.FormEvent) => {
@@ -326,18 +323,17 @@ export const Tasks: React.FC = () => {
         }
     };
 
-    const handleDeleteList = () => {
-        if (!activeTab || activeTab === 'all') return;
+    const handleDeleteList = (id?: string) => {
+        const targetId = id || activeTab;
+        if (!targetId || targetId === 'all') return;
 
-
-
-        const projectToDelete = projects.find(p => p.id === activeTab);
+        const projectToDelete = projects.find(p => p.id === targetId);
         setConfirmConfig({
             isOpen: true,
             title: t('deleteList'),
             message: `${t('deleteListConfirm')} "${projectToDelete?.title}"? ${t('deleteListMessage')}`,
             onConfirm: () => {
-                deleteProject(activeTab);
+                deleteProject(targetId);
                 setActiveTab('all');
             },
             isDestructive: true,
@@ -345,21 +341,31 @@ export const Tasks: React.FC = () => {
         });
     };
 
+    const longPressTimer = React.useRef<any>(null);
+    const isLongPress = React.useRef(false);
+
+    const handleTouchStart = (project: Project) => {
+        isLongPress.current = false;
+        longPressTimer.current = setTimeout(() => {
+            isLongPress.current = true;
+            haptic.impact('medium');
+            handleEditList(project);
+        }, 600);
+    };
+
+    const handleTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <h1 className={styles.title}>{t('tasks')}</h1>
-                    {activeTab !== 'all' && (
-                        <div style={{ position: 'absolute', right: 0, display: 'flex', gap: 12 }}>
-                            <button onClick={handleEditList} style={{ color: 'var(--color-text-primary)', opacity: 0.6 }}>
-                                <Settings size={20} />
-                            </button>
-                            <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8 }}>
-                                <Trash2 size={20} />
-                            </button>
-                        </div>
-                    )}
+                    {/* Buttons removed from header */}
                 </div>
 
                 <div className={extraStyles.toolbar} style={{ marginTop: 12, padding: 0 }}>
@@ -377,8 +383,16 @@ export const Tasks: React.FC = () => {
                         <button
                             key={p.id}
                             className={`${styles.filterChip} ${activeTab === p.id ? styles.activeChip : ''} `}
-                            onClick={() => setActiveTab(p.id)}
-                            style={{ whiteSpace: 'nowrap' }}
+                            onClick={() => {
+                                if (!isLongPress.current) {
+                                    setActiveTab(p.id);
+                                }
+                            }}
+                            onTouchStart={() => handleTouchStart(p)}
+                            onTouchEnd={handleTouchEnd}
+                            onTouchMove={handleTouchEnd}
+                            onContextMenu={(e) => e.preventDefault()}
+                            style={{ whiteSpace: 'nowrap', userSelect: 'none' }}
                         >
                             {p.title}
                         </button>
@@ -712,9 +726,34 @@ export const Tasks: React.FC = () => {
                         </div>
                     )}
 
-                    <button type="submit" className={formStyles.submitBtn} style={{ marginTop: 24 }}>
-                        {editingList ? 'Сохранить' : 'Создать'}
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
+                        <button type="submit" className={formStyles.submitBtn}>
+                            {editingList ? 'Сохранить' : 'Создать'}
+                        </button>
+
+                        {editingList && (
+                            <button
+                                type="button"
+                                style={{
+                                    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                                    color: '#FF3B30',
+                                    width: '100%',
+                                    padding: '14px',
+                                    borderRadius: '12px',
+                                    border: 'none',
+                                    fontWeight: 600,
+                                    fontSize: '16px',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={() => {
+                                    setIsNewListModalOpen(false);
+                                    handleDeleteList(editingList.id);
+                                }}
+                            >
+                                Удалить список
+                            </button>
+                        )}
+                    </div>
                 </form>
             </Modal>
 
