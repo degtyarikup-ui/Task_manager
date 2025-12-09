@@ -19,7 +19,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
                 className={`${styles.navItem} ${activeTab === 'tasks' ? styles.active : ''}`}
                 onClick={() => onTabChange('tasks')}
             >
-                <div className={`${styles.iconWrapper} ${styles.tasksIcon}`}>
+                <div className={styles.iconWrapper}>
                     <CircleCheck size={24} />
                 </div>
                 <span className={styles.label}>{t('tasks')}</span>

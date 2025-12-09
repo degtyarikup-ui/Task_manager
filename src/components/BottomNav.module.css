@@ -49,12 +49,7 @@
 }
 
 /* Tasks Icon Specifics */
-/* Tasks Icon Specifics */
-.active .iconWrapper.tasksIcon {
-    background-color: var(--color-accent);
-    border-radius: 50%;
-    color: white;
-}
+
 
 .label {
     margin-top: 2px;
