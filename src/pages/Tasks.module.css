@@ -1,5 +1,5 @@
 .container {
-    padding: calc(14px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(12px + env(safe-area-inset-top)) 24px 120px;
     /* Bottom padding for FAB and bottom nav */
     max-width: 600px;
     margin: 0 auto;
@@ -16,8 +16,8 @@
 }
 
 .title {
-    font-size: 34px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--color-text-primary);
     text-align: center;
     /* Отступы, чтобы кнопки Telegram (Закрыть, Меню) не перекрывали текст */

@@ -1,5 +1,5 @@
 .container {
-    padding: calc(14px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(12px + env(safe-area-inset-top)) 24px 120px;
     /* Увеличен нижний отступ */
     max-width: 600px;
     margin: 0 auto;
@@ -8,12 +8,12 @@
 }
 
 .header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .title {
-    font-size: 34px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
     color: var(--color-text-primary);
     text-align: center;
     padding: 0 40px;
