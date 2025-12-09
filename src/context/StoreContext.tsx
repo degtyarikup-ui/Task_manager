@@ -113,7 +113,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     deadline: t.deadline || '',
                     client: t.client || '',
                     projectId: t.project_id || undefined,
-                    createdAt: new Date(t.created_at).getTime()
+                    createdAt: new Date(t.created_at).getTime(),
+                    updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
                 }));
 
                 setState(prev => ({
@@ -220,7 +221,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const addTask = async (data: Omit<Task, 'id' | 'createdAt'>) => {
         const tempId = `temp-${Date.now()}`;
-        const newTask: Task = { ...data, id: tempId, createdAt: Date.now() };
+        const newTask: Task = { ...data, id: tempId, createdAt: Date.now(), updatedAt: Date.now() };
         setState(prev => ({ ...prev, tasks: [newTask, ...prev.tasks] }));
 
         const { data: inserted, error } = await supabase
@@ -251,7 +252,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const updateTask = async (id: string, data: Partial<Task>) => {
         setState(prev => ({
             ...prev,
-            tasks: prev.tasks.map(t => t.id === id ? { ...t, ...data } : t)
+            tasks: prev.tasks.map(t => t.id === id ? { ...t, ...data, updatedAt: Date.now() } : t)
         }));
 
         const updateData: any = {};

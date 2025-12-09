@@ -64,6 +64,7 @@ export const Profile: React.FC = () => {
     });
 
     const [isDonateOpen, setIsDonateOpen] = useState(false);
+    const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
     // Адрес USDT (TON)
@@ -135,9 +136,10 @@ export const Profile: React.FC = () => {
             {/* Statistics */}
             <div className={styles.sectionTitle}>{t('statistics')}</div>
             <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
+                <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
                     <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
                     <div className={styles.statLabel}>{t('completedTasks')}</div>
+                    <ChevronRight size={14} style={{ position: 'absolute', top: 12, right: 12, opacity: 0.3 }} />
                 </div>
                 <div className={styles.statCard}>
                     <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
@@ -299,7 +301,53 @@ export const Profile: React.FC = () => {
                         </button>
                     </div>
                 </div>
-            </Modal>
-        </div>
+
+            </Modal >
+
+            {/* Completed Tasks History */}
+            < Modal
+                isOpen={isCompletedModalOpen}
+                onClose={() => setIsCompletedModalOpen(false)}
+                title={t('completedTasks')}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {tasks.filter(t => t.status === 'completed').sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt)).map(t => (
+                        <div key={t.id} style={{
+                            background: 'var(--bg-input)', padding: '12px 14px', borderRadius: 12,
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}>
+                            <div style={{ display: 'flex', gap: 10, alignItems: 'center', overflow: 'hidden' }}>
+                                <div style={{
+                                    width: 20, height: 20, borderRadius: '50%',
+                                    background: 'var(--color-success)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <Check size={12} color="white" strokeWidth={3} />
+                                </div>
+                                <span style={{
+                                    textDecoration: 'line-through',
+                                    color: 'var(--color-text-secondary)',
+                                    fontSize: 15,
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis'
+                                }}>
+                                    {t.title}
+                                </span>
+                            </div>
+                            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)', flexShrink: 0, marginLeft: 8 }}>
+                                {new Date(t.updatedAt || t.createdAt).toLocaleDateString()}
+                            </span>
+                        </div>
+                    ))}
+                    {tasks.filter(t => t.status === 'completed').length === 0 && (
+                        <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '32px 0' }}>
+                            Нет завершенных задач
+                        </div>
+                    )}
+                </div>
+            </Modal >
+        </div >
     );
 };

@@ -284,8 +284,17 @@ export const Tasks: React.FC = () => {
     };
 
     const filteredTasks = tasks.filter(t => {
-        if (activeTab === 'all') return true;
-        return t.projectId === activeTab;
+        // 1. Filter by Project Tab
+        if (activeTab !== 'all' && t.projectId !== activeTab) return false;
+
+        // 2. Hide completed tasks older than 24h (updatedAt)
+        if (t.status === 'completed') {
+            const lastUpdate = t.updatedAt || t.createdAt;
+            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+            if (Date.now() - lastUpdate > ONE_DAY_MS) return false;
+        }
+
+        return true;
     }).sort((a, b) => {
         // 1. Completed to bottom
         if (a.status === 'completed' && b.status !== 'completed') return 1;

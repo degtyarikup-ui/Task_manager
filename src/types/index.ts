@@ -22,6 +22,7 @@ export interface Task {
     deadline?: string;
     client?: string;
     createdAt: number;
+    updatedAt?: number;
 }
 
 export interface Client {
