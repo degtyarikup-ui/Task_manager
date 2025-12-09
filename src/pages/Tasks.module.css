@@ -172,6 +172,38 @@
 
 .deleting {
     animation: fadeOut 0.3s forwards ease-in-out;
-    pointer-events: none;
     /* Disable clicks while deleting */
+}
+
+/* Client Filter Chips */
+.filterScroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 12px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.filterScroll::-webkit-scrollbar {
+    display: none;
+}
+
+.filterChip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: var(--bg-input);
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.activeChip {
+    background-color: var(--color-text-primary) !important;
+    color: var(--bg-card) !important;
 }
