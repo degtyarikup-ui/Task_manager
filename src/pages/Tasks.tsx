@@ -588,7 +588,8 @@ export const Tasks: React.FC = () => {
                                         key={c.id}
                                         type="button"
                                         onClick={() => {
-                                            setFormData({ ...formData, client: c.name });
+                                            const newClient = formData.client === c.name ? '' : c.name;
+                                            setFormData({ ...formData, client: newClient });
                                             setActiveTool(null);
                                         }}
                                         style={{
