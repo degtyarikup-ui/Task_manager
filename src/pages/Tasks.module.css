@@ -1,5 +1,5 @@
 .container {
-    padding: 20px 20px 120px;
+    padding: calc(20px + env(safe-area-inset-top)) 20px 120px;
     /* Bottom padding for FAB and bottom nav */
     max-width: 600px;
     margin: 0 auto;
@@ -151,4 +151,20 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+        max-height: 0;
+        margin-bottom: 0;
+        padding: 0;
+    }
+}
+
+.deleting {
+    animation: fadeOut 0.3s forwards ease-in-out;
+    pointer-events: none;
+    /* Disable clicks while deleting */
 }

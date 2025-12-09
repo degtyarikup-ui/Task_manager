@@ -16,7 +16,7 @@ export interface Task {
     id: string;
     title: string;
     description?: string;
-    projectId: string; // Empty string if no project (though UI should encourage it)
+    projectId?: string; // Optional if task is not in a list
     status: Status;
     priority: Priority;
     deadline?: string;

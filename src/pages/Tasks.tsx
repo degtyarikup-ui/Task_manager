@@ -56,8 +56,8 @@ const getStatusLabel = (s: Status) => {
 }
 
 // Simple Task Card Component
-const TaskItem = ({ task, onToggle, onDelete, onEdit }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void }) => (
-    <div className={styles.taskCard} onClick={() => onEdit(task)}>
+const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean }) => (
+    <div className={`${styles.taskCard} ${isDeleting ? styles.deleting : ''}`} onClick={() => onEdit(task)}>
         <button
             className={`${styles.checkbox} ${task.status === 'completed' ? styles.checked : ''} `}
             onClick={(e) => { e.stopPropagation(); onToggle(task.id); }}
@@ -65,9 +65,13 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit }: { task: Task, onToggle: 
             {task.status === 'completed' && <Check size={14} color="white" />}
         </button>
         <div className={styles.taskContent}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '4px' }}>
                 {task.priority !== 'low' && (
-                    <AlertTriangle size={16} className={getIconClass(task.priority)} />
+                    <AlertTriangle
+                        size={16}
+                        className={getIconClass(task.priority)}
+                        style={{ flexShrink: 0, marginTop: 3 }}
+                    />
                 )}
                 <span className={`${styles.taskTitle} ${task.status === 'completed' ? styles.completedText : ''} `} style={{ marginBottom: 0 }}>
                     {task.title}
@@ -129,6 +133,15 @@ export const Tasks: React.FC = () => {
     });
 
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const handleDelete = (id: string) => {
+        setDeletingId(id);
+        setTimeout(() => {
+            deleteTask(id);
+            setDeletingId(null);
+        }, 300); // Wait for animation
+    };
 
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
@@ -183,19 +196,7 @@ export const Tasks: React.FC = () => {
         setIsCalendarOpen(false); // Close calendar on form reset
     }
 
-    const openEditModal = (task: Task) => {
-        setFormData({
-            title: task.title,
-            description: task.description || '',
-            status: task.status,
-            priority: task.priority,
-            projectId: task.projectId,
-            deadline: task.deadline || '',
-            client: task.client || ''
-        });
-        setEditingId(task.id);
-        setIsModalOpen(true);
-    };
+
 
     const togglePriority = () => {
         const cycle: Priority[] = ['low', 'medium', 'high'];
@@ -311,15 +312,18 @@ export const Tasks: React.FC = () => {
                         <small>Нажмите +, чтобы добавить</small>
                     </div>
                 ) : (
-                    filteredTasks.map(task => (
-                        <TaskItem
-                            key={task.id}
-                            task={task}
-                            onToggle={toggleTask}
-                            onDelete={deleteTask}
-                            onEdit={openEditModal}
-                        />
-                    ))
+                    filteredTasks.map(task => <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={toggleTask}
+                        onDelete={handleDelete}
+                        onEdit={(t) => {
+                            setFormData(t);
+                            setEditingId(t.id);
+                            setIsModalOpen(true);
+                        }}
+                        isDeleting={deletingId === task.id}
+                    />)
                 )}
             </div>
 
