@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isBefore, startOfDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -46,7 +47,7 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
         onClose();
     }
 
-    return (
+    return createPortal(
         <div className={styles.backdrop} onClick={onClose}>
             <div className={styles.calendarContainer} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
@@ -93,5 +94,5 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
                 </div>
             </div>
         </div>
-    );
+        , document.body);
 };
