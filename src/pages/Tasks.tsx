@@ -136,8 +136,15 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 
                     <div className={extraStyles.taskMeta}>
                         {task.deadline && (
-                            <span className={extraStyles.metaBadge}>
-                                <Calendar size={10} />
+                            <span className={extraStyles.metaBadge} style={
+                                (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
+                                    ? { color: '#FF3B30', backgroundColor: 'rgba(255, 59, 48, 0.1)' }
+                                    : {}
+                            }>
+                                {(task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
+                                    ? <AlertTriangle size={10} />
+                                    : <Calendar size={10} />
+                                }
                                 {formatDate(task.deadline)}
                             </span>
                         )}
@@ -279,6 +286,17 @@ export const Tasks: React.FC = () => {
     const filteredTasks = tasks.filter(t => {
         if (activeTab === 'all') return true;
         return t.projectId === activeTab;
+    }).sort((a, b) => {
+        // 1. Completed to bottom
+        if (a.status === 'completed' && b.status !== 'completed') return 1;
+        if (a.status !== 'completed' && b.status === 'completed') return -1;
+
+        // 2. Sort by date (asc)
+        if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
+        if (a.deadline && !b.deadline) return -1; // With deadline first
+        if (!a.deadline && b.deadline) return 1;
+
+        return 0;
     });
 
     const toggleTool = (tool: string) => {
@@ -707,24 +725,7 @@ export const Tasks: React.FC = () => {
                         />
                     </div>
 
-                    {editingList && (
-                        <div style={{ marginTop: 20 }}>
-                            <label className={formStyles.label} style={{ marginBottom: 10, display: 'block' }}>Статус</label>
-                            <div className={extraStyles.statusContainer} style={{ marginTop: 0 }}>
-                                {['in-progress', 'on-hold', 'completed'].map((s) => (
-                                    <button
-                                        key={s}
-                                        type="button"
-                                        className={`${styles.filterChip} ${listStatus === s ? styles.activeChip : ''}`}
-                                        style={{ padding: '8px 12px', fontSize: 13 }}
-                                        onClick={() => setListStatus(s as Status)}
-                                    >
-                                        {getStatusLabel(s as Status)}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
                         <button type="submit" className={formStyles.submitBtn}>
