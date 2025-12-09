@@ -6,7 +6,6 @@ import {
     Moon,
     Bell,
     Globe,
-    LogOut,
     Trash2,
     ChevronRight,
     Heart,
@@ -207,10 +206,7 @@ export const Profile: React.FC = () => {
                         <Trash2 size={20} className={styles.menuIcon} />
                         <span className={styles.menuLabel}>{t('clearAllData')}</span>
                     </button>
-                    <button className={`${styles.menuItem} ${styles.dangerItem}`}>
-                        <LogOut size={20} className={styles.menuIcon} />
-                        <span className={styles.menuLabel}>{t('logout')}</span>
-                    </button>
+
                 </div>
             </div>
 
