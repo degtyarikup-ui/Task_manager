@@ -92,7 +92,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
     const priorityColor = task.priority === 'high' ? '#FF3B30' : task.priority === 'medium' ? '#FF9500' : 'var(--color-border)';
 
     return (
-        <div style={{ position: 'relative', borderRadius: 16, marginBottom: 12, overflow: 'hidden' }}>
+        <div style={{ position: 'relative', borderRadius: 16, marginBottom: 6, overflow: 'hidden' }}>
             <div style={{
                 position: 'absolute', inset: 0,
                 background: '#FF3B30',

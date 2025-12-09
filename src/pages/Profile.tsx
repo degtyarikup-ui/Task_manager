@@ -26,7 +26,7 @@ export const Profile: React.FC = () => {
     // Calculated Statistics
     const completedTasks = tasks.filter(t => t.status === 'completed').length;
     const activeTasks = tasks.filter(t => t.status === 'in-progress').length;
-    const onHoldProjects = projects.filter(p => p.status === 'on-hold').length;
+    const onHoldTasks = tasks.filter(t => t.status === 'on-hold').length;
     const totalClients = clients.length;
 
     // Get user data from Telegram
@@ -144,7 +144,7 @@ export const Profile: React.FC = () => {
                     <div className={styles.statLabel}>{t('activeTasks')}</div>
                 </div>
                 <div className={styles.statCard}>
-                    <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldProjects}</div>
+                    <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldTasks}</div>
                     <div className={styles.statLabel}>{t('lists')}</div>
                 </div>
                 <div className={styles.statCard}>
