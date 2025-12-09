@@ -474,10 +474,10 @@ export const Tasks: React.FC = () => {
                                         }}
                                     >
                                         <div style={{
-                                            width: 16, height: 16, borderRadius: '50%',
+                                            width: 24, height: 24, borderRadius: '50%',
                                             background: generateAvatarColor(c.name),
-                                            color: 'white', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            marginRight: 6, fontWeight: 'bold', flexShrink: 0
+                                            color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            marginRight: 8, fontWeight: 'bold', flexShrink: 0
                                         }}>
                                             {getInitials(c.name)}
                                         </div>
