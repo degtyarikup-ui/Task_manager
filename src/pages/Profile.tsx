@@ -17,7 +17,7 @@ import {
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Modal } from '../components/Modal';
 import styles from './Profile.module.css';
-import avatarImg from '../assets/avatar.png';
+import avatarImg from '../assets/avatar_beaver.png';
 
 export const Profile: React.FC = () => {
     const { tasks, clients, theme, toggleTheme, language, toggleLanguage } = useStore();

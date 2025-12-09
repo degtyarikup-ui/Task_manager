@@ -1,5 +1,13 @@
 .container {
-    padding: calc(60px + env(safe-area-inset-top)) 24px 120px;
+    padding: 24px 24px 120px;
+}
+
+:global(.platform-ios) .container {
+    padding-top: 12px;
+}
+
+:global(.platform-android) .container {
+    padding-top: 60px;
     /* More padding for bottom nav */
     max-width: 800px;
     /* Wider */
