@@ -1,6 +1,6 @@
 .container {
-    padding: 20px 20px 100px;
-    /* Bottom padding for FAB */
+    padding: 20px 20px 120px;
+    /* Bottom padding for FAB and bottom nav */
     max-width: 600px;
     margin: 0 auto;
     min-height: 100vh;
@@ -104,7 +104,8 @@
 
 .fab {
     position: fixed;
-    bottom: 32px;
+    bottom: 96px;
+    /* Поднимаем выше меню (80px меню + 16px отступ) */
     right: 24px;
     width: 56px;
     height: 56px;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { Modal } from '../components/Modal';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Plus } from 'lucide-react';
@@ -9,6 +10,7 @@ import type { Client } from '../types';
 
 export const Clients: React.FC = () => {
     const { clients, addClient, updateClient, deleteClient } = useStore(); // Added updateClient
+    const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -94,31 +96,29 @@ export const Clients: React.FC = () => {
             </header>
 
             <div className={styles.grid}>
-                {clients.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <p>Нет клиентов</p>
-                        <small>Нажмите +, чтобы добавить</small>
+                {/* Add Client Card */}
+                <div className={`${styles.card} ${styles.addCard}`} onClick={handleCreate}>
+                    <div className={`${styles.avatar} ${styles.addAvatar}`}>
+                        <Plus size={32} />
                     </div>
-                ) : (
-                    clients.map(client => (
-                        <div
-                            key={client.id}
-                            className={styles.card}
-                            onClick={() => handleEdit(client)}
-                        >
-                            <div className={styles.avatar}>
-                                {getInitials(client.name)}
-                            </div>
-                            <div className={styles.name}>{client.name}</div>
-                            {client.contact && <div className={styles.contact}>{client.contact}</div>}
-                        </div>
-                    ))
-                )}
-            </div>
+                    <div className={styles.name}>{t('addClient')}</div>
+                </div>
 
-            <button className={styles.fab} onClick={handleCreate}>
-                <Plus size={28} />
-            </button>
+                {/* Existing Clients */}
+                {clients.map(client => (
+                    <div
+                        key={client.id}
+                        className={styles.card}
+                        onClick={() => handleEdit(client)}
+                    >
+                        <div className={styles.avatar}>
+                            {getInitials(client.name)}
+                        </div>
+                        <div className={styles.name}>{client.name}</div>
+                        {client.contact && <div className={styles.contact}>{client.contact}</div>}
+                    </div>
+                ))}
+            </div>
 
             <Modal
                 isOpen={isModalOpen}

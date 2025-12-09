@@ -1,5 +1,6 @@
 .container {
-    padding: 24px 24px 100px;
+    padding: 24px 24px 120px;
+    /* Увеличен нижний отступ */
     max-width: 600px;
     margin: 0 auto;
     min-height: 100vh;

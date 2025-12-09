@@ -1,6 +1,6 @@
 .container {
-    padding: 24px 24px 100px;
-    /* More padding */
+    padding: 24px 24px 120px;
+    /* More padding for bottom nav */
     max-width: 800px;
     /* Wider */
     margin: 0 auto;
@@ -89,9 +89,33 @@
     max-width: 100%;
 }
 
+/* Add Client Card Styles */
+.addCard {
+    border: 2px dashed var(--color-border);
+    background: transparent;
+    opacity: 0.7;
+    transition: all 0.2s;
+}
+
+.addCard:hover {
+    opacity: 1;
+    border-color: var(--color-accent);
+    background: var(--bg-card);
+}
+
+.addCard:active {
+    transform: scale(0.98);
+}
+
+.addAvatar {
+    background: var(--color-border) !important;
+    color: var(--color-text-secondary) !important;
+}
+
 .fab {
     position: fixed;
-    bottom: 32px;
+    bottom: 96px;
+    /* Поднимаем выше меню (80px меню + 16px отступ) */
     right: 24px;
     width: 56px;
     height: 56px;
