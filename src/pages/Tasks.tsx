@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
+import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
 import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
 import type { Task, Status, Priority } from '../types';
@@ -146,6 +147,7 @@ export const Tasks: React.FC = () => {
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
     const handleDelete = (id: string) => {
+        haptic.notification('warning');
         setDeletingId(id);
         setTimeout(() => {
             deleteTask(id);
@@ -218,6 +220,7 @@ export const Tasks: React.FC = () => {
     const toggleTask = (id: string) => {
         const task = tasks.find(t => t.id === id);
         if (task) {
+            haptic.impact('light');
             updateTask(id, {
                 status: task.status === 'completed' ? 'in-progress' : 'completed'
             });
