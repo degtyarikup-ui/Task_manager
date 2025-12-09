@@ -389,7 +389,6 @@ export const Tasks: React.FC = () => {
                         style={{
                             backgroundColor: 'var(--bg-card)',
                             color: 'var(--color-text-primary)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                             whiteSpace: 'nowrap'
                         }}
                     >
