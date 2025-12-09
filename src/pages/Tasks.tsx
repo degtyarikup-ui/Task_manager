@@ -267,10 +267,10 @@ export const Tasks: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <h1 className={styles.title}>{t('tasks')}</h1>
                     {activeTab !== 'all' && (
-                        <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8 }}>
+                        <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8, position: 'absolute', right: 0 }}>
                             <Trash2 size={20} />
                         </button>
                     )}

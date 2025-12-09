@@ -1,5 +1,5 @@
 .container {
-    padding: calc(88px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(14px + env(safe-area-inset-top)) 24px 120px;
     /* More padding for bottom nav */
     max-width: 800px;
     /* Wider */
@@ -10,6 +10,7 @@
 
 .header {
     margin-bottom: 32px;
+    text-align: center;
 }
 
 .title {
@@ -17,6 +18,7 @@
     font-weight: 700;
     color: var(--color-text-primary);
     margin-bottom: 8px;
+    padding: 0 40px;
 }
 
 .subtitle {

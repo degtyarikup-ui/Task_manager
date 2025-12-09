@@ -1,5 +1,5 @@
 .container {
-    padding: calc(88px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(14px + env(safe-area-inset-top)) 24px 120px;
     /* Увеличен нижний отступ */
     max-width: 600px;
     margin: 0 auto;
@@ -15,6 +15,8 @@
     font-size: 34px;
     font-weight: 700;
     color: var(--color-text-primary);
+    text-align: center;
+    padding: 0 40px;
 }
 
 .profileCard {
