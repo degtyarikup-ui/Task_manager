@@ -463,24 +463,51 @@ export const Tasks: React.FC = () => {
                                     type="text"
                                     className={formStyles.input}
                                     placeholder="Новый клиент..."
+                                    id="new-client-input"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
-                                            const val = e.currentTarget.value.trim();
+                                            const target = e.currentTarget;
+                                            const val = target.value.trim();
                                             if (val) {
                                                 addClient({ name: val, contact: '' });
                                                 setFormData({ ...formData, client: val });
-                                                e.currentTarget.value = ''; // Clear input
-                                                // Don't close tool so they can see it added, or close it? Let's close it for efficiency.
+                                                target.value = '';
                                                 setActiveTool(null);
                                             }
                                         }
                                     }}
                                 />
+                                <button
+                                    type="button"
+                                    style={{
+                                        width: '44px',
+                                        height: '44px',
+                                        borderRadius: '12px',
+                                        background: 'var(--color-accent)',
+                                        color: 'white',
+                                        border: 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0
+                                    }}
+                                    onClick={() => {
+                                        const input = document.getElementById('new-client-input') as HTMLInputElement;
+                                        if (input) {
+                                            const val = input.value.trim();
+                                            if (val) {
+                                                addClient({ name: val, contact: '' });
+                                                setFormData({ ...formData, client: val });
+                                                input.value = '';
+                                                setActiveTool(null);
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <Plus size={20} />
+                                </button>
                             </div>
-                            <small style={{ color: '#86868b', marginTop: 4, display: 'block' }}>
-                                Нажмите Enter чтобы добавить
-                            </small>
                         </div>
                     )}
 
