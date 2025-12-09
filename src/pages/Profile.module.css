@@ -1,5 +1,5 @@
 .container {
-    padding: 24px 24px 120px;
+    padding: calc(88px + env(safe-area-inset-top)) 24px 120px;
     /* Увеличен нижний отступ */
     max-width: 600px;
     margin: 0 auto;
