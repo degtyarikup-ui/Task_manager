@@ -97,7 +97,9 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
                 position: 'absolute', inset: 0,
                 background: '#FF3B30',
                 display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
-                paddingRight: 24, borderRadius: 16
+                paddingRight: 24, borderRadius: 16,
+                opacity: offset < -5 ? 1 : 0,
+                transition: 'opacity 0.2s'
             }}>
                 <Trash2 size={24} color="white" />
             </div>
