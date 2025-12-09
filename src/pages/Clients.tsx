@@ -133,7 +133,7 @@ export const Clients: React.FC = () => {
                         className={styles.card}
                         onClick={() => handleEdit(client)}
                     >
-                        <div className={styles.avatar}>
+                        <div className={styles.avatar} style={{ background: generateAvatarColor(client.name) }}>
                             {getInitials(client.name)}
                         </div>
                         <div className={styles.name}>{client.name}</div>
