@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Users, CircleUser, CircleCheck } from 'lucide-react';
+import { Users, CircleUser, CircleCheck } from 'lucide-react';
 import { useTranslation } from '../i18n/useTranslation';
 import styles from './BottomNav.module.css';
 
@@ -20,11 +20,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
                 onClick={() => onTabChange('tasks')}
             >
                 <div className={`${styles.iconWrapper} ${styles.tasksIcon}`}>
-                    {activeTab === 'tasks' ? (
-                        <Check size={16} strokeWidth={3} />
-                    ) : (
-                        <CircleCheck size={24} />
-                    )}
+                    <CircleCheck size={24} />
                 </div>
                 <span className={styles.label}>{t('tasks')}</span>
             </button>

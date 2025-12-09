@@ -1,5 +1,5 @@
 .container {
-    padding: calc(46px + env(safe-area-inset-top)) 24px 120px;
+    padding: calc(54px + env(safe-area-inset-top)) 24px 120px;
     /* More padding for bottom nav */
     max-width: 800px;
     /* Wider */
