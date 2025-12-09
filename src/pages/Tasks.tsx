@@ -5,8 +5,8 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
-import type { Task, Status, Priority } from '../types';
+import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Settings } from 'lucide-react';
+import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
 import formStyles from '../components/ui/Form.module.css';
@@ -118,7 +118,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 );
 
 export const Tasks: React.FC = () => {
-    const { tasks, addTask, updateTask, deleteTask, projects, addProject, deleteProject, clients, addClient } = useStore();
+    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient } = useStore();
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -238,20 +238,41 @@ export const Tasks: React.FC = () => {
 
     const [isNewListModalOpen, setIsNewListModalOpen] = useState(false);
     const [newListName, setNewListName] = useState('');
+    const [editingList, setEditingList] = useState<Project | null>(null);
+    const [listStatus, setListStatus] = useState<Status>('in-progress');
 
     const handleAddList = () => {
+        setEditingList(null);
         setNewListName('');
+        setListStatus('in-progress');
         setIsNewListModalOpen(true);
     };
 
-    const handleCreateList = (e: React.FormEvent) => {
+    const handleEditList = () => {
+        const projectToEdit = projects.find(p => p.id === activeTab);
+        if (projectToEdit) {
+            setEditingList(projectToEdit);
+            setNewListName(projectToEdit.title);
+            setListStatus(projectToEdit.status);
+            setIsNewListModalOpen(true);
+        }
+    };
+
+    const handleSaveList = (e: React.FormEvent) => {
         e.preventDefault();
         if (newListName.trim()) {
-            addProject({
-                title: newListName.trim(),
-                description: '',
-                status: 'in-progress'
-            });
+            if (editingList) {
+                updateProject(editingList.id, {
+                    title: newListName.trim(),
+                    status: listStatus
+                });
+            } else {
+                addProject({
+                    title: newListName.trim(),
+                    description: '',
+                    status: 'in-progress'
+                });
+            }
             setIsNewListModalOpen(false);
         }
     };
@@ -281,9 +302,14 @@ export const Tasks: React.FC = () => {
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <h1 className={styles.title}>{t('tasks')}</h1>
                     {activeTab !== 'all' && (
-                        <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8, position: 'absolute', right: 0 }}>
-                            <Trash2 size={20} />
-                        </button>
+                        <div style={{ position: 'absolute', right: 0, display: 'flex', gap: 12 }}>
+                            <button onClick={handleEditList} style={{ color: 'var(--color-text-primary)', opacity: 0.6 }}>
+                                <Settings size={20} />
+                            </button>
+                            <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8 }}>
+                                <Trash2 size={20} />
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -585,21 +611,41 @@ export const Tasks: React.FC = () => {
             <Modal
                 isOpen={isNewListModalOpen}
                 onClose={() => setIsNewListModalOpen(false)}
-                title="Новый список"
+                title={editingList ? 'Редактировать список' : 'Новый список'}
             >
-                <form onSubmit={handleCreateList}>
+                <form onSubmit={handleSaveList}>
                     <div className={formStyles.inputGroup}>
                         <input
                             className={formStyles.input}
                             value={newListName}
                             onChange={(e) => setNewListName(e.target.value)}
-                            placeholder="Название списка, например 'Работа'"
+                            placeholder="Название списка"
                             autoFocus
                             required
                         />
                     </div>
-                    <button type="submit" className={formStyles.submitBtn} style={{ marginTop: 16 }}>
-                        Создать список
+
+                    {editingList && (
+                        <div style={{ marginTop: 20 }}>
+                            <label className={formStyles.label} style={{ marginBottom: 10, display: 'block' }}>Статус</label>
+                            <div className={extraStyles.statusContainer} style={{ marginTop: 0 }}>
+                                {['in-progress', 'on-hold', 'completed'].map((s) => (
+                                    <button
+                                        key={s}
+                                        type="button"
+                                        className={`${styles.filterChip} ${listStatus === s ? styles.activeChip : ''}`}
+                                        style={{ padding: '8px 12px', fontSize: 13 }}
+                                        onClick={() => setListStatus(s as Status)}
+                                    >
+                                        {getStatusLabel(s as Status)}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    <button type="submit" className={formStyles.submitBtn} style={{ marginTop: 24 }}>
+                        {editingList ? 'Сохранить' : 'Создать'}
                     </button>
                 </form>
             </Modal>
