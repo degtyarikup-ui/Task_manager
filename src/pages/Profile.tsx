@@ -20,7 +20,7 @@ import styles from './Profile.module.css';
 import avatarImg from '../assets/avatar.png';
 
 export const Profile: React.FC = () => {
-    const { tasks, projects, clients, theme, toggleTheme, language, toggleLanguage } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage } = useStore();
     const { t } = useTranslation();
 
     // Calculated Statistics
