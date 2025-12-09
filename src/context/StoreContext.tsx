@@ -23,7 +23,7 @@ interface StoreContextType extends AppState {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'crm_data_v1';
+
 
 // Initial state for offline/first load
 const initialState: AppState = {
