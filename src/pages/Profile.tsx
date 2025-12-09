@@ -8,9 +8,14 @@ import {
     Globe,
     LogOut,
     Trash2,
-    ChevronRight
+    ChevronRight,
+    Heart,
+    Copy,
+    Check,
+    Wallet
 } from 'lucide-react';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { Modal } from '../components/Modal';
 import styles from './Profile.module.css';
 import avatarImg from '../assets/avatar.png';
 
@@ -57,6 +62,22 @@ export const Profile: React.FC = () => {
         isDestructive: false,
         isAlert: false
     });
+
+    const [isDonateOpen, setIsDonateOpen] = useState(false);
+    const [isCopied, setIsCopied] = useState(false);
+
+    // Адрес USDT (TON)
+    const WALLET_ADDRESS = 'UQAK0pJdd3kOfQ5XWuiYODbTdNtKxpSnHV3BFdEp2SyswJ-r';
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(WALLET_ADDRESS);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    const handleOpenWallet = () => {
+        window.open(`ton://transfer/${WALLET_ADDRESS}`, '_blank');
+    };
 
     const handleClearData = () => {
         setConfirmConfig({
@@ -119,8 +140,18 @@ export const Profile: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
+                    <button className={styles.menuItem} onClick={() => setIsDonateOpen(true)}>
+                        <div className={styles.menuIcon} style={{ color: '#FF2D55' }}>
+                            <Heart size={20} />
+                        </div>
+                        <div className={styles.menuLabel}>{t('donate')}</div>
+                        <ChevronRight size={16} className={styles.menuValue} />
+                    </button>
+
                     <button className={styles.menuItem} onClick={toggleTheme}>
-                        <Moon size={20} className={styles.menuIcon} />
+                        <div className={styles.menuIcon}>
+                            <Moon size={20} />
+                        </div>
                         <span className={styles.menuLabel}>{t('theme')}</span>
                         <span className={styles.menuValue}>
                             {theme === 'light' ? t('light') : t('dark')} <ChevronRight size={16} />
@@ -174,6 +205,86 @@ export const Profile: React.FC = () => {
                 }}
                 onCancel={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
             />
+
+            <Modal
+                isOpen={isDonateOpen}
+                onClose={() => setIsDonateOpen(false)}
+                title={t('donateTitle')}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', textAlign: 'center' }}>
+                    <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #FF9500 0%, #FF2D55 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        marginBottom: '8px'
+                    }}>
+                        <Heart size={32} fill="white" />
+                    </div>
+
+                    <p style={{ fontSize: '15px', lineHeight: '1.5', color: 'var(--color-text-secondary)' }}>
+                        {t('donateMessage')}
+                    </p>
+
+                    <div style={{
+                        width: '100%',
+                        padding: '12px',
+                        background: 'var(--bg-input)',
+                        borderRadius: '12px',
+                        fontSize: '13px',
+                        fontFamily: 'monospace',
+                        wordBreak: 'break-all',
+                        color: 'var(--color-text-primary)'
+                    }}>
+                        {WALLET_ADDRESS}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                        <button
+                            onClick={handleCopy}
+                            style={{
+                                flex: 1,
+                                height: '44px',
+                                borderRadius: '12px',
+                                background: isCopied ? 'var(--color-success)' : 'var(--bg-chip)',
+                                color: isCopied ? 'white' : 'var(--color-text-primary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                fontWeight: 500,
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            {isCopied ? <Check size={18} /> : <Copy size={18} />}
+                            {isCopied ? t('copied') : t('copyAddress')}
+                        </button>
+
+                        <button
+                            onClick={handleOpenWallet}
+                            style={{
+                                flex: 1,
+                                height: '44px',
+                                borderRadius: '12px',
+                                background: 'var(--color-accent)',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                fontWeight: 500
+                            }}
+                        >
+                            <Wallet size={18} />
+                            Wallet
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

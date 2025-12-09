@@ -92,6 +92,13 @@ export const translations = {
         clearDataMessage: 'Вы уверены, что хотите удалить все данные приложения? Это действие нельзя отменить.',
         logout: 'Выйти',
         version: 'Версия',
+        support: 'Поддержка',
+        donate: 'Поддержать проект',
+        donateTitle: 'Поддержка разработчика',
+        donateMessage: 'Внесите вклад в развитие приложения, отправив USDT (TON).',
+        copyAddress: 'Скопировать адрес',
+        copied: 'Скопировано!',
+        donateViaCryptoBot: 'Отправить через Wallet',
 
         // Modal Actions
         create: 'Создать',
@@ -206,6 +213,13 @@ export const translations = {
         clearDataMessage: 'Are you sure you want to delete all application data? This action cannot be undone.',
         logout: 'Log Out',
         version: 'Version',
+        support: 'Support',
+        donate: 'Support Project',
+        donateTitle: 'Support Developer',
+        donateMessage: 'Contribute to the app development by sending USDT (TON).',
+        copyAddress: 'Copy Address',
+        copied: 'Copied!',
+        donateViaCryptoBot: 'Send via Wallet',
 
         // Modal Actions
         create: 'Create',
