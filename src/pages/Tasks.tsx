@@ -386,9 +386,14 @@ export const Tasks: React.FC = () => {
                     <button
                         className={styles.filterChip}
                         onClick={handleAddList}
-                        style={{ whiteSpace: 'nowrap' }}
+                        style={{
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--color-text-primary)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                            whiteSpace: 'nowrap'
+                        }}
                     >
-                        {t('createList')}
+                        + {t('createList')}
                     </button>
                 </div>
             </header>

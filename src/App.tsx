@@ -15,6 +15,7 @@ function AppContent() {
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
       tg.expand();
+      setTimeout(() => tg.expand(), 100);
       tg.ready();
     }
   }, []); // Run once on mount
