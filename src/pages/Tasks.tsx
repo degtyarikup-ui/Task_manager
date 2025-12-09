@@ -93,17 +93,20 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
                 {/* Priority Badge Removed */}
 
                 {task.client && (
-                    <span className={extraStyles.metaBadge}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', marginTop: 6, marginRight: 6 }}>
                         <div style={{
-                            width: 14, height: 14, borderRadius: '50%',
+                            width: 22, height: 22, borderRadius: '50%',
                             background: generateAvatarColor(task.client),
-                            color: 'white', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            marginRight: 4, flexShrink: 0, fontWeight: 'bold'
+                            color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0, fontWeight: 'bold',
+                            marginRight: 6
                         }}>
                             {getInitials(task.client)}
                         </div>
-                        {task.client}
-                    </span>
+                        <span className={extraStyles.metaBadge} style={{ marginTop: 0, marginRight: 0 }}>
+                            {task.client}
+                        </span>
+                    </div>
                 )}
                 <span className={extraStyles.metaBadge}>
                     {getStatusIcon(task.status, 10)}

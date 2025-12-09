@@ -130,10 +130,10 @@
 .metaBadge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 10px;
+    border-radius: 50px;
     background: var(--bg-input);
     /* Используем переменную вместо #F2F2F7 */
     color: var(--color-text-secondary);
