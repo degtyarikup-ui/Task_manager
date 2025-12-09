@@ -68,6 +68,7 @@ export const Profile: React.FC = () => {
 
     // Адрес USDT (TON)
     const WALLET_ADDRESS = 'UQAK0pJdd3kOfQ5XWuiYODbTdNtKxpSnHV3BFdEp2SyswJ-r';
+    const SUPPORT_LINK = 'https://t.me/sergei_degtyarik';
 
     const handleCopy = () => {
         navigator.clipboard.writeText(WALLET_ADDRESS);
@@ -77,6 +78,10 @@ export const Profile: React.FC = () => {
 
     const handleOpenWallet = () => {
         window.open(`ton://transfer/${WALLET_ADDRESS}`, '_blank');
+    };
+
+    const handleSupport = () => {
+        window.open(SUPPORT_LINK, '_blank');
     };
 
     const handleClearData = () => {
@@ -140,6 +145,13 @@ export const Profile: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
+                    <button className={styles.menuItem} onClick={handleSupport}>
+                        <div className={styles.menuIcon} style={{ color: '#007AFF' }}>
+                            <HelpCircle size={20} />
+                        </div>
+                        <div className={styles.menuLabel}>{t('support')}</div>
+                        <ChevronRight size={16} className={styles.menuValue} />
+                    </button>
                     <button className={styles.menuItem} onClick={() => setIsDonateOpen(true)}>
                         <div className={styles.menuIcon} style={{ color: '#FF2D55' }}>
                             <Heart size={20} />
