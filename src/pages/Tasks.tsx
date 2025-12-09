@@ -393,7 +393,7 @@ export const Tasks: React.FC = () => {
                             whiteSpace: 'nowrap'
                         }}
                     >
-                        + {t('createList')}
+                        {t('createList')}
                     </button>
                 </div>
             </header>

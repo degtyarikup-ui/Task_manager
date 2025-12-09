@@ -14,6 +14,9 @@ function AppContent() {
     // @ts-ignore
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
+      if (tg.platform) {
+        document.body.classList.add(`platform-${tg.platform}`);
+      }
       tg.expand();
       setTimeout(() => tg.expand(), 100);
       tg.ready();

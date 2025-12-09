@@ -1,5 +1,13 @@
 .container {
-    padding: 40px 24px 120px;
+    padding: 24px 24px 120px;
+}
+
+:global(.platform-ios) .container {
+    padding-top: 12px;
+}
+
+:global(.platform-android) .container {
+    padding-top: 60px;
     /* Увеличен нижний отступ */
     max-width: 600px;
     margin: 0 auto;
