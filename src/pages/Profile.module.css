@@ -1,5 +1,10 @@
 .container {
     padding: 24px 24px 120px;
+    max-width: 600px;
+    margin: 0 auto;
+    min-height: 100%;
+    box-sizing: border-box;
+    animation: fadeIn 0.4s ease;
 }
 
 :global(.platform-ios) .container {
@@ -8,11 +13,6 @@
 
 :global(.platform-android) .container {
     padding-top: 60px;
-    /* Увеличен нижний отступ */
-    max-width: 600px;
-    margin: 0 auto;
-    min-height: 100vh;
-    animation: fadeIn 0.4s ease;
 }
 
 .header {
