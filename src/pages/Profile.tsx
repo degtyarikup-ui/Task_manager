@@ -12,7 +12,8 @@ import {
     Heart,
     Copy,
     Check,
-    Wallet
+    Wallet,
+    HelpCircle
 } from 'lucide-react';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Modal } from '../components/Modal';
