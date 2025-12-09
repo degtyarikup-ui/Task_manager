@@ -225,7 +225,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 priority: data.priority,
                 deadline: data.deadline,
                 client: data.client,
-                project_id: data.projectId
+                project_id: data.projectId || null
             })
             .select()
             .single();
@@ -253,7 +253,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (data.priority !== undefined) updateData.priority = data.priority;
         if (data.deadline !== undefined) updateData.deadline = data.deadline;
         if (data.client !== undefined) updateData.client = data.client;
-        if (data.projectId !== undefined) updateData.project_id = data.projectId;
+        if (data.projectId !== undefined) updateData.project_id = data.projectId || null;
 
         await supabase.from('tasks').update(updateData).eq('id', id);
     };

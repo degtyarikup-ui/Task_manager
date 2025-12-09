@@ -7,9 +7,10 @@ import { Plus } from 'lucide-react';
 import styles from './Clients.module.css';
 import formStyles from '../components/ui/Form.module.css';
 import type { Client } from '../types';
+import { generateAvatarColor, getInitials } from '../utils/colors';
 
 export const Clients: React.FC = () => {
-    const { clients, addClient, updateClient, deleteClient, language } = useStore(); // Added updateClient
+    const { clients, addClient, updateClient, deleteClient, language } = useStore();
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -28,17 +29,26 @@ export const Clients: React.FC = () => {
         isAlert: false
     });
 
-    // Generate initials from name
-    const getInitials = (name: string) => {
-        return name
-            .split(' ')
-            .map(n => n[0])
-            .slice(0, 2)
-            .join('')
-            .toUpperCase();
-    };
+    // Removed local getInitials
 
     const getClientCountLabel = (count: number) => {
+        // ...
+        // ... inside map
+        {
+            clients.map(client => (
+                <div
+                    key={client.id}
+                    className={styles.card}
+                    onClick={() => handleEdit(client)}
+                >
+                    <div className={styles.avatar} style={{ background: generateAvatarColor(client.name), color: 'white' }}>
+                        {getInitials(client.name)}
+                    </div>
+                    <div className={styles.name}>{client.name}</div>
+                    {client.contact && <div className={styles.contact}>{client.contact}</div>}
+                </div>
+            ))
+        }
         if (language !== 'ru') {
             return count === 1 ? t('clientsCount') : t('clientsCount2');
         }

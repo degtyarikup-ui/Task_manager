@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
+import { generateAvatarColor, getInitials } from '../utils/colors';
 import { Modal } from '../components/Modal';
 import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
 import type { Task, Status, Priority } from '../types';
@@ -92,7 +93,14 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 
                 {task.client && (
                     <span className={extraStyles.metaBadge}>
-                        <User size={10} />
+                        <div style={{
+                            width: 14, height: 14, borderRadius: '50%',
+                            background: generateAvatarColor(task.client),
+                            color: 'white', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            marginRight: 4, flexShrink: 0, fontWeight: 'bold'
+                        }}>
+                            {getInitials(task.client)}
+                        </div>
                         {task.client}
                     </span>
                 )}
@@ -390,7 +398,18 @@ export const Tasks: React.FC = () => {
                             className={`${extraStyles.toolBtn} ${activeTool === 'client' ? extraStyles.active : ''} `}
                             onClick={() => toggleTool('client')}
                         >
-                            <User size={18} className={extraStyles.toolIcon} />
+                            {formData.client ? (
+                                <div style={{
+                                    width: 18, height: 18, borderRadius: '50%',
+                                    background: generateAvatarColor(formData.client),
+                                    color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    marginRight: 6, fontWeight: 'bold', flexShrink: 0
+                                }}>
+                                    {getInitials(formData.client)}
+                                </div>
+                            ) : (
+                                <User size={18} className={extraStyles.toolIcon} />
+                            )}
                             {formData.client || 'Клиент'}
                         </button>
 
@@ -451,7 +470,14 @@ export const Tasks: React.FC = () => {
                                             setActiveTool(null);
                                         }}
                                     >
-                                        <User size={14} style={{ marginRight: 6 }} />
+                                        <div style={{
+                                            width: 16, height: 16, borderRadius: '50%',
+                                            background: generateAvatarColor(c.name),
+                                            color: 'white', fontSize: 8, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            marginRight: 6, fontWeight: 'bold', flexShrink: 0
+                                        }}>
+                                            {getInitials(c.name)}
+                                        </div>
                                         {c.name}
                                     </button>
                                 ))}
