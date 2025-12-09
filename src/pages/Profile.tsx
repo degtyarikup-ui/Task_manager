@@ -78,11 +78,25 @@ export const Profile: React.FC = () => {
     };
 
     const handleOpenWallet = () => {
-        window.open(`ton://transfer/${WALLET_ADDRESS}`, '_blank');
+        const link = `https://app.tonkeeper.com/transfer/${WALLET_ADDRESS}`;
+        // @ts-ignore
+        const tg = window.Telegram?.WebApp;
+
+        if (tg && tg.openLink) {
+            tg.openLink(link);
+        } else {
+            window.open(link, '_blank');
+        }
     };
 
     const handleSupport = () => {
-        window.open(SUPPORT_LINK, '_blank');
+        // @ts-ignore
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(SUPPORT_LINK);
+        } else {
+            window.open(SUPPORT_LINK, '_blank');
+        }
     };
 
     const handleClearData = () => {
