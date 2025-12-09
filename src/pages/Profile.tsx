@@ -4,7 +4,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { getTelegramUser } from '../utils/telegram';
 import {
     Moon,
-    Bell,
+
     Globe,
     Trash2,
     ChevronRight,
@@ -181,13 +181,7 @@ export const Profile: React.FC = () => {
                             {theme === 'light' ? t('light') : t('dark')} <ChevronRight size={16} />
                         </span>
                     </button>
-                    <button className={styles.menuItem}>
-                        <Bell size={20} className={styles.menuIcon} />
-                        <span className={styles.menuLabel}>{t('notifications')}</span>
-                        <span className={styles.menuValue}>
-                            {t('on')} <ChevronRight size={16} />
-                        </span>
-                    </button>
+
                     <button className={styles.menuItem} onClick={toggleLanguage}>
                         <Globe size={20} className={styles.menuIcon} />
                         <span className={styles.menuLabel}>{t('language')}</span>
