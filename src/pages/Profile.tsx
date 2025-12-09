@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { ConfirmModal } from '../components/ConfirmModal';
 import styles from './Profile.module.css';
+import avatarImg from '../assets/avatar.png';
 
 export const Profile: React.FC = () => {
     const { tasks, projects, clients, theme, toggleTheme, language, toggleLanguage } = useStore();
@@ -79,8 +80,13 @@ export const Profile: React.FC = () => {
 
             {/* Profile Header */}
             <div className={styles.profileCard}>
-                <div className={styles.avatar} style={{ background: user.gradient }}>
-                    {user.initials}
+                <div
+                    className={styles.avatar}
+                    style={{
+                        background: user?.gradient || 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)'
+                    }}
+                >
+                    <img src={avatarImg} className={styles.avatarImage} alt="Profile" />
                 </div>
                 <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.name}</div>

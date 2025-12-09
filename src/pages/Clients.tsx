@@ -9,7 +9,7 @@ import formStyles from '../components/ui/Form.module.css';
 import type { Client } from '../types';
 
 export const Clients: React.FC = () => {
-    const { clients, addClient, updateClient, deleteClient } = useStore(); // Added updateClient
+    const { clients, addClient, updateClient, deleteClient, language } = useStore(); // Added updateClient
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -36,6 +36,18 @@ export const Clients: React.FC = () => {
             .slice(0, 2)
             .join('')
             .toUpperCase();
+    };
+
+    const getClientCountLabel = (count: number) => {
+        if (language !== 'ru') {
+            return count === 1 ? t('clientsCount') : t('clientsCount2');
+        }
+        // Russian Pluralization
+        const lastDigit = count % 10;
+        const lastTwoDigits = count % 100;
+        if (lastDigit === 1 && lastTwoDigits !== 11) return t('clientsCount');
+        if ([2, 3, 4].includes(lastDigit) && ![12, 13, 14].includes(lastTwoDigits)) return t('clientsCount2');
+        return t('clientsCount5');
     };
 
     const handleEdit = (client: Client) => {
@@ -76,8 +88,8 @@ export const Clients: React.FC = () => {
     const handleDelete = (id: string, name: string) => {
         setConfirmConfig({
             isOpen: true,
-            title: 'Удалить клиента?',
-            message: `Вы уверены, что хотите удалить клиента "${name}"?`,
+            title: t('deleteClient'),
+            message: `${t('deleteClientConfirm')} "${name}"?`,
             onConfirm: () => {
                 deleteClient(id);
                 // If we were editing this one, close modal
@@ -91,8 +103,8 @@ export const Clients: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1 className={styles.title}>Клиенты</h1>
-                <p className={styles.subtitle}>{clients.length} {clients.length === 1 ? 'клиент' : 'клиентов'}</p>
+                <h1 className={styles.title}>{t('clients')}</h1>
+                <p className={styles.subtitle}>{clients.length} {getClientCountLabel(clients.length)}</p>
             </header>
 
             <div className={styles.grid}>
@@ -123,32 +135,32 @@ export const Clients: React.FC = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={editingId ? "Редактировать" : "Новый клиент"}
+                title={editingId ? t('edit') : t('newClientBtn')}
             >
                 <form onSubmit={handleSubmit}>
                     <div className={formStyles.inputGroup}>
-                        <label className={formStyles.label}>Имя / Компания</label>
+                        <label className={formStyles.label}>{t('clientNameCompany')}</label>
                         <input
                             className={formStyles.input}
                             value={formData.name}
                             onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            placeholder="Например: ООО Ромашка"
+                            placeholder={t('newClient')} // "Например..." заменил на "New client..." или можно добавить ключ "example"
                             autoFocus
                             required
                         />
                     </div>
                     <div className={formStyles.inputGroup}>
-                        <label className={formStyles.label}>Контакты</label>
+                        <label className={formStyles.label}>{t('contacts')}</label>
                         <input
                             className={formStyles.input}
                             value={formData.contact}
                             onChange={e => setFormData({ ...formData, contact: e.target.value })}
-                            placeholder="Телефон, email или telegram"
+                            placeholder={t('contactPlaceholder')}
                         />
                     </div>
 
                     <button type="submit" className={formStyles.submitBtn}>
-                        Сохранить
+                        {t('save')}
                     </button>
 
                     {editingId && (
@@ -165,7 +177,7 @@ export const Clients: React.FC = () => {
                             }}
                             onClick={() => handleDelete(editingId, formData.name || '')}
                         >
-                            Удалить клиента
+                            {t('deleteClient')}
                         </button>
                     )}
                 </form>
@@ -183,6 +195,6 @@ export const Clients: React.FC = () => {
                 }}
                 onCancel={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
             />
-        </div>
+        </div >
     );
 };

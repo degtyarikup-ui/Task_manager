@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { Modal } from '../components/Modal';
 import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
 import type { Task, Status, Priority } from '../types';
@@ -109,6 +110,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 
 export const Tasks: React.FC = () => {
     const { tasks, addTask, updateTask, deleteTask, projects, addProject, deleteProject, clients, addClient } = useStore();
+    const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -251,8 +253,8 @@ export const Tasks: React.FC = () => {
         const projectToDelete = projects.find(p => p.id === activeTab);
         setConfirmConfig({
             isOpen: true,
-            title: 'Удалить список?',
-            message: `Вы уверены, что хотите удалить список "${projectToDelete?.title}" и все задачи в нем?`,
+            title: t('deleteList'),
+            message: `${t('deleteListConfirm')} "${projectToDelete?.title}"? ${t('deleteListMessage')}`,
             onConfirm: () => {
                 deleteProject(activeTab);
                 setActiveTab('all');
@@ -266,7 +268,7 @@ export const Tasks: React.FC = () => {
         <div className={styles.container}>
             <header className={styles.header}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                    <h1 className={styles.title}>Задачи</h1>
+                    <h1 className={styles.title}>{t('tasks')}</h1>
                     {activeTab !== 'all' && (
                         <button onClick={handleDeleteList} style={{ color: '#FF3B30', opacity: 0.8 }}>
                             <Trash2 size={20} />
@@ -281,7 +283,7 @@ export const Tasks: React.FC = () => {
                         onClick={() => setActiveTab('all')}
                         style={{ whiteSpace: 'nowrap' }}
                     >
-                        Все
+                        {t('all')}
                     </button>
 
                     {/* Project Tabs */}
@@ -300,7 +302,7 @@ export const Tasks: React.FC = () => {
                         onClick={handleAddList}
                         style={{ whiteSpace: 'nowrap' }}
                     >
-                        + Создать список
+                        {t('createList')}
                     </button>
                 </div>
             </header>
@@ -308,8 +310,8 @@ export const Tasks: React.FC = () => {
             <div className={styles.taskList}>
                 {filteredTasks.length === 0 ? (
                     <div className={styles.emptyState}>
-                        <p>Задач нет</p>
-                        <small>Нажмите +, чтобы добавить</small>
+                        <p>{t('noTasks')}</p>
+                        <small>{t('clickToAdd')}</small>
                     </div>
                 ) : (
                     filteredTasks.map(task => <TaskItem
