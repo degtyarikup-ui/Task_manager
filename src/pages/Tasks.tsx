@@ -547,17 +547,32 @@ export const Tasks: React.FC = () => {
                                     <button
                                         key={c.id}
                                         type="button"
-                                        className={`${styles.filterChip} ${formData.client === c.name ? styles.activeChip : ''}`}
                                         onClick={() => {
                                             setFormData({ ...formData, client: c.name });
                                             setActiveTool(null);
                                         }}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 10,
+                                            padding: '4px 16px 4px 4px',
+                                            borderRadius: 100,
+                                            border: formData.client === c.name ? '1px solid var(--color-text-primary)' : '1px solid var(--color-border)',
+                                            backgroundColor: 'transparent',
+                                            color: 'var(--color-text-primary)',
+                                            fontSize: 15,
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            flexShrink: 0
+                                        }}
                                     >
                                         <div style={{
-                                            width: 24, height: 24, borderRadius: '50%',
+                                            width: 32, height: 32, borderRadius: '50%',
                                             background: generateAvatarColor(c.name),
-                                            color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            marginRight: 8, fontWeight: 'bold', flexShrink: 0
+                                            color: 'white', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            flexShrink: 0,
+                                            fontWeight: 'bold'
                                         }}>
                                             {getInitials(c.name)}
                                         </div>
