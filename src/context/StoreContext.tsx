@@ -129,19 +129,32 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const loadData = async () => {
             setIsLoading(true);
             try {
-                // Fetch all data in parallel for faster loading
-                const [projectsRes, clientsRes, tasksRes] = await Promise.all([
-                    supabase.from('projects').select('*').eq('user_id', userId),
-                    supabase.from('clients').select('*').eq('user_id', userId),
-                    supabase.from('tasks').select('*').eq('user_id', userId)
-                ]);
+                // Fetch Projects
+                const { data: projectsData, error: projError } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .eq('user_id', userId);
 
-                if (projectsRes.error) console.error('Error fetching projects:', projectsRes.error);
-                if (clientsRes.error) console.error('Error fetching clients:', clientsRes.error);
-                if (tasksRes.error) console.error('Error fetching tasks:', tasksRes.error);
+                if (projError) console.error('Error fetching projects:', projError);
+
+                // Fetch Clients
+                const { data: clientsData, error: clientError } = await supabase
+                    .from('clients')
+                    .select('*')
+                    .eq('user_id', userId);
+
+                if (clientError) console.error('Error fetching clients:', clientError);
+
+                // Fetch Tasks
+                const { data: tasksData, error: taskError } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('user_id', userId);
+
+                if (taskError) console.error('Error fetching tasks:', taskError);
 
                 // Map DB types to App types
-                const projects: Project[] = (projectsRes.data || []).map((p: DatabaseProject) => ({
+                const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => ({
                     id: p.id,
                     title: p.title,
                     description: p.description || '',
@@ -149,13 +162,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     createdAt: new Date(p.created_at).getTime()
                 }));
 
-                const clients: Client[] = (clientsRes.data || []).map((c: DatabaseClient) => ({
+                const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
                     id: c.id,
                     name: c.name,
                     contact: c.contact || ''
                 }));
 
-                const tasks: Task[] = (tasksRes.data || []).map((t: DatabaseTask) => {
+                const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
                     let subtasks = [];
                     try {
                         if (t.description && t.description.startsWith('[')) {
