@@ -788,7 +788,7 @@ export const Tasks: React.FC = () => {
                             className={formStyles.input}
                             value={newListName}
                             onChange={(e) => setNewListName(e.target.value)}
-                            placeholder="Название списка"
+                            placeholder={t('listName') || 'List Name'}
                             autoFocus
                             required
                         />
@@ -820,7 +820,7 @@ export const Tasks: React.FC = () => {
                                     handleDeleteList(editingList.id);
                                 }}
                             >
-                                Удалить список
+                                {t('deleteList') || 'Delete List'}
                             </button>
                         )}
                     </div>
