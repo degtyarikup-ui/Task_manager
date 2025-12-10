@@ -158,19 +158,27 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     contact: c.contact || ''
                 }));
 
-                const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => ({
-                    id: t.id,
-                    title: t.title,
-                    // description: t.description || '', // Removed
-                    subtasks: [], // Init empty, no DB support yet
-                    status: t.status as Status,
-                    priority: t.priority as Priority,
-                    deadline: t.deadline || '',
-                    client: t.client || '',
-                    projectId: t.project_id || undefined,
-                    createdAt: new Date(t.created_at).getTime(),
-                    updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
-                }));
+                const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
+                    let subtasks = [];
+                    try {
+                        if (t.description && t.description.startsWith('[')) {
+                            subtasks = JSON.parse(t.description);
+                        }
+                    } catch (e) { }
+
+                    return {
+                        id: t.id,
+                        title: t.title,
+                        subtasks: subtasks,
+                        status: t.status as Status,
+                        priority: t.priority as Priority,
+                        deadline: t.deadline || '',
+                        client: t.client || '',
+                        projectId: t.project_id || undefined,
+                        createdAt: new Date(t.created_at).getTime(),
+                        updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
+                    };
+                });
 
                 setState(prev => ({
                     ...prev,
@@ -288,7 +296,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             .insert({
                 user_id: userId,
                 title: data.title,
-                // description: data.description,
+                description: JSON.stringify(data.subtasks || []),
                 status: data.status,
                 priority: data.priority,
                 deadline: data.deadline,
@@ -316,8 +324,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         const updateData: any = {};
         if (data.title !== undefined) updateData.title = data.title;
-        if (data.title !== undefined) updateData.title = data.title;
-        // if (data.description !== undefined) updateData.description = data.description;
+        if (data.subtasks !== undefined) updateData.description = JSON.stringify(data.subtasks);
         if (data.status !== undefined) updateData.status = data.status;
         if (data.priority !== undefined) updateData.priority = data.priority;
         if (data.deadline !== undefined) updateData.deadline = data.deadline;
