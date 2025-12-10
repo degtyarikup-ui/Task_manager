@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check, X } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check, X, GripVertical } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -15,6 +16,7 @@ import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar'; // Alias to avoid conflict if any
 
 import { ConfirmModal } from '../components/ConfirmModal'; // Import custom modal
+import { Tooltip } from '../components/Tooltip';
 import { TaskItem } from '../components/TaskItem';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
@@ -31,6 +33,21 @@ export const Tasks: React.FC = () => {
     const locale = language === 'ru' ? ru : enUS;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+
+    useEffect(() => {
+        const hasSeenTooltip = localStorage.getItem('hasSeenOnboardingTooltip');
+        if (!hasSeenTooltip && tasks.length === 0) {
+            // Show after a short delay for effect
+            const timer = setTimeout(() => setShowTooltip(true), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [tasks.length]);
+
+    const handleDismissTooltip = () => {
+        setShowTooltip(false);
+        localStorage.setItem('hasSeenOnboardingTooltip', 'true');
+    };
 
     // Default to 'all'
     const [activeTab, setActiveTab] = useState<string>('all');
@@ -141,8 +158,19 @@ export const Tasks: React.FC = () => {
         setNewSubtaskTitle('');
         setEditingId(null);
         setActiveTool(null);
+        setActiveTool(null);
         setIsCalendarOpen(false); // Close calendar on form reset
     }
+
+    const onDragEnd = (result: DropResult) => {
+        if (!result.destination) return;
+
+        const items = Array.from(formData.subtasks || []);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+
+        setFormData(prev => ({ ...prev, subtasks: items }));
+    };
 
 
 
@@ -379,9 +407,20 @@ export const Tasks: React.FC = () => {
                 )}
             </div>
 
-            <button className={styles.fab} onClick={() => { resetForm(); setIsModalOpen(true); }}>
+            <button className={styles.fab} onClick={() => {
+                resetForm();
+                setIsModalOpen(true);
+                if (showTooltip) handleDismissTooltip();
+            }}>
                 <Plus size={28} />
             </button>
+
+            {showTooltip && (
+                <Tooltip
+                    message={t('onboardingTooltip') || 'Щелкните здесь, чтобы создать свою первую задачу.'}
+                    onDismiss={handleDismissTooltip}
+                />
+            )}
 
             {/* Task Edit/Create Modal */}
             <Modal
@@ -420,24 +459,85 @@ export const Tasks: React.FC = () => {
                                 <Plus size={20} />
                             </button>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {(formData.subtasks || []).map(sub => (
-                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleSubtaskValid(sub.id)}
-                                        className={`${styles.checkbox} ${sub.completed ? styles.checked : ''}`}
-                                        style={{ marginRight: 12, flexShrink: 0 }}
+                        <DragDropContext onDragEnd={onDragEnd}>
+                            <Droppable droppableId="subtasks">
+                                {(provided) => (
+                                    <div
+                                        {...provided.droppableProps}
+                                        ref={provided.innerRef}
+                                        style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
                                     >
-                                        {sub.completed && <Check size={14} color="white" />}
-                                    </button>
-                                    <span style={{ flex: 1, textDecoration: sub.completed ? 'line-through' : 'none', color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)' }}>{sub.title}</span>
-                                    <button type="button" onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-danger)' }}>
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                                        {(formData.subtasks || []).map((sub, index) => (
+                                            <Draggable key={sub.id} draggableId={sub.id} index={index}>
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            background: 'var(--bg-input)',
+                                                            padding: '8px 12px',
+                                                            borderRadius: 12,
+                                                            marginBottom: 8,
+                                                            ...provided.draggableProps.style
+                                                        }}
+                                                    >
+                                                        <div
+                                                            {...provided.dragHandleProps}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                marginRight: 10,
+                                                                color: 'var(--color-text-secondary)',
+                                                                cursor: 'grab',
+                                                                minWidth: 20,
+                                                                height: 20,
+                                                                touchAction: 'none'
+                                                            }}
+                                                        >
+                                                            <GripVertical size={18} />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => toggleSubtaskValid(sub.id)}
+                                                            className={`${styles.checkbox} ${sub.completed ? styles.checked : ''}`}
+                                                            style={{ marginRight: 12, flexShrink: 0 }}
+                                                        >
+                                                            {sub.completed && <Check size={14} color="white" />}
+                                                        </button>
+                                                        <span style={{
+                                                            flex: 1,
+                                                            textDecoration: sub.completed ? 'line-through' : 'none',
+                                                            color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)',
+                                                            fontSize: 15
+                                                        }}>
+                                                            {sub.title}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeSubtask(sub.id)}
+                                                            style={{
+                                                                background: 'none',
+                                                                border: 'none',
+                                                                padding: 4,
+                                                                color: 'var(--color-danger)',
+                                                                display: 'flex',
+                                                                alignItems: 'center'
+                                                            }}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
                     </div>
 
                     {/* Tools Row */}
@@ -509,195 +609,200 @@ export const Tasks: React.FC = () => {
 
                     {/* Dynamic Details Area */}
 
-                    {activeTool === 'status' && (
-                        <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>{t('taskStatus')}</label>
-                            <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
-                                {availableStatuses.map((s) => {
-                                    const isCustom = !['in-progress', 'on-hold', 'completed'].includes(s);
-                                    return (
-                                        <div key={s} style={{ position: 'relative' }}>
-                                            <button
-                                                type="button"
-                                                className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
-                                                onClick={() => {
-                                                    setFormData({ ...formData, status: s as Status });
-                                                    setActiveTool(null);
-                                                }}
-                                            >
-                                                {getStatusIcon(s as Status, 16)}
-                                                {getStatusLabel(s as Status, t)}
-                                            </button>
-                                            {isCustom && (
+                    {
+                        activeTool === 'status' && (
+                            <div style={{ marginTop: 24 }}>
+                                <label className={formStyles.label}>{t('taskStatus')}</label>
+                                <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
+                                    {availableStatuses.map((s) => {
+                                        const isCustom = !['in-progress', 'on-hold', 'completed'].includes(s);
+                                        return (
+                                            <div key={s} style={{ position: 'relative' }}>
                                                 <button
                                                     type="button"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (window.confirm(`${t('deleteStatusConfirm')} "${s}"?`)) {
-                                                            deleteCustomStatus(s);
-                                                        }
-                                                    }}
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: -6,
-                                                        right: -6,
-                                                        width: 20,
-                                                        height: 20,
-                                                        borderRadius: '50%',
-                                                        backgroundColor: 'var(--color-danger)',
-                                                        color: 'white',
-                                                        border: '2px solid var(--bg-card)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        cursor: 'pointer',
-                                                        zIndex: 10
+                                                    className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
+                                                    onClick={() => {
+                                                        setFormData({ ...formData, status: s as Status });
+                                                        setActiveTool(null);
                                                     }}
                                                 >
-                                                    <X size={12} />
+                                                    {getStatusIcon(s as Status, 16)}
+                                                    {getStatusLabel(s as Status, t)}
                                                 </button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                                <button
-                                    type="button"
-                                    className={extraStyles.optionChip}
-                                    style={{ borderStyle: 'dashed', opacity: 0.7 }}
-                                    onClick={() => {
-                                        const newStatus = prompt(t('newStatus'));
-                                        if (newStatus) addCustomStatus(newStatus);
-                                    }}
-                                >
-                                    <Plus size={16} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTool === 'client' && (
-                        <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>{t('client')}</label>
-
-                            {clients.length > 0 ? (
-                                <div style={{ marginBottom: 16 }}>
-                                    <div className={extraStyles.statusContainer} style={{ marginTop: 8, flexWrap: 'wrap' }}>
-                                        {clients.map((c) => (
-                                            <button
-                                                key={c.id}
-                                                type="button"
-                                                className={`${extraStyles.optionChip} ${formData.client === c.name ? extraStyles.active : ''}`}
-                                                onClick={() => {
-                                                    const newClient = formData.client === c.name ? '' : c.name;
-                                                    setFormData({ ...formData, client: newClient });
-                                                    setActiveTool(null);
-                                                }}
-                                            >
-                                                <div style={{
-                                                    width: 24, height: 24, borderRadius: '50%',
-                                                    background: generateAvatarColor(c.name),
-                                                    color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    flexShrink: 0,
-                                                    fontWeight: 'bold'
-                                                }}>
-                                                    {getInitials(c.name)}
-                                                </div>
-                                                {c.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : null}
-
-                            {/* Add New Client Inline */}
-                            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                                <input
-                                    type="text"
-                                    className={formStyles.input}
-                                    placeholder={t('newClient')}
-                                    id="new-client-input-tasks"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const target = e.currentTarget;
-                                            const val = target.value.trim();
-                                            if (val) {
-                                                addClient({ name: val, contact: '' });
-                                                setFormData({ ...formData, client: val });
-                                                target.value = '';
-                                                setActiveTool(null);
-                                            }
-                                        }
-                                    }}
-                                />
-                                <button
-                                    type="button"
-                                    style={{
-                                        width: '44px',
-                                        height: '44px',
-                                        borderRadius: '12px',
-                                        background: 'var(--color-accent)',
-                                        color: 'white',
-                                        border: 'none',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0
-                                    }}
-                                    onClick={() => {
-                                        const input = document.getElementById('new-client-input-tasks') as HTMLInputElement;
-                                        if (input) {
-                                            const val = input.value.trim();
-                                            if (val) {
-                                                addClient({ name: val, contact: '' });
-                                                setFormData({ ...formData, client: val });
-                                                input.value = '';
-                                                setActiveTool(null);
-                                            }
-                                        }
-                                    }}
-                                >
-                                    <Plus size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTool === 'list' && (
-                        <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>{t('list')}</label>
-                            <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
-                                {projects.map((p) => (
+                                                {isCustom && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (window.confirm(`${t('deleteStatusConfirm')} "${s}"?`)) {
+                                                                deleteCustomStatus(s);
+                                                            }
+                                                        }}
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: -6,
+                                                            right: -6,
+                                                            width: 20,
+                                                            height: 20,
+                                                            borderRadius: '50%',
+                                                            backgroundColor: 'var(--color-danger)',
+                                                            color: 'white',
+                                                            border: '2px solid var(--bg-card)',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            cursor: 'pointer',
+                                                            zIndex: 10
+                                                        }}
+                                                    >
+                                                        <X size={12} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                     <button
-                                        key={p.id}
                                         type="button"
-                                        className={styles.filterChip}
-                                        style={{
-                                            backgroundColor: (formData.projectId === p.id) || (!formData.projectId && activeTab === p.id) ? 'black' : '#f2f2f7',
-                                            color: (formData.projectId === p.id) || (!formData.projectId && activeTab === p.id) ? 'white' : 'black',
-                                        }}
+                                        className={extraStyles.addStatusBtn}
                                         onClick={() => {
-                                            setFormData({ ...formData, projectId: p.id });
-                                            setActiveTool(null);
+                                            const newStatus = prompt(t('newStatus'));
+                                            if (newStatus) addCustomStatus(newStatus);
                                         }}
                                     >
-                                        {p.title}
+                                        <Plus size={20} />
                                     </button>
-                                ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )
+                    }
+
+                    {
+                        activeTool === 'client' && (
+                            <div style={{ marginTop: 24 }}>
+                                <label className={formStyles.label}>{t('client')}</label>
+
+                                {clients.length > 0 ? (
+                                    <div style={{ marginBottom: 16 }}>
+                                        <div className={extraStyles.statusContainer} style={{ marginTop: 8, flexWrap: 'wrap' }}>
+                                            {clients.map((c) => (
+                                                <button
+                                                    key={c.id}
+                                                    type="button"
+                                                    className={`${extraStyles.optionChip} ${formData.client === c.name ? extraStyles.active : ''}`}
+                                                    onClick={() => {
+                                                        const newClient = formData.client === c.name ? '' : c.name;
+                                                        setFormData({ ...formData, client: newClient });
+                                                        setActiveTool(null);
+                                                    }}
+                                                >
+                                                    <div style={{
+                                                        width: 24, height: 24, borderRadius: '50%',
+                                                        background: generateAvatarColor(c.name),
+                                                        color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        flexShrink: 0,
+                                                        fontWeight: 'bold'
+                                                    }}>
+                                                        {getInitials(c.name)}
+                                                    </div>
+                                                    {c.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null}
+
+                                {/* Add New Client Inline */}
+                                <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                                    <input
+                                        type="text"
+                                        className={formStyles.input}
+                                        placeholder={t('newClient')}
+                                        id="new-client-input-tasks"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                const target = e.currentTarget;
+                                                const val = target.value.trim();
+                                                if (val) {
+                                                    addClient({ name: val, contact: '' });
+                                                    setFormData({ ...formData, client: val });
+                                                    target.value = '';
+                                                    setActiveTool(null);
+                                                }
+                                            }
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        style={{
+                                            width: '44px',
+                                            height: '44px',
+                                            borderRadius: '12px',
+                                            background: 'var(--color-accent)',
+                                            color: 'white',
+                                            border: 'none',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0
+                                        }}
+                                        onClick={() => {
+                                            const input = document.getElementById('new-client-input-tasks') as HTMLInputElement;
+                                            if (input) {
+                                                const val = input.value.trim();
+                                                if (val) {
+                                                    addClient({ name: val, contact: '' });
+                                                    setFormData({ ...formData, client: val });
+                                                    input.value = '';
+                                                    setActiveTool(null);
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        activeTool === 'list' && (
+                            <div style={{ marginTop: 24 }}>
+                                <label className={formStyles.label}>{t('list')}</label>
+                                <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
+                                    {projects.map((p) => (
+                                        <button
+                                            key={p.id}
+                                            type="button"
+                                            className={styles.filterChip}
+                                            style={{
+                                                backgroundColor: (formData.projectId === p.id) || (!formData.projectId && activeTab === p.id) ? 'black' : '#f2f2f7',
+                                                color: (formData.projectId === p.id) || (!formData.projectId && activeTab === p.id) ? 'white' : 'black',
+                                            }}
+                                            onClick={() => {
+                                                setFormData({ ...formData, projectId: p.id });
+                                                setActiveTool(null);
+                                            }}
+                                        >
+                                            {p.title}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    }
 
 
 
                     <button type="submit" className={styles.submitBtn}>
                         {t('save')}
                     </button>
-                </form>
-            </Modal>
+                </form >
+            </Modal >
 
             {/* New List Modal */}
-            <Modal
+            < Modal
                 isOpen={isNewListModalOpen}
                 onClose={() => setIsNewListModalOpen(false)}
                 title={editingList ? t('editList') || 'Редактировать список' : t('newList')}
@@ -745,7 +850,7 @@ export const Tasks: React.FC = () => {
                         )}
                     </div>
                 </form>
-            </Modal>
+            </Modal >
 
 
             <ConfirmModal

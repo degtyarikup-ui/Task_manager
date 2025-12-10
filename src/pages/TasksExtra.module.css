@@ -175,3 +175,25 @@
 .optionChip:active {
     transform: scale(0.98);
 }
+
+.addStatusBtn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px dashed var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    padding: 0;
+    /* Override default padding */
+}
+
+.addStatusBtn:active {
+    background-color: var(--bg-input);
+    transform: scale(0.96);
+}
