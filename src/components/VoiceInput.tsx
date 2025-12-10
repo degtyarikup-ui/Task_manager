@@ -95,13 +95,28 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
         }
 
         if (isListening) {
-            recognitionRef.current.stop();
+            try { recognitionRef.current.stop(); } catch (e) { }
             setIsListening(false);
         } else {
             setError(null);
-            recognitionRef.current.start();
-            setIsListening(true);
-            haptic.impact('light');
+            try {
+                // Force stop potential lingering instance
+                recognitionRef.current.abort();
+
+                // Small delay to allow cleanup
+                setTimeout(() => {
+                    try {
+                        recognitionRef.current.start();
+                        setIsListening(true);
+                        haptic.impact('light');
+                    } catch (e) {
+                        console.error('Start error:', e);
+                        setIsListening(false);
+                    }
+                }, 100);
+            } catch (e) {
+                console.error('Abort error:', e);
+            }
         }
     };
 
