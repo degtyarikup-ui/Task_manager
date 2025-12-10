@@ -21,6 +21,8 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
         try {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                if (!SpeechRecognition) return; // Exit if undefined
+
                 recognitionRef.current = new SpeechRecognition();
                 recognitionRef.current.continuous = false;
                 recognitionRef.current.interimResults = false;

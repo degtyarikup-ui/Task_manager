@@ -11,7 +11,7 @@ export const translations = {
         noTasks: 'Задач нет',
         clickToAdd: 'Нажмите +, чтобы добавить',
         newTask: 'Новая задача',
-        onboardingTooltip: 'Щелкните здесь, чтобы создать свою первую задачу.',
+        onboardingTooltip: 'Нажми здесь, чтобы создать свою первую задачу.',
         editTask: 'Редактировать',
         taskName: 'Название задачи',
         description: 'Описание',
