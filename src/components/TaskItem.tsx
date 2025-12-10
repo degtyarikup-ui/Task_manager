@@ -19,12 +19,12 @@ interface TaskItemProps {
 
 export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, isDeleting, locale, t }) => {
     const [offset, setOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
     const startX = React.useRef(0);
-    const isDragging = React.useRef(false);
 
     const onTouchStart = (e: React.TouchEvent) => {
         startX.current = e.touches[0].clientX;
-        isDragging.current = false;
+        setIsDragging(false);
     };
 
     const onTouchMove = (e: React.TouchEvent) => {
@@ -32,7 +32,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
         const diff = currentX - startX.current;
         if (diff < 0) {
             setOffset(Math.max(diff, -100));
-            if (Math.abs(diff) > 5) isDragging.current = true;
+            if (Math.abs(diff) > 5) setIsDragging(true);
         }
     };
 
@@ -44,7 +44,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
         } else {
             setOffset(0);
         }
-        setTimeout(() => { isDragging.current = false; }, 100);
+        setTimeout(() => { setIsDragging(false); }, 100);
     };
 
     const priorityColor = task.priority === 'high' ? '#FF3B30' : task.priority === 'medium' ? '#FF9500' : 'var(--color-border)';
@@ -63,11 +63,11 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
             </div>
 
             <div className={`${styles.taskCard} ${isDeleting ? styles.deleting : ''}`}
-                onClick={() => { if (!isDragging.current && offset === 0) onEdit(task); else setOffset(0); }}
+                onClick={() => { if (!isDragging && offset === 0) onEdit(task); else setOffset(0); }}
                 onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
                 style={{
                     transform: `translateX(${offset}px)`,
-                    transition: isDragging.current ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                    transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
                     marginBottom: 0,
                     background: 'var(--bg-card)',
                     position: 'relative',

@@ -136,6 +136,9 @@ export const Tasks: React.FC = () => {
         }
     };
 
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const [now] = useState(Date.now());
+
     const filteredTasks = tasks.filter(t => {
         // 1. Filter by Project Tab
         if (activeTab !== 'all' && t.projectId !== activeTab) return false;
@@ -143,8 +146,7 @@ export const Tasks: React.FC = () => {
         // 2. Hide completed tasks older than 24h (updatedAt)
         if (t.status === 'completed') {
             const lastUpdate = t.updatedAt || t.createdAt;
-            const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-            if (Date.now() - lastUpdate > ONE_DAY_MS) return false;
+            if (now - lastUpdate > ONE_DAY_MS) return false;
         }
 
         return true;

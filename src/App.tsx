@@ -12,7 +12,7 @@ function TelegramThemeHandler() {
   const { theme } = useStore();
 
   useEffect(() => {
-    // @ts-ignore
+
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
       if (tg.platform) {
@@ -25,7 +25,7 @@ function TelegramThemeHandler() {
   }, []); // Run once on mount
 
   useEffect(() => {
-    // @ts-ignore
+
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
       const color = theme === 'dark' ? '#000000' : '#F5F5F7';
@@ -70,14 +70,18 @@ function Layout() {
   );
 }
 
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 function App() {
   return (
-    <StoreProvider>
-      <TelegramThemeHandler />
-      <Router>
-        <Layout />
-      </Router>
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <TelegramThemeHandler />
+        <Router>
+          <Layout />
+        </Router>
+      </StoreProvider>
+    </ErrorBoundary>
   );
 }
 
