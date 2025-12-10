@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { Modal } from '../components/Modal';
@@ -12,6 +13,7 @@ import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-p
 import { haptic } from '../utils/haptics';
 
 export const Clients: React.FC = () => {
+    const navigate = useNavigate();
     const { clients, addClient, updateClient, deleteClient, reorderClients, language } = useStore();
 
     const onDragEnd = (result: DropResult) => {
@@ -171,7 +173,7 @@ export const Clients: React.FC = () => {
                                             {...provided.dragHandleProps}
                                             className={styles.card}
                                             onClick={() => {
-                                                if (!snapshot.isDragging) handleEdit(client);
+                                                if (!snapshot.isDragging) navigate(`/clients/${client.id}`);
                                             }}
                                             style={{
                                                 ...provided.draggableProps.style,

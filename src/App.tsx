@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/StoreContext';
 import styles from './App.module.css';
 import { Tasks } from './pages/Tasks';
 import { Clients } from './pages/Clients';
-import { BottomNav } from './components/BottomNav';
 import { Profile } from './pages/Profile';
+import { ClientDetails } from './pages/ClientDetails';
+import { BottomNav } from './components/BottomNav';
 
-function AppContent() {
-  const [activeTab, setActiveTab] = useState<'tasks' | 'clients' | 'profile'>('tasks');
+function TelegramThemeHandler() {
   const { theme } = useStore();
 
   useEffect(() => {
@@ -24,30 +25,47 @@ function AppContent() {
   }, []); // Run once on mount
 
   useEffect(() => {
-    // Cast to any to avoid TypeScript errors with incomplete definitions
     // @ts-ignore
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
-      // Set header color to match app background
       const color = theme === 'dark' ? '#000000' : '#F5F5F7';
-
-      // We set the header color. If it's light, Telegram automatically makes status bar icons dark.
       if (tg.setHeaderColor) tg.setHeaderColor(color);
       if (tg.setBackgroundColor) tg.setBackgroundColor(color);
-
-      // Expand to full height if needed, though viewport meta handles it mostly
       if (tg.expand) tg.expand();
     }
   }, [theme]);
 
+  return null;
+}
+
+function BottomNavWrapper() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  let activeTab: 'tasks' | 'clients' | 'profile' = 'tasks';
+  if (location.pathname.startsWith('/clients')) activeTab = 'clients';
+  if (location.pathname.startsWith('/profile')) activeTab = 'profile';
+
+  return <BottomNav activeTab={activeTab} onTabChange={(tab) => navigate('/' + tab)} />;
+}
+
+function Layout() {
+  const location = useLocation();
+  // Show Nav on main pages only
+  const showBottomNav = ['/tasks', '/clients', '/profile'].includes(location.pathname) || location.pathname === '/';
+
   return (
     <div className={styles.appContainer}>
       <main className={styles.mainContent}>
-        {activeTab === 'tasks' && <Tasks />}
-        {activeTab === 'clients' && <Clients />}
-        {activeTab === 'profile' && <Profile />}
+        <Routes>
+          <Route path="/" element={<Navigate to="/tasks" replace />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/clients" element={<Clients />} />
+          <Route path="/clients/:clientId" element={<ClientDetails />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
       </main>
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      {showBottomNav && <BottomNavWrapper />}
     </div>
   );
 }
@@ -55,7 +73,10 @@ function AppContent() {
 function App() {
   return (
     <StoreProvider>
-      <AppContent />
+      <TelegramThemeHandler />
+      <Router>
+        <Layout />
+      </Router>
     </StoreProvider>
   );
 }

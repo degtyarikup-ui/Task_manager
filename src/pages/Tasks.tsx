@@ -5,174 +5,24 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, User, List } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
 import formStyles from '../components/ui/Form.module.css';
-import { format, isSameYear } from 'date-fns';
+import { format } from 'date-fns';
 import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar'; // Alias to avoid conflict if any
 
 import { ConfirmModal } from '../components/ConfirmModal'; // Import custom modal
+import { TaskItem } from '../components/TaskItem';
+import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
 // ... logic ...
 
 
 
-const formatDate = (dateString: string, locale: any) => {
-    const date = new Date(dateString);
-    const options: any = { locale: locale || ru };
-    if (!isSameYear(date, new Date())) {
-        return format(date, 'd MMM yyyy', options);
-    }
-    return format(date, 'd MMM', options);
-};
 
-// Priority Helpers
-const getIconClass = (p: Priority) => {
-    switch (p) {
-        case 'high': return extraStyles.priorityHigh;
-        case 'medium': return extraStyles.priorityMedium;
-        case 'low': return extraStyles.priorityLow;
-        default: return extraStyles.priorityLow;
-    }
-};
-
-const getStatusIcon = (s: Status, size = 14) => {
-    switch (s) {
-        case 'in-progress': return <Loader size={size} className={extraStyles.toolIcon} />;
-        case 'on-hold': return <Pause size={size} className={extraStyles.toolIcon} />;
-        case 'completed': return <Check size={size} className={extraStyles.toolIcon} />;
-        default: return <Hash size={size} className={extraStyles.toolIcon} />;
-    }
-};
-
-const getStatusLabel = (s: Status, t: any) => {
-    // Standard statuses
-    if (s === 'in-progress') return t('inProgress') || 'В работе';
-    if (s === 'on-hold') return t('onHold') || 'Пауза';
-    if (s === 'completed') return t('completed') || 'Готово';
-    if (s === 'archive') return t('archive') || 'Архив';
-
-    // Custom status or fallback
-    return s;
-}
-
-// Simple Task Card Component
-const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting, locale, t }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean, locale: any, t: any }) => {
-    const [offset, setOffset] = useState(0);
-    const startX = React.useRef(0);
-    const isDragging = React.useRef(false);
-
-    const onTouchStart = (e: React.TouchEvent) => {
-        startX.current = e.touches[0].clientX;
-        isDragging.current = false;
-    };
-
-    const onTouchMove = (e: React.TouchEvent) => {
-        const currentX = e.touches[0].clientX;
-        const diff = currentX - startX.current;
-        if (diff < 0) {
-            setOffset(Math.max(diff, -100));
-            if (Math.abs(diff) > 5) isDragging.current = true;
-        }
-    };
-
-    const onTouchEnd = () => {
-        if (offset < -60) {
-            haptic.notification('warning');
-            onDelete(task.id);
-            setOffset(-500);
-        } else {
-            setOffset(0);
-        }
-        setTimeout(() => { isDragging.current = false; }, 100);
-    };
-
-    const priorityColor = task.priority === 'high' ? '#FF3B30' : task.priority === 'medium' ? '#FF9500' : 'var(--color-border)';
-
-    return (
-        <div style={{ position: 'relative', borderRadius: 16, marginBottom: 6, overflow: 'hidden' }}>
-            <div style={{
-                position: 'absolute', inset: 0,
-                background: '#FF3B30',
-                display: 'flex', justifyContent: 'flex-end', alignItems: 'center',
-                paddingRight: 24, borderRadius: 16,
-                opacity: offset < -5 ? 1 : 0,
-                transition: 'opacity 0.2s'
-            }}>
-                <Trash2 size={24} color="white" />
-            </div>
-
-            <div className={`${styles.taskCard} ${isDeleting ? styles.deleting : ''}`}
-                onClick={() => { if (!isDragging.current && offset === 0) onEdit(task); else setOffset(0); }}
-                onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}
-                style={{
-                    transform: `translateX(${offset}px)`,
-                    transition: isDragging.current ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                    marginBottom: 0,
-                    background: 'var(--bg-card)',
-                    position: 'relative',
-                    zIndex: 2
-                }}
-            >
-                <button
-                    className={`${styles.checkbox} ${task.status === 'completed' ? styles.checked : ''} `}
-                    onClick={(e) => { e.stopPropagation(); onToggle(task.id); }}
-                    style={{
-                        borderColor: task.status === 'completed' ? 'transparent' : priorityColor,
-                        borderWidth: 2
-                    }}
-                >
-                    {task.status === 'completed' && <Check size={14} color="white" />}
-                </button>
-                <div className={styles.taskContent}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '4px' }}>
-                        <span className={`${styles.taskTitle} ${task.status === 'completed' ? styles.completedText : ''} `} style={{ marginBottom: 0 }}>
-                            {task.title}
-                        </span>
-                    </div>
-                    {task.description && <p className={styles.taskDesc}>{task.description}</p>}
-
-                    <div className={extraStyles.taskMeta}>
-                        {task.deadline && (
-                            <span className={extraStyles.metaBadge} style={
-                                (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
-                                    ? { color: '#FF3B30', backgroundColor: 'rgba(255, 59, 48, 0.1)' }
-                                    : {}
-                            }>
-                                {(task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
-                                    ? <AlertTriangle size={10} />
-                                    : <Calendar size={10} />
-                                }
-                                {formatDate(task.deadline, locale)}
-                            </span>
-                        )}
-
-                        {task.client && (
-                            <span className={extraStyles.metaBadge} style={{ paddingLeft: 4, paddingRight: 10, borderRadius: 20, gap: 6 }}>
-                                <div style={{
-                                    width: 20, height: 20, borderRadius: '50%',
-                                    background: generateAvatarColor(task.client),
-                                    color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0, fontWeight: 'bold'
-                                }}>
-                                    {getInitials(task.client)}
-                                </div>
-                                {task.client}
-                            </span>
-                        )}
-                        <span className={extraStyles.metaBadge}>
-                            {getStatusIcon(task.status, 10)}
-                            {getStatusLabel(task.status, t)}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 export const Tasks: React.FC = () => {
     const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading } = useStore();
