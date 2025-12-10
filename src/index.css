@@ -5,18 +5,26 @@
   --bg-app: #F5F5F7;
   --bg-card: #FFFFFF;
   --bg-sidebar: #FFFFFF;
-  --bg-input: #F2F2F7;
+  --bg-input: #E5E5EA;
+  /* Standard gray input */
   --bg-chip: #E5E5EA;
+  /* Standard gray chip */
+  --bg-nav-item-active: #F2F2F7;
+  /* Very light gray for nav active state */
+
   /* iOS secondary system fill */
-  --bg-chip-active: #1D1D1F;
-  --color-chip-text: #86868B;
+  --bg-chip-active: #1C1C1E;
+  /* Consistent dark gray/black */
+  --color-chip-text: #8E8E93;
   --color-chip-text-active: #FFFFFF;
 
-  --color-text-primary: #1D1D1F;
-  --color-text-secondary: #86868B;
+  --color-text-primary: #1C1C1E;
+  /* iOS System Gray 6 equivalent for text */
+  --color-text-secondary: #8E8E93;
   --color-accent: #00C2EC;
   /* Telegram Blue */
-  --color-border: #D2D2D7;
+  --color-border: #E5E5EA;
+  /* Lighter border */
 
   --color-success: #34C759;
   --color-warning: #FF9F0A;
@@ -51,7 +59,7 @@
   --color-chip-text-active: #FFFFFF;
 
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #98989D;
+  --color-text-secondary: #8E8E93;
   --color-border: #38383A;
 }
 

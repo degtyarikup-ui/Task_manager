@@ -36,7 +36,7 @@
 }
 
 .navItem.active {
-    background-color: var(--bg-chip);
+    background-color: var(--bg-nav-item-active);
     color: var(--color-accent);
 }
 
