@@ -17,8 +17,7 @@ import { Calendar as CustomCalendar } from '../components/Calendar'; // Alias to
 
 import { ConfirmModal } from '../components/ConfirmModal'; // Import custom modal
 import { Tooltip } from '../components/Tooltip';
-// Lazy load VoiceInput to prevent initialization issues on some devices
-const VoiceInput = React.lazy(() => import('../components/VoiceInput').then(module => ({ default: module.VoiceInput })));
+
 import { TaskItem } from '../components/TaskItem';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
@@ -394,20 +393,7 @@ export const Tasks: React.FC = () => {
                 )}
             </div>
 
-            <React.Suspense fallback={null}>
-                <VoiceInput onTaskCreated={(taskData) => {
-                    resetForm();
-                    setFormData(prev => ({
-                        ...prev,
-                        ...taskData,
-                        // Ensure status/priority have defaults if AI returned null
-                        status: taskData.status || 'in-progress',
-                        priority: taskData.priority || 'low'
-                    }));
-                    setIsModalOpen(true);
-                    if (showTooltip) handleDismissTooltip();
-                }} />
-            </React.Suspense>
+
 
             <button className={styles.fab} onClick={() => {
                 resetForm();
