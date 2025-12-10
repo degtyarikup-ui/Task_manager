@@ -77,8 +77,10 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
             const taskData = await parseTaskFromVoice(text, clients, apiKey);
             onTaskCreated(taskData);
             haptic.notification('success');
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
+            // Show detailed error for debugging
+            alert('AI Error: ' + (err.message || JSON.stringify(err)));
             setError('Ошибка AI обработки');
             haptic.notification('error');
         } finally {
