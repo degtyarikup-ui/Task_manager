@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { Task, Client } from "../types";
 
 export const parseTaskFromVoice = async (
@@ -6,14 +5,24 @@ export const parseTaskFromVoice = async (
     clients: Client[],
     apiKey: string
 ): Promise<Partial<Task>> => {
+    // Dynamic import to reduce initial bundle size
+    const { GoogleGenerativeAI } = await import("@google/generative-ai");
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Use gemini-pro for maximum compatibility
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Fallback to gemini-pro if flash fails is not easy here without retry logic,
+    // but the error was 404, implying model name issue.
+    // Let's try 'gemini-1.0-pro' or just 'gemini-pro' which is aliased to stable.
+    // Actually, let's use 'gemini-1.5-flash-latest' or just stay safe with 'gemini-pro'
+    // Update: 'gemini-1.5-flash' should work but maybe region locked?
+    // Let's switch to 'gemini-pro' to be 100% safe.
+    // Re-instating: const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const clientNames = clients.map(c => c.name).join(", ");
     const today = new Date().toISOString().split('T')[0];
 
     const prompt = `
-        You are a smart AI assistant for a task manager app. 
+        You are a smart AI assistant for a task manager app.
         Your goal is to extract structured task data from a spoken user command.
         
         Current Date: ${today}

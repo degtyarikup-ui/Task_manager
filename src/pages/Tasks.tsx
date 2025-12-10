@@ -362,22 +362,7 @@ export const Tasks: React.FC = () => {
             </header>
 
             <div className={styles.taskList}>
-                {isLoading ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {[...Array(5)].map((_, i) => (
-                            <div key={i} className={styles.skeletonItem}>
-                                <div className={styles.skeletonRow}>
-                                    <div className={styles.skeletonCircle} />
-                                    <div className={styles.skeletonLine} style={{ width: '60%' }} />
-                                </div>
-                                <div className={styles.skeletonRow} style={{ marginTop: 8, paddingLeft: 36 }}>
-                                    <div className={styles.skeletonLine} style={{ width: '30%' }} />
-                                    <div className={styles.skeletonLine} style={{ width: '20%' }} />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : filteredTasks.length === 0 ? (
+                {isLoading ? null : filteredTasks.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>{t('noTasks')}</p>
                         <small>{t('clickToAdd')}</small>
