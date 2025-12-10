@@ -16,6 +16,14 @@
     padding-top: 60px;
 }
 
+.detailsHeaderPadding {
+    padding-top: 48px !important;
+}
+
+:global(.platform-android) .detailsHeaderPadding {
+    padding-top: 72px !important;
+}
+
 .header {
     margin-bottom: 24px;
     display: flex;

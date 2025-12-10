@@ -61,7 +61,7 @@ export const ClientDetails: React.FC = () => {
     };
 
     return (
-        <div className={styles.container} style={{ paddingTop: 48 }}>
+        <div className={`${styles.container} ${styles.detailsHeaderPadding}`}>
 
 
             {/* Client Info Card */}
