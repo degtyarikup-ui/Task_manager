@@ -366,7 +366,7 @@ export const Tasks: React.FC = () => {
                                 const project = projects.find(p => p.id === activeTab);
                                 if (!project) return;
                                 // Generate invite link
-                                const inviteLink = `https://t.me/Task_manager_new_bot?startapp=invite_${project.id}`;
+                                const inviteLink = `https://t.me/track_it1_bot?startapp=invite_${project.id}`;
                                 const text = `Join my list "${project.title}" in Task Manager!`;
                                 const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(text)}`;
 
