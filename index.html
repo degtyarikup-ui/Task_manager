@@ -9,18 +9,30 @@
   <meta name="theme-color" content="#F5F5F7" />
   <title>Task Manager</title>
   <!-- Telegram Web App SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js" onload="initTelegram()"></script>
   <script>
-    // Immediate initialization to remove loader instantly
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.expand();
-      window.Telegram.WebApp.ready();
+    function initTelegram() {
+      // Version 3.1 - Robust Init
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.expand();
+        // Small delay to ensure Telegram UI is ready to receive
+        setTimeout(function () {
+          window.Telegram.WebApp.ready();
+        }, 50);
+      }
     }
+    // Fallback if onload doesn't fire (cached script)
+    if (window.Telegram) initTelegram();
   </script>
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div
+      style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #F5F5F7; color: #888;">
+      Loading...
+    </div>
+  </div>
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
