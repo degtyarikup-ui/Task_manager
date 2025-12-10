@@ -12,10 +12,17 @@ export interface Project {
     createdAt: number;
 }
 
+export interface Subtask {
+    id: string;
+    title: string;
+    completed: boolean;
+}
+
 export interface Task {
     id: string;
     title: string;
-    description?: string;
+    // description removed
+    subtasks: Subtask[];
     projectId?: string; // Optional if task is not in a list
     status: Status;
     priority: Priority;

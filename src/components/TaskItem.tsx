@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Trash2, Calendar, AlertTriangle } from 'lucide-react';
+import { Check, Trash2, Calendar, AlertTriangle, CheckSquare } from 'lucide-react';
 import type { Task } from '../types';
 import styles from '../pages/Tasks.module.css';
 import extraStyles from '../pages/TasksExtra.module.css';
@@ -90,7 +90,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                             {task.title}
                         </span>
                     </div>
-                    {task.description && <p className={styles.taskDesc}>{task.description}</p>}
+                    {/* Description removed */}
+                    {(task.subtasks && task.subtasks.length > 0) && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, marginBottom: 8 }}>
+                            <CheckSquare size={14} color="var(--color-text-secondary)" />
+                            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                                {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
+                            </span>
+                        </div>
+                    )}
 
                     <div className={extraStyles.taskMeta}>
                         {task.deadline && (

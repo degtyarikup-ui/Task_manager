@@ -161,7 +161,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => ({
                     id: t.id,
                     title: t.title,
-                    description: t.description || '',
+                    // description: t.description || '', // Removed
+                    subtasks: [], // Init empty, no DB support yet
                     status: t.status as Status,
                     priority: t.priority as Priority,
                     deadline: t.deadline || '',
@@ -287,7 +288,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             .insert({
                 user_id: userId,
                 title: data.title,
-                description: data.description,
+                // description: data.description,
                 status: data.status,
                 priority: data.priority,
                 deadline: data.deadline,
@@ -315,7 +316,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         const updateData: any = {};
         if (data.title !== undefined) updateData.title = data.title;
-        if (data.description !== undefined) updateData.description = data.description;
+        if (data.title !== undefined) updateData.title = data.title;
+        // if (data.description !== undefined) updateData.description = data.description;
         if (data.status !== undefined) updateData.status = data.status;
         if (data.priority !== undefined) updateData.priority = data.priority;
         if (data.deadline !== undefined) updateData.deadline = data.deadline;

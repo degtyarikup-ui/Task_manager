@@ -160,7 +160,7 @@ export const Profile: React.FC = () => {
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
                     <button className={styles.menuItem} onClick={handleSupport}>
-                        <div className={styles.menuIcon} style={{ color: '#007AFF' }}>
+                        <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>
                             <HelpCircle size={20} />
                         </div>
                         <div className={styles.menuLabel}>{t('support')}</div>

@@ -25,7 +25,7 @@
 
 .input:focus {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 194, 236, 0.1);
     background-color: var(--bg-card);
 }
 
@@ -57,7 +57,7 @@
 .submitBtn {
     width: 100%;
     padding: 14px;
-    background-color: #007AFF;
+    background-color: var(--color-accent);
     color: white;
     font-size: 16px;
     font-weight: 600;
@@ -72,7 +72,7 @@
 }
 
 .submitBtn:hover {
-    background-color: #0062cc;
+    background-color: #0099BD;
     transform: scale(0.99);
 }
 

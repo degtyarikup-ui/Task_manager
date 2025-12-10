@@ -8,7 +8,7 @@ import styles from './Tasks.module.css'; // Reuse basic styles
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { ru, enUS } from 'date-fns/locale';
 import { Modal } from '../components/Modal';
-import { Calendar, AlertTriangle, List } from 'lucide-react';
+import { Calendar, AlertTriangle, List, CheckSquare, Trash2, Plus } from 'lucide-react';
 import formStyles from '../components/ui/Form.module.css';
 import extraStyles from './TasksExtra.module.css';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
@@ -45,16 +45,41 @@ export const ClientDetails: React.FC = () => {
 
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
-        description: '',
+        // description removed
+        subtasks: [],
         status: 'in-progress',
         priority: 'low',
         deadline: '',
         client: ''
     });
 
+    const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+
+    const addSubtask = () => {
+        if (!newSubtaskTitle.trim()) return;
+        const newSub = { id: Date.now().toString(), title: newSubtaskTitle.trim(), completed: false };
+        setFormData(prev => ({ ...prev, subtasks: [...(prev.subtasks || []), newSub] }));
+        setNewSubtaskTitle('');
+    };
+
+    const toggleSubtaskValid = (id: string) => {
+        setFormData(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).map(s => s.id === id ? { ...s, completed: !s.completed } : s)
+        }));
+    };
+
+    const removeSubtask = (id: string) => {
+        setFormData(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).filter(s => s.id !== id)
+        }));
+    };
+
     const resetForm = () => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
-        setFormData({ title: '', description: '', status: 'in-progress', priority: 'low', deadline: todayStr, client: '' });
+        setFormData({ title: '', subtasks: [], status: 'in-progress', priority: 'low', deadline: todayStr, client: '' });
+        setNewSubtaskTitle('');
         setEditingId(null);
         setActiveTool(null);
         setIsCalendarOpen(false);
@@ -65,7 +90,8 @@ export const ClientDetails: React.FC = () => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         setFormData({
             title: task.title,
-            description: task.description || '',
+            // description removed
+            subtasks: task.subtasks || [],
             status: task.status,
             priority: task.priority || 'low',
             deadline: task.deadline || todayStr,
@@ -95,7 +121,8 @@ export const ClientDetails: React.FC = () => {
         if (formData.title && editingId) {
             updateTask(editingId, {
                 title: formData.title,
-                description: formData.description || '',
+                // description: formData.description || '',
+                subtasks: formData.subtasks || [],
                 status: (formData.status as Status) || 'in-progress',
                 priority: formData.priority || 'low',
                 projectId: formData.projectId, // Allow moving lists?
@@ -205,6 +232,40 @@ export const ClientDetails: React.FC = () => {
                             autoFocus
                             required
                         />
+                    </div>
+
+                    {/* Subtasks Section */}
+                    <div style={{ marginTop: 16 }}>
+                        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                            <input
+                                className={formStyles.input}
+                                value={newSubtaskTitle}
+                                onChange={e => setNewSubtaskTitle(e.target.value)}
+                                placeholder="Add subtask"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        addSubtask();
+                                    }
+                                }}
+                            />
+                            <button type="button" onClick={addSubtask} style={{ background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 12, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Plus size={20} />
+                            </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {(formData.subtasks || []).map(sub => (
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
+                                    <button type="button" onClick={() => toggleSubtaskValid(sub.id)} style={{ background: 'none', border: 'none', padding: 0 }}>
+                                        {sub.completed ? <CheckSquare size={20} color="var(--color-accent)" /> : <div style={{ width: 18, height: 18, border: '2px solid var(--color-text-secondary)', borderRadius: 4 }} />}
+                                    </button>
+                                    <span style={{ flex: 1, textDecoration: sub.completed ? 'line-through' : 'none', color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)' }}>{sub.title}</span>
+                                    <button type="button" onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-danger)' }}>
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Tools Row */}

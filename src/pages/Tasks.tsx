@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Plus, Calendar, AlertTriangle, User, List } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, User, List, CheckSquare, Trash2 } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -66,12 +66,36 @@ export const Tasks: React.FC = () => {
 
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
-        description: '',
+        // description removed
+        subtasks: [],
         status: 'in-progress',
         priority: 'low',
         deadline: '',
         client: ''
     });
+
+    const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+
+    const addSubtask = () => {
+        if (!newSubtaskTitle.trim()) return;
+        const newSub = { id: Date.now().toString(), title: newSubtaskTitle.trim(), completed: false };
+        setFormData(prev => ({ ...prev, subtasks: [...(prev.subtasks || []), newSub] }));
+        setNewSubtaskTitle('');
+    };
+
+    const toggleSubtaskValid = (id: string) => { // Rename to avoid conflict if any
+        setFormData(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).map(s => s.id === id ? { ...s, completed: !s.completed } : s)
+        }));
+    };
+
+    const removeSubtask = (id: string) => {
+        setFormData(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).filter(s => s.id !== id)
+        }));
+    };
 
     const [activeTool, setActiveTool] = useState<string | null>(null);
 
@@ -85,7 +109,8 @@ export const Tasks: React.FC = () => {
                 // Update existing
                 updateTask(editingId, {
                     title: formData.title,
-                    description: formData.description || '',
+                    // description removed
+                    subtasks: formData.subtasks || [],
                     status: (formData.status as Status) || 'in-progress',
                     priority: formData.priority || 'low',
                     projectId: formData.projectId, // Allow moving lists
@@ -96,7 +121,8 @@ export const Tasks: React.FC = () => {
                 // Create new
                 addTask({
                     title: formData.title,
-                    description: formData.description || '',
+                    // description removed
+                    subtasks: formData.subtasks || [],
                     status: (formData.status as Status) || 'in-progress',
                     priority: formData.priority || 'low',
                     projectId: targetProjectId,
@@ -111,7 +137,8 @@ export const Tasks: React.FC = () => {
 
     const resetForm = () => {
         const todayStr = format(new Date(), 'yyyy-MM-dd');
-        setFormData({ title: '', description: '', status: 'in-progress', priority: 'low', deadline: todayStr, client: '' });
+        setFormData({ title: '', subtasks: [], status: 'in-progress', priority: 'low', deadline: todayStr, client: '' });
+        setNewSubtaskTitle('');
         setEditingId(null);
         setActiveTool(null);
         setIsCalendarOpen(false); // Close calendar on form reset
@@ -324,7 +351,7 @@ export const Tasks: React.FC = () => {
                             setEditingId(tToEdit.id);
                             setFormData({
                                 title: tToEdit.title,
-                                description: tToEdit.description || '',
+                                subtasks: tToEdit.subtasks || [],
                                 status: tToEdit.status,
                                 priority: tToEdit.priority,
                                 projectId: tToEdit.projectId,
@@ -360,6 +387,40 @@ export const Tasks: React.FC = () => {
                             autoFocus
                             required
                         />
+                    </div>
+
+                    {/* Subtasks Section */}
+                    <div style={{ marginTop: 16 }}>
+                        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                            <input
+                                className={formStyles.input}
+                                value={newSubtaskTitle}
+                                onChange={e => setNewSubtaskTitle(e.target.value)}
+                                placeholder="Add subtask"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        addSubtask();
+                                    }
+                                }}
+                            />
+                            <button type="button" onClick={addSubtask} style={{ background: 'var(--color-accent)', color: 'white', border: 'none', borderRadius: 12, width: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Plus size={20} />
+                            </button>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {(formData.subtasks || []).map(sub => (
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
+                                    <button type="button" onClick={() => toggleSubtaskValid(sub.id)} style={{ background: 'none', border: 'none', padding: 0 }}>
+                                        {sub.completed ? <CheckSquare size={20} color="var(--color-accent)" /> : <div style={{ width: 18, height: 18, border: '2px solid var(--color-text-secondary)', borderRadius: 4 }} />}
+                                    </button>
+                                    <span style={{ flex: 1, textDecoration: sub.completed ? 'line-through' : 'none', color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)' }}>{sub.title}</span>
+                                    <button type="button" onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-danger)' }}>
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Tools Row */}
@@ -612,15 +673,7 @@ export const Tasks: React.FC = () => {
                         </div>
                     )}
 
-                    <div style={{ marginTop: 24 }}>
-                        <textarea
-                            className={formStyles.textarea}
-                            placeholder={t('description')}
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            rows={3}
-                        />
-                    </div>
+
 
                     <button type="submit" className={styles.submitBtn}>
                         {t('save')}
