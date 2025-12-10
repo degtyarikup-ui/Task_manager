@@ -17,7 +17,7 @@ import {
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Modal } from '../components/Modal';
 import styles from './Profile.module.css';
-import avatarImg from '../assets/avatar_beaver.png';
+
 
 export const Profile: React.FC = () => {
     const { tasks, clients, theme, toggleTheme, language, toggleLanguage } = useStore();
@@ -125,7 +125,7 @@ export const Profile: React.FC = () => {
                         background: user?.gradient || 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)'
                     }}
                 >
-                    <img src={avatarImg} className={styles.avatarImage} alt="Profile" />
+                    {user.initials}
                 </div>
                 <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.name}</div>
