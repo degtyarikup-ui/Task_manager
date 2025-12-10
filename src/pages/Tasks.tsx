@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Plus, Calendar, AlertTriangle, User, List, CheckSquare, Trash2 } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -410,9 +410,14 @@ export const Tasks: React.FC = () => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {(formData.subtasks || []).map(sub => (
-                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
-                                    <button type="button" onClick={() => toggleSubtaskValid(sub.id)} style={{ background: 'none', border: 'none', padding: 0 }}>
-                                        {sub.completed ? <CheckSquare size={20} color="var(--color-accent)" /> : <div style={{ width: 18, height: 18, border: '2px solid var(--color-text-secondary)', borderRadius: 4 }} />}
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => toggleSubtaskValid(sub.id)}
+                                        className={`${styles.checkbox} ${sub.completed ? styles.checked : ''}`}
+                                        style={{ marginRight: 12, flexShrink: 0 }}
+                                    >
+                                        {sub.completed && <Check size={14} color="white" />}
                                     </button>
                                     <span style={{ flex: 1, textDecoration: sub.completed ? 'line-through' : 'none', color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)' }}>{sub.title}</span>
                                     <button type="button" onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', padding: 0, color: 'var(--color-danger)' }}>
