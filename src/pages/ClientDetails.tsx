@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
@@ -14,6 +14,19 @@ export const ClientDetails: React.FC = () => {
     const { clients, tasks, language, updateTask, deleteTask } = useStore();
     const { t } = useTranslation();
     const locale = language === 'ru' ? ru : enUS;
+
+    useEffect(() => {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+            tg.BackButton.show();
+            const handleBack = () => navigate(-1);
+            tg.BackButton.onClick(handleBack);
+            return () => {
+                tg.BackButton.offClick(handleBack);
+                tg.BackButton.hide();
+            };
+        }
+    }, [navigate]);
 
     const client = clients.find(c => c.id === clientId);
 
@@ -49,13 +62,7 @@ export const ClientDetails: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
-                <button onClick={() => navigate(-1)} style={{ border: 'none', background: 'none', padding: 0, marginRight: 16 }}>
-                    <ChevronLeft size={28} color="var(--color-text-primary)" />
-                </button>
-                <h2 style={{ margin: 0, fontSize: 24 }}>{client.name}</h2>
-            </div>
+
 
             {/* Client Info Card */}
             <div style={{
