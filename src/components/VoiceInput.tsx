@@ -58,11 +58,18 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
 
         try {
             // Get API Key from Environment Variables (set by developer)
-            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            let apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+            // Debugging: Log if key is missing (do not log the key itself in prod)
+            if (!apiKey) {
+                console.warn('VITE_GEMINI_API_KEY not found in import.meta.env');
+                // Fallback for local dev if .env is missing but user wants to test
+                // apiKey = "YOUR_FALLBACK_KEY"; 
+            }
 
             if (!apiKey) {
                 console.error('Gemini API Key is missing is environment variables');
-                alert('Голосовой ввод не настроен администратором (API Key missing).');
+                alert('Голосовой ввод не настроен. Ключ API не найден.');
                 setIsProcessing(false);
                 return;
             }
