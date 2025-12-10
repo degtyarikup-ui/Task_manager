@@ -6,7 +6,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check, X, GripVertical } from 'lucide-react';
+import { Trash2, Calendar, GripVertical, Plus, Check, X, User, Share2, AlertTriangle, List } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -357,6 +357,34 @@ export const Tasks: React.FC = () => {
                     >
                         {t('createList')}
                     </button>
+
+                    {activeTab !== 'all' && (
+                        <button
+                            className={`${styles.filterChip} ${extraStyles.shareBtn}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                const project = projects.find(p => p.id === activeTab);
+                                if (!project) return;
+                                // Generate invite link
+                                const inviteLink = `https://t.me/Task_manager_new_bot?startapp=invite_${project.id}`;
+                                const text = `Join my list "${project.title}" in Task Manager!`;
+                                const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(text)}`;
+
+                                const tg = (window as any).Telegram?.WebApp;
+                                if (tg && tg.openTelegramLink) {
+                                    tg.openTelegramLink(url);
+                                } else {
+                                    window.open(url, '_blank');
+                                }
+                            }}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 12, paddingRight: 12
+                            }}
+                        >
+                            <Share2 size={14} />
+                            {t('share')}
+                        </button>
+                    )}
                 </div>
             </header>
 

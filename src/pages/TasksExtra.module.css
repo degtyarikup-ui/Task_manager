@@ -197,3 +197,16 @@
     background-color: var(--bg-input);
     transform: scale(0.96);
 }
+
+.shareBtn {
+    background: linear-gradient(135deg, #00C853, #69F0AE);
+    color: white;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 200, 83, 0.3);
+}
+
+.shareBtn.active {
+    background: linear-gradient(135deg, #00C853, #69F0AE) !important;
+    color: white !important;
+    opacity: 0.9;
+}

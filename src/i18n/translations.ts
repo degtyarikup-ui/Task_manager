@@ -24,6 +24,7 @@ export const translations = {
         status: 'Статус',
         client: 'Клиент',
         list: 'Список',
+        share: 'Поделиться',
 
         // Priorities
         low: 'Низкий',
@@ -152,6 +153,7 @@ export const translations = {
         status: 'Status',
         client: 'Client',
         list: 'List',
+        share: 'Share',
 
         // Priorities
         low: 'Low',

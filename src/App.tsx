@@ -24,6 +24,15 @@ function TelegramThemeHandler() {
     }
   }, []); // Run once on mount
 
+  const { joinProject } = useStore();
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    const startParam = tg?.initDataUnsafe?.start_param;
+    if (startParam && startParam.startsWith('invite_')) {
+      joinProject(startParam);
+    }
+  }, [joinProject]);
+
   useEffect(() => {
 
     const tg = (window as any).Telegram?.WebApp;

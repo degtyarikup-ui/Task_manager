@@ -8,6 +8,8 @@ interface StoreContextType extends AppState {
     addProject: (project: Omit<Project, 'id' | 'createdAt'>) => void;
     updateProject: (id: string, data: Partial<Project>) => void;
     deleteProject: (id: string) => void;
+    joinProject: (inviteCode: string) => Promise<boolean>;
+
 
     addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
     updateTask: (id: string, data: Partial<Task>) => void;
@@ -129,13 +131,38 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const loadData = async () => {
             setIsLoading(true);
             try {
-                // Fetch Projects
-                const { data: projectsData, error: projError } = await supabase
+                // 1. Fetch Own Projects
+                const { data: ownProjects, error: projError } = await supabase
                     .from('projects')
                     .select('*')
                     .eq('user_id', userId);
 
                 if (projError) console.error('Error fetching projects:', projError);
+
+                // 2. Fetch Shared Projects (where I am a member)
+                const { data: memberRows } = await supabase
+                    .from('project_members')
+                    .select('project_id')
+                    .eq('user_id', userId);
+
+                const sharedProjectIds = (memberRows || []).map((r: any) => r.project_id);
+                let sharedProjects: any[] = [];
+
+                if (sharedProjectIds.length > 0) {
+                    const { data: sharedPrjData } = await supabase
+                        .from('projects')
+                        .select('*')
+                        .in('id', sharedProjectIds);
+                    sharedProjects = sharedPrjData || [];
+                }
+
+                // Combine projects
+                const allProjectsRaw = [...(ownProjects || []), ...sharedProjects];
+                // Remove duplicates just in case
+                const uniqueProjectsMap = new Map();
+                allProjectsRaw.forEach(p => uniqueProjectsMap.set(p.id, p));
+                const projectsData = Array.from(uniqueProjectsMap.values());
+                const allProjectIds = projectsData.map(p => p.id);
 
                 // Fetch Clients
                 const { data: clientsData, error: clientError } = await supabase
@@ -145,11 +172,24 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                 if (clientError) console.error('Error fetching clients:', clientError);
 
-                // Fetch Tasks
-                const { data: tasksData, error: taskError } = await supabase
+                // Fetch Tasks (Own + In Shared Projects)
+                // We fetch tasks that are EITHER created by me OR belong to a project I have access to
+                let tasksQuery = supabase
                     .from('tasks')
-                    .select('*')
-                    .eq('user_id', userId);
+                    .select('*');
+
+                if (allProjectIds.length > 0) {
+                    // Logic: (user_id = me) OR (project_id IN allProjectIds)
+                    // Supabase syntax for OR is complex, simpler to fetch two sets or use .or()
+                    // .or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`)
+                    // But for safety and simpler code, we can fetch all tasks for projects AND all orphan tasks for user
+                    // For now, let's fetch ALL tasks for user + tasks for shared projects
+                    tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
+                } else {
+                    tasksQuery = tasksQuery.eq('user_id', userId);
+                }
+
+                const { data: tasksData, error: taskError } = await tasksQuery;
 
                 if (taskError) console.error('Error fetching tasks:', taskError);
 
@@ -294,6 +334,45 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }));
 
         await supabase.from('projects').delete().eq('id', id);
+        await supabase.from('projects').delete().eq('id', id);
+    };
+
+    const joinProject = async (inviteCode: string): Promise<boolean> => {
+        // inviteCode format: "invite_<UUID>"
+        if (!inviteCode.startsWith('invite_')) return false;
+        const projectId = inviteCode.replace('invite_', '');
+        if (!projectId) return false;
+
+        try {
+            // Check if already in project or is owner
+            const existing = state.projects.find(p => p.id === projectId);
+            if (existing) return true; // Already joined
+
+            // Insert into members
+            const { error } = await supabase
+                .from('project_members')
+                .insert({
+                    project_id: projectId,
+                    user_id: userId,
+                    role: 'member'
+                });
+
+            if (error) {
+                // If unique constraint violation, it means we are already added (maybe data sync lag), so success
+                if (error.code === '23505') return true;
+                console.error('Join error:', error);
+                return false;
+            }
+
+            // Reload data to show new project
+            // In a better app we would just fetch the single project
+            window.location.reload(); // Simple refresh to sync everything
+            return true;
+
+        } catch (e) {
+            console.error('Join exception', e);
+            return false;
+        }
     };
 
     const addTask = async (data: Omit<Task, 'id' | 'createdAt'>) => {
@@ -410,6 +489,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             addProject,
             updateProject,
             deleteProject,
+            joinProject,
             addTask,
             updateTask,
             deleteTask,
