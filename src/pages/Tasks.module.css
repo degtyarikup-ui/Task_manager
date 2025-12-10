@@ -21,7 +21,7 @@
 }
 
 :global(.platform-android) .detailsHeaderPadding {
-    padding-top: 72px !important;
+    padding-top: 100px !important;
 }
 
 .header {
