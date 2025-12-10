@@ -63,6 +63,7 @@ function Layout() {
           <Route path="/clients" element={<Clients />} />
           <Route path="/clients/:clientId" element={<ClientDetails />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="*" element={<Navigate to="/tasks" replace />} />
         </Routes>
       </main>
       {showBottomNav && <BottomNavWrapper />}
