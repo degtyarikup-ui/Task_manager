@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash, X } from 'lucide-react';
+import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -496,15 +496,9 @@ export const Tasks: React.FC = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => { setIsModalOpen(false); resetForm(); }}
-                title={editingId ? "Редактировать" : "Новая задача"}
+                title={editingId ? t('editTask') : t('newTask')}
             >
                 <form onSubmit={handleSubmit}>
-                    <div className={formStyles.header} style={{ justifyContent: 'space-between', paddingRight: 16 }}>
-                        <h3>{editingId ? t('editTask') : t('newTask')}</h3>
-                        <button type="button" onClick={() => { setIsModalOpen(false); resetForm(); }}>
-                            <X size={24} />
-                        </button>
-                    </div>
                     <div className={formStyles.inputGroup}>
                         <input
                             className={formStyles.input}
