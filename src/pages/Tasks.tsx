@@ -5,13 +5,13 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash } from 'lucide-react';
+import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash, X } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
 import formStyles from '../components/ui/Form.module.css';
 import { format, isSameYear } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar'; // Alias to avoid conflict if any
 
 import { ConfirmModal } from '../components/ConfirmModal'; // Import custom modal
@@ -20,9 +20,9 @@ import { ConfirmModal } from '../components/ConfirmModal'; // Import custom moda
 
 
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string, locale: any) => {
     const date = new Date(dateString);
-    const options: any = { locale: ru };
+    const options: any = { locale: locale || ru };
     if (!isSameYear(date, new Date())) {
         return format(date, 'd MMM yyyy', options);
     }
@@ -48,18 +48,19 @@ const getStatusIcon = (s: Status, size = 14) => {
     }
 };
 
-const getStatusLabel = (s: Status) => {
-    const map: Record<string, string> = {
-        'in-progress': 'В работе',
-        'on-hold': 'Пауза',
-        'completed': 'Готово',
-        'archive': 'Архив'
-    };
-    return map[s] || s;
+const getStatusLabel = (s: Status, t: any) => {
+    // Standard statuses
+    if (s === 'in-progress') return t('inProgress') || 'В работе';
+    if (s === 'on-hold') return t('onHold') || 'Пауза';
+    if (s === 'completed') return t('completed') || 'Готово';
+    if (s === 'archive') return t('archive') || 'Архив';
+
+    // Custom status or fallback
+    return s;
 }
 
 // Simple Task Card Component
-const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean }) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting, locale }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean, locale: any }) => {
     const [offset, setOffset] = useState(0);
     const startX = React.useRef(0);
     const isDragging = React.useRef(false);
@@ -145,7 +146,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
                                     ? <AlertTriangle size={10} />
                                     : <Calendar size={10} />
                                 }
-                                {formatDate(task.deadline)}
+                                {formatDate(task.deadline, locale)}
                             </span>
                         )}
 
@@ -164,7 +165,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
                         )}
                         <span className={extraStyles.metaBadge}>
                             {getStatusIcon(task.status, 10)}
-                            {getStatusLabel(task.status)}
+                            {getStatusLabel(task.status, t)}
                         </span>
                     </div>
                 </div>
@@ -174,8 +175,10 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 };
 
 export const Tasks: React.FC = () => {
-    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus } = useStore();
+    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading } = useStore();
     const { t } = useTranslation();
+
+    const locale = language === 'ru' ? ru : enUS;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -439,23 +442,47 @@ export const Tasks: React.FC = () => {
             </header>
 
             <div className={styles.taskList}>
-                {filteredTasks.length === 0 ? (
+                {isLoading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className={styles.skeletonItem}>
+                                <div className={styles.skeletonRow}>
+                                    <div className={styles.skeletonCircle} />
+                                    <div className={styles.skeletonLine} style={{ width: '60%' }} />
+                                </div>
+                                <div className={styles.skeletonRow} style={{ marginTop: 8, paddingLeft: 36 }}>
+                                    <div className={styles.skeletonLine} style={{ width: '30%' }} />
+                                    <div className={styles.skeletonLine} style={{ width: '20%' }} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : filteredTasks.length === 0 ? (
                     <div className={styles.emptyState}>
                         <p>{t('noTasks')}</p>
                         <small>{t('clickToAdd')}</small>
                     </div>
                 ) : (
-                    filteredTasks.map(task => <TaskItem
-                        key={task.id}
-                        task={task}
+                    filteredTasks.map(t => <TaskItem
+                        key={t.id}
+                        task={t}
                         onToggle={toggleTask}
                         onDelete={handleDelete}
-                        onEdit={(t) => {
-                            setFormData(t);
-                            setEditingId(t.id);
+                        onEdit={(task) => {
+                            setEditingId(task.id);
+                            setFormData({
+                                title: task.title,
+                                description: task.description || '',
+                                status: task.status,
+                                priority: task.priority,
+                                projectId: task.projectId,
+                                deadline: task.deadline,
+                                client: task.client
+                            });
                             setIsModalOpen(true);
                         }}
-                        isDeleting={deletingId === task.id}
+                        isDeleting={deletingId === t.id}
+                        locale={locale}
                     />)
                 )}
             </div>
@@ -471,36 +498,44 @@ export const Tasks: React.FC = () => {
                 title={editingId ? "Редактировать" : "Новая задача"}
             >
                 <form onSubmit={handleSubmit}>
+                    <div className={formStyles.header} style={{ justifyContent: 'space-between', paddingRight: 16 }}>
+                        <h3>{editingId ? t('editTask') : t('newTask')}</h3>
+                        <button type="button" onClick={() => { setIsModalOpen(false); resetForm(); }}>
+                            <X size={24} />
+                        </button>
+                    </div>
                     <div className={formStyles.inputGroup}>
                         <input
                             className={formStyles.input}
                             value={formData.title}
                             onChange={e => setFormData({ ...formData, title: e.target.value })}
-                            placeholder="Название задачи"
-                            autoFocus={!editingId} // Don't autofocus on edit to avoid jarring jump, or maybe yes? Let's keep it typical mobile behavior, maybe false on edit.
+                            placeholder={t('taskTitle')}
+                            autoFocus
                             required
                         />
                     </div>
 
-                    {/* Toolbar */}
+                    {/* Tools Row */}
                     <div className={extraStyles.toolbar}>
-                        <div className={extraStyles.dateInputWrapper} style={{ position: 'relative' }}>
-                            <button type="button"
-                                className={extraStyles.toolBtn}
-                                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
-                            >
-                                <Calendar size={18} className={extraStyles.toolIcon} />
-                                {formData.deadline ? formatDate(formData.deadline) : 'Срок'}
-                            </button>
+                        {/* Date */}
+                        <button
+                            type="button"
+                            className={`${extraStyles.toolBtn} ${formData.deadline ? extraStyles.active : ''}`}
+                            onClick={() => setIsCalendarOpen(true)}
+                        >
+                            <Calendar size={18} className={extraStyles.toolIcon} />
+                            {formData.deadline ? formatDate(formData.deadline, locale) : t('deadline')}
+                        </button>
 
-                            {isCalendarOpen && (
-                                <CustomCalendar
-                                    selectedDate={formData.deadline || null}
-                                    onChange={(date) => setFormData({ ...formData, deadline: date })}
-                                    onClose={() => setIsCalendarOpen(false)}
-                                />
-                            )}
-                        </div>
+                        {isCalendarOpen && (
+                            <CustomCalendar
+                                selectedDate={formData.deadline || null}
+                                onChange={(date) => setFormData({ ...formData, deadline: date })}
+                                onClose={() => setIsCalendarOpen(false)}
+                                locale={locale}
+                                todayLabel={t('today') || 'Today'}
+                            />
+                        )}
 
                         <button type="button"
                             className={`${extraStyles.toolBtn} ${extraStyles.priorityBtn} ${getIconClass(formData.priority || 'low')} ${formData.priority !== 'low' ? extraStyles.active : ''} `}
@@ -510,11 +545,11 @@ export const Tasks: React.FC = () => {
                         </button>
 
                         <button type="button"
-                            className={extraStyles.toolBtn}
+                            className={`${extraStyles.toolBtn} ${activeTool === 'status' ? extraStyles.active : ''} `}
                             onClick={() => toggleTool('status')}
                         >
                             {getStatusIcon((formData.status as Status) || 'in-progress', 18)}
-                            {getStatusLabel((formData.status as Status) || 'in-progress')}
+                            {getStatusLabel((formData.status as Status) || 'in-progress', t)}
                         </button>
 
                         <button type="button"
@@ -533,7 +568,7 @@ export const Tasks: React.FC = () => {
                             ) : (
                                 <User size={18} className={extraStyles.toolIcon} />
                             )}
-                            {formData.client || 'Клиент'}
+                            {formData.client || t('client')}
                         </button>
 
                         {projects.length > 0 && (
@@ -542,7 +577,7 @@ export const Tasks: React.FC = () => {
                                 onClick={() => toggleTool('list')}
                             >
                                 <List size={18} className={extraStyles.toolIcon} />
-                                {projects.find(p => p.id === (formData.projectId || activeTab))?.title || 'Список'}
+                                {projects.find(p => p.id === (formData.projectId || activeTab))?.title || t('list')}
                             </button>
                         )}
                     </div>
@@ -551,7 +586,7 @@ export const Tasks: React.FC = () => {
 
                     {activeTool === 'status' && (
                         <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>Статус задачи</label>
+                            <label className={formStyles.label}>{t('taskStatus')}</label>
                             <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
                                 {availableStatuses.map((s) => (
                                     <button
@@ -566,7 +601,7 @@ export const Tasks: React.FC = () => {
                                             e.preventDefault();
                                             if (!['in-progress', 'on-hold', 'completed'].includes(s)) {
                                                 // Simple confirm for now, or use custom modal
-                                                if (window.confirm(`Удалить статус "${s}"?`)) {
+                                                if (window.confirm(`${t('deleteStatusConfirm')} "${s}"?`)) {
                                                     deleteCustomStatus(s);
                                                     if (formData.status === s) setFormData({ ...formData, status: 'in-progress' });
                                                 }
@@ -574,7 +609,7 @@ export const Tasks: React.FC = () => {
                                         }}
                                     >
                                         {getStatusIcon(s as Status, 16)}
-                                        {getStatusLabel(s as Status)}
+                                        {getStatusLabel(s as Status, t)}
                                     </button>
                                 ))}
                             </div>
@@ -584,7 +619,7 @@ export const Tasks: React.FC = () => {
                                 <input
                                     type="text"
                                     className={formStyles.input}
-                                    placeholder="Новый статус..."
+                                    placeholder={t('newStatus') + "..."}
                                     id="new-status-input"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
@@ -619,42 +654,45 @@ export const Tasks: React.FC = () => {
 
                     {activeTool === 'client' && (
                         <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>Клиент</label>
+                            <label className={formStyles.label}>{t('client')}</label>
 
-                            {/* Existing Clients List */}
-                            <div className={extraStyles.statusContainer} style={{ marginTop: 8, flexWrap: 'wrap' }}>
-                                {clients.map((c) => (
-                                    <button
-                                        key={c.id}
-                                        type="button"
-                                        className={`${extraStyles.optionChip} ${formData.client === c.name ? extraStyles.active : ''}`}
-                                        onClick={() => {
-                                            const newClient = formData.client === c.name ? '' : c.name;
-                                            setFormData({ ...formData, client: newClient });
-                                            setActiveTool(null);
-                                        }}
-                                    >
-                                        <div style={{
-                                            width: 24, height: 24, borderRadius: '50%',
-                                            background: generateAvatarColor(c.name),
-                                            color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            flexShrink: 0,
-                                            fontWeight: 'bold'
-                                        }}>
-                                            {getInitials(c.name)}
-                                        </div>
-                                        {c.name}
-                                    </button>
-                                ))}
-                            </div>
+                            {clients.length > 0 ? (
+                                <div style={{ marginBottom: 16 }}>
+                                    <div className={extraStyles.statusContainer} style={{ marginTop: 8, flexWrap: 'wrap' }}>
+                                        {clients.map((c) => (
+                                            <button
+                                                key={c.id}
+                                                type="button"
+                                                className={`${extraStyles.optionChip} ${formData.client === c.name ? extraStyles.active : ''}`}
+                                                onClick={() => {
+                                                    const newClient = formData.client === c.name ? '' : c.name;
+                                                    setFormData({ ...formData, client: newClient });
+                                                    setActiveTool(null);
+                                                }}
+                                            >
+                                                <div style={{
+                                                    width: 24, height: 24, borderRadius: '50%',
+                                                    background: generateAvatarColor(c.name),
+                                                    color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    flexShrink: 0,
+                                                    fontWeight: 'bold'
+                                                }}>
+                                                    {getInitials(c.name)}
+                                                </div>
+                                                {c.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : null}
 
                             {/* Add New Client Inline */}
                             <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
                                 <input
                                     type="text"
                                     className={formStyles.input}
-                                    placeholder="Новый клиент..."
-                                    id="new-client-input"
+                                    placeholder={t('newClient')}
+                                    id="new-client-input-tasks"
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter') {
                                             e.preventDefault();
@@ -684,7 +722,7 @@ export const Tasks: React.FC = () => {
                                         flexShrink: 0
                                     }}
                                     onClick={() => {
-                                        const input = document.getElementById('new-client-input') as HTMLInputElement;
+                                        const input = document.getElementById('new-client-input-tasks') as HTMLInputElement;
                                         if (input) {
                                             const val = input.value.trim();
                                             if (val) {
@@ -704,7 +742,7 @@ export const Tasks: React.FC = () => {
 
                     {activeTool === 'list' && (
                         <div style={{ marginTop: 24 }}>
-                            <label className={formStyles.label}>Список</label>
+                            <label className={formStyles.label}>{t('list')}</label>
                             <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
                                 {projects.map((p) => (
                                     <button
@@ -727,18 +765,18 @@ export const Tasks: React.FC = () => {
                         </div>
                     )}
 
-                    <div className={formStyles.inputGroup} style={{ marginTop: 24 }}>
+                    <div style={{ marginTop: 24 }}>
                         <textarea
                             className={formStyles.textarea}
+                            placeholder={t('description')}
                             value={formData.description}
-                            onChange={e => setFormData({ ...formData, description: e.target.value })}
-                            placeholder="Описание"
-                            style={{ minHeight: 80 }}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            rows={3}
                         />
                     </div>
 
                     <button type="submit" className={styles.submitBtn}>
-                        Сохранить
+                        {t('save')}
                     </button>
                 </form>
             </Modal>
@@ -747,7 +785,7 @@ export const Tasks: React.FC = () => {
             <Modal
                 isOpen={isNewListModalOpen}
                 onClose={() => setIsNewListModalOpen(false)}
-                title={editingList ? 'Редактировать список' : 'Новый список'}
+                title={editingList ? t('editList') || 'Редактировать список' : t('newList')}
             >
                 <form onSubmit={handleSaveList}>
                     <div className={formStyles.inputGroup}>
@@ -765,7 +803,7 @@ export const Tasks: React.FC = () => {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 24 }}>
                         <button type="submit" className={formStyles.submitBtn}>
-                            {editingList ? 'Сохранить' : 'Создать'}
+                            {editingList ? t('save') : t('create')}
                         </button>
 
                         {editingList && (

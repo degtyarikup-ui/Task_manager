@@ -110,6 +110,11 @@ export const translations = {
         taskPriority: 'Приоритет задачи',
         taskStatus: 'Статус задачи',
         selectList: 'Выбрать список',
+        archive: 'Архив',
+        editList: 'Редактировать список',
+        taskTitle: 'Название задачи',
+        newStatus: 'Новый статус',
+        deleteStatusConfirm: 'Удалить статус',
 
         // Days of week
         mon: 'Пн',
@@ -231,6 +236,11 @@ export const translations = {
         taskPriority: 'Task Priority',
         taskStatus: 'Task Status',
         selectList: 'Select List',
+        archive: 'Archive',
+        editList: 'Edit List',
+        taskTitle: 'Task Name',
+        newStatus: 'New Status',
+        deleteStatusConfirm: 'Delete status',
 
         // Days of week
         mon: 'Mon',

@@ -216,3 +216,74 @@
     background-color: var(--color-text-primary) !important;
     color: var(--bg-card) !important;
 }
+
+/* Skeleton Loading */
+@keyframes skeleton-pulse {
+    0% {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    50% {
+        background-color: rgba(0, 0, 0, 0.11);
+    }
+
+    100% {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+}
+
+[data-theme='dark'] .skeletonItem {
+    background-color: #1c1c1e;
+}
+
+@keyframes skeleton-pulse-dark {
+    0% {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    50% {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    100% {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+}
+
+.skeletonItem {
+    padding: 16px;
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+.skeletonRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.skeletonCircle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+[data-theme='dark'] .skeletonCircle {
+    animation-name: skeleton-pulse-dark;
+}
+
+.skeletonLine {
+    height: 16px;
+    border-radius: 4px;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+[data-theme='dark'] .skeletonLine {
+    animation-name: skeleton-pulse-dark;
+}

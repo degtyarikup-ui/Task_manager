@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isBefore, startOfDay } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isBefore, startOfDay, type Locale } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './Calendar.module.css';
 
@@ -9,9 +8,11 @@ interface CalendarProps {
     selectedDate: string | null;
     onChange: (date: string) => void;
     onClose: () => void;
+    locale: Locale;
+    todayLabel: string;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose }) => {
+export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, locale, todayLabel }) => {
     const [currentMonth, setCurrentMonth] = useState(selectedDate ? new Date(selectedDate) : new Date());
 
     const onNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -20,10 +21,13 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
     // Generate days
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
-    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 }); // Monday start
-    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 1, locale });
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1, locale });
 
-    const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    // Generate specific week days based on locale
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1, locale });
+    const weekEnd = endOfWeek(new Date(), { weekStartsOn: 1, locale });
+    const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd }).map(d => format(d, 'EEEEEE', { locale }));
 
     const dateList = eachDayOfInterval({ start: startDate, end: endDate });
 
@@ -52,7 +56,7 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
             <div className={styles.calendarContainer} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.header}>
                     <span className={styles.title}>
-                        {format(currentMonth, 'LLLL yyyy', { locale: ru })}
+                        {format(currentMonth, 'LLLL yyyy', { locale })}
                     </span>
                     <div style={{ display: 'flex', gap: 4 }}>
                         <button type="button" className={styles.navBtn} onClick={onPrevMonth}>
@@ -89,7 +93,7 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
 
                 <div className={styles.footer} style={{ justifyContent: 'flex-end' }}>
                     <button type="button" className={styles.linkBtn} onClick={handleToday}>
-                        Сегодня
+                        {todayLabel}
                     </button>
                 </div>
             </div>

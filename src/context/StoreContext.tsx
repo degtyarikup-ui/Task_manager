@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { AppState, Client, Project, Task, Status, Priority } from '../types';
+import type { Language } from '../i18n/translations';
 import { initTelegramApp, getTelegramTheme, isTelegramWebApp, getTelegramUser } from '../utils/telegram';
 import { supabase, type DatabaseTask, type DatabaseProject, type DatabaseClient } from '../lib/supabase';
 
@@ -30,13 +31,34 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 
 
+// Helper to determine initial language
+const getInitialLanguage = (): Language => {
+    // 1. Saved choice
+    const saved = localStorage.getItem('user_language') as Language;
+    if (saved && (saved === 'ru' || saved === 'en')) return saved;
+
+    // 2. System detection
+    try {
+        const tgLang = (window as any).Telegram?.WebApp?.initDataUnsafe?.user?.language_code;
+        const navLang = navigator.language;
+        const langCode = (tgLang || navLang || 'en').toLowerCase().slice(0, 2);
+
+        if (['ru', 'be', 'uk', 'kk'].includes(langCode)) {
+            return 'ru';
+        }
+    } catch (e) {
+        console.error('Language detection failed:', e);
+    }
+    return 'en';
+};
+
 // Initial state for offline/first load
 const initialState: AppState = {
     projects: [],
     tasks: [],
     clients: [],
     theme: 'light',
-    language: 'ru'
+    language: getInitialLanguage()
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -187,10 +209,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     const toggleLanguage = () => {
-        setState(prev => ({
-            ...prev,
-            language: prev.language === 'ru' ? 'en' : 'ru'
-        }));
+        setState(prev => {
+            const newLang = prev.language === 'ru' ? 'en' : 'ru';
+            localStorage.setItem('user_language', newLang);
+            return {
+                ...prev,
+                language: newLang
+            };
+        });
     };
 
     // --- Actions with Supabase Sync ---
