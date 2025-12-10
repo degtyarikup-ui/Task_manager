@@ -1,5 +1,5 @@
 export type Priority = 'low' | 'medium' | 'high';
-export type Status = 'in-progress' | 'on-hold' | 'completed' | 'awaiting-payment' | 'paid';
+export type Status = 'in-progress' | 'on-hold' | 'completed' | 'awaiting-payment' | 'paid' | string;
 
 export interface Project {
     id: string;

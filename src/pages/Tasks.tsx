@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List } from 'lucide-react';
+import { Check, Plus, Trash2, Calendar, AlertTriangle, Loader, User, Pause, List, Hash } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -44,7 +44,7 @@ const getStatusIcon = (s: Status, size = 14) => {
         case 'in-progress': return <Loader size={size} className={extraStyles.toolIcon} />;
         case 'on-hold': return <Pause size={size} className={extraStyles.toolIcon} />;
         case 'completed': return <Check size={size} className={extraStyles.toolIcon} />;
-        default: return <Loader size={size} className={extraStyles.toolIcon} />;
+        default: return <Hash size={size} className={extraStyles.toolIcon} />;
     }
 };
 
@@ -174,7 +174,7 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting }: { task: Task
 };
 
 export const Tasks: React.FC = () => {
-    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient } = useStore();
+    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus } = useStore();
     const { t } = useTranslation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -553,26 +553,66 @@ export const Tasks: React.FC = () => {
                         <div style={{ marginTop: 24 }}>
                             <label className={formStyles.label}>Статус задачи</label>
                             <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
-                                {['in-progress', 'on-hold', 'completed'].map((s) => (
+                                {availableStatuses.map((s) => (
                                     <button
                                         key={s}
                                         type="button"
-                                        className={`${styles.filterChip} ${formData.status === s ? styles.activeChip : ''}`}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            paddingRight: '16px'
-                                        }}
+                                        className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
                                         onClick={() => {
                                             setFormData({ ...formData, status: s as Status });
                                             setActiveTool(null);
+                                        }}
+                                        onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            if (!['in-progress', 'on-hold', 'completed'].includes(s)) {
+                                                // Simple confirm for now, or use custom modal
+                                                if (window.confirm(`Удалить статус "${s}"?`)) {
+                                                    deleteCustomStatus(s);
+                                                    if (formData.status === s) setFormData({ ...formData, status: 'in-progress' });
+                                                }
+                                            }
                                         }}
                                     >
                                         {getStatusIcon(s as Status, 16)}
                                         {getStatusLabel(s as Status)}
                                     </button>
                                 ))}
+                            </div>
+
+                            {/* Add New Status */}
+                            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+                                <input
+                                    type="text"
+                                    className={formStyles.input}
+                                    placeholder="Новый статус..."
+                                    id="new-status-input"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.value.trim();
+                                            if (val) {
+                                                addCustomStatus(val);
+                                                e.currentTarget.value = '';
+                                            }
+                                        }
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    style={{
+                                        width: '44px', borderRadius: '12px', background: 'var(--color-accent)',
+                                        color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                                    }}
+                                    onClick={() => {
+                                        const input = document.getElementById('new-status-input') as HTMLInputElement;
+                                        if (input && input.value.trim()) {
+                                            addCustomStatus(input.value.trim());
+                                            input.value = '';
+                                        }
+                                    }}
+                                >
+                                    <Plus size={20} />
+                                </button>
                             </div>
                         </div>
                     )}
@@ -587,31 +627,17 @@ export const Tasks: React.FC = () => {
                                     <button
                                         key={c.id}
                                         type="button"
+                                        className={`${extraStyles.optionChip} ${formData.client === c.name ? extraStyles.active : ''}`}
                                         onClick={() => {
                                             const newClient = formData.client === c.name ? '' : c.name;
                                             setFormData({ ...formData, client: newClient });
                                             setActiveTool(null);
                                         }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 10,
-                                            padding: '4px 16px 4px 4px',
-                                            borderRadius: 100,
-                                            border: formData.client === c.name ? '1px solid var(--color-text-primary)' : '1px solid var(--color-border)',
-                                            backgroundColor: 'transparent',
-                                            color: 'var(--color-text-primary)',
-                                            fontSize: 15,
-                                            fontWeight: 600,
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            flexShrink: 0
-                                        }}
                                     >
                                         <div style={{
-                                            width: 32, height: 32, borderRadius: '50%',
+                                            width: 24, height: 24, borderRadius: '50%',
                                             background: generateAvatarColor(c.name),
-                                            color: 'white', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             flexShrink: 0,
                                             fontWeight: 'bold'
                                         }}>

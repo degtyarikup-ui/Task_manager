@@ -17,6 +17,10 @@ interface StoreContextType extends AppState {
     deleteClient: (id: string) => void;
     reorderClients: (clients: Client[]) => void;
 
+    availableStatuses: string[];
+    addCustomStatus: (status: string) => void;
+    deleteCustomStatus: (status: string) => void;
+
     toggleTheme: () => void;
     toggleLanguage: () => void;
     isLoading: boolean;
@@ -39,6 +43,34 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [state, setState] = useState<AppState>(initialState);
     const [isLoading, setIsLoading] = useState(true);
     const [userId, setUserId] = useState<number>(0);
+
+    // Statuses
+    const defaultStatuses = ['in-progress', 'on-hold', 'completed'];
+    const [customStatuses, setCustomStatuses] = useState<string[]>([]);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('custom_statuses');
+        if (saved) {
+            try { setCustomStatuses(JSON.parse(saved)); } catch (e) { }
+        }
+    }, []);
+
+    const availableStatuses = [...defaultStatuses, ...customStatuses];
+
+    const addCustomStatus = (s: string) => {
+        if (!s) return;
+        if (!availableStatuses.includes(s)) {
+            const updated = [...customStatuses, s];
+            setCustomStatuses(updated);
+            localStorage.setItem('custom_statuses', JSON.stringify(updated));
+        }
+    };
+
+    const deleteCustomStatus = (s: string) => {
+        const updated = customStatuses.filter(st => st !== s);
+        setCustomStatuses(updated);
+        localStorage.setItem('custom_statuses', JSON.stringify(updated));
+    };
 
     // 1. Initialize Telegram & Auth
     useEffect(() => {
@@ -340,6 +372,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             updateClient,
             deleteClient,
             reorderClients,
+            availableStatuses,
+            addCustomStatus,
+            deleteCustomStatus,
             toggleTheme,
             toggleLanguage,
             isLoading

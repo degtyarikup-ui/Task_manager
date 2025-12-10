@@ -148,3 +148,30 @@
     flex-wrap: wrap;
     align-items: center;
 }
+
+/* Unified Option Chip Style */
+.optionChip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--color-border);
+    background-color: transparent;
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.optionChip.active {
+    background-color: var(--color-text-primary) !important;
+    color: var(--bg-card) !important;
+    border-color: var(--color-text-primary) !important;
+}
+
+.optionChip:active {
+    transform: scale(0.98);
+}
