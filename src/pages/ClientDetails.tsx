@@ -19,7 +19,7 @@ import type { Task, Status, Priority } from '../types';
 export const ClientDetails: React.FC = () => {
     const { clientId } = useParams();
     const navigate = useNavigate();
-    const { clients, tasks, language, updateTask, deleteTask } = useStore();
+    const { clients, tasks, language, updateTask, deleteTask, deleteClient } = useStore();
     const { t } = useTranslation();
     const locale = language === 'ru' ? ru : enUS;
 
@@ -166,6 +166,24 @@ export const ClientDetails: React.FC = () => {
         }
     };
 
+    const handleDeleteClient = () => {
+        if (!client) return;
+        if (window.confirm(`${t('deleteClientConfirm')} "${client.name}"?`)) {
+            deleteClient(client.id);
+            navigate(-1);
+        }
+    };
+
+    const handleSubtaskToggle = (taskId: string, subId: string) => {
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.subtasks) {
+            const updatedSubtasks = task.subtasks.map(s =>
+                s.id === subId ? { ...s, completed: !s.completed } : s
+            );
+            updateTask(taskId, { subtasks: updatedSubtasks });
+        }
+    };
+
     return (
         <div className={`${styles.container} ${styles.detailsHeaderPadding}`}>
 
@@ -177,8 +195,24 @@ export const ClientDetails: React.FC = () => {
                 borderRadius: 24,
                 marginBottom: 32,
                 display: 'flex', alignItems: 'center', gap: 16,
-                boxShadow: 'var(--shadow-sm)'
+                boxShadow: 'var(--shadow-sm)',
+                position: 'relative'
             }}>
+                <button
+                    onClick={handleDeleteClient}
+                    style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 16,
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-danger)',
+                        padding: 8
+                    }}
+                >
+                    <Trash2 size={20} />
+                </button>
+
                 <div style={{
                     width: 64, height: 64, borderRadius: '50%',
                     background: generateAvatarColor(client.name),
@@ -209,12 +243,21 @@ export const ClientDetails: React.FC = () => {
                             onToggle={handleToggle}
                             onDelete={handleDelete}
                             onEdit={handleEdit}
+                            onSubtaskToggle={handleSubtaskToggle}
                             locale={locale}
                             t={t}
                         />
                     ))
                 )}
             </div>
+
+            <button className={styles.fab} onClick={() => {
+                resetForm();
+                setFormData(prev => ({ ...prev, client: client.name }));
+                setIsModalOpen(true);
+            }}>
+                <Plus size={28} />
+            </button>
 
             {/* Edit Modal */}
             <Modal

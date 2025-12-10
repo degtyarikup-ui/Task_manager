@@ -5,7 +5,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check } from 'lucide-react';
+import { Plus, Calendar, AlertTriangle, User, List, Trash2, Check, X } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
@@ -269,6 +269,17 @@ export const Tasks: React.FC = () => {
         }
     };
 
+    const handleSubtaskToggle = (taskId: string, subId: string) => {
+        const task = tasks.find(t => t.id === taskId);
+        if (task && task.subtasks) {
+            const updatedSubtasks = task.subtasks.map(s =>
+                s.id === subId ? { ...s, completed: !s.completed } : s
+            );
+            updateTask(taskId, { subtasks: updatedSubtasks });
+            haptic.impact('light');
+        }
+    };
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -361,6 +372,7 @@ export const Tasks: React.FC = () => {
                             setIsModalOpen(true);
                         }}
                         isDeleting={deletingId === task.id}
+                        onSubtaskToggle={handleSubtaskToggle}
                         locale={locale}
                         t={t}
                     />)
@@ -501,65 +513,63 @@ export const Tasks: React.FC = () => {
                         <div style={{ marginTop: 24 }}>
                             <label className={formStyles.label}>{t('taskStatus')}</label>
                             <div className={extraStyles.statusContainer} style={{ marginTop: 8 }}>
-                                {availableStatuses.map((s) => (
-                                    <button
-                                        key={s}
-                                        type="button"
-                                        className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
-                                        onClick={() => {
-                                            setFormData({ ...formData, status: s as Status });
-                                            setActiveTool(null);
-                                        }}
-                                        onContextMenu={(e) => {
-                                            e.preventDefault();
-                                            if (!['in-progress', 'on-hold', 'completed'].includes(s)) {
-                                                // Simple confirm for now, or use custom modal
-                                                if (window.confirm(`${t('deleteStatusConfirm')} "${s}"?`)) {
-                                                    deleteCustomStatus(s);
-                                                    if (formData.status === s) setFormData({ ...formData, status: 'in-progress' });
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        {getStatusIcon(s as Status, 16)}
-                                        {getStatusLabel(s as Status, t)}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Add New Status */}
-                            <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-                                <input
-                                    type="text"
-                                    className={formStyles.input}
-                                    placeholder={t('newStatus') + "..."}
-                                    id="new-status-input"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault();
-                                            const val = e.currentTarget.value.trim();
-                                            if (val) {
-                                                addCustomStatus(val);
-                                                e.currentTarget.value = '';
-                                            }
-                                        }
-                                    }}
-                                />
+                                {availableStatuses.map((s) => {
+                                    const isCustom = !['in-progress', 'on-hold', 'completed'].includes(s);
+                                    return (
+                                        <div key={s} style={{ position: 'relative' }}>
+                                            <button
+                                                type="button"
+                                                className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
+                                                onClick={() => {
+                                                    setFormData({ ...formData, status: s as Status });
+                                                    setActiveTool(null);
+                                                }}
+                                            >
+                                                {getStatusIcon(s as Status, 16)}
+                                                {getStatusLabel(s as Status, t)}
+                                            </button>
+                                            {isCustom && (
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (window.confirm(`${t('deleteStatusConfirm')} "${s}"?`)) {
+                                                            deleteCustomStatus(s);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: -6,
+                                                        right: -6,
+                                                        width: 20,
+                                                        height: 20,
+                                                        borderRadius: '50%',
+                                                        backgroundColor: 'var(--color-danger)',
+                                                        color: 'white',
+                                                        border: '2px solid var(--bg-card)',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        cursor: 'pointer',
+                                                        zIndex: 10
+                                                    }}
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                                 <button
                                     type="button"
-                                    style={{
-                                        width: '44px', borderRadius: '12px', background: 'var(--color-accent)',
-                                        color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-                                    }}
+                                    className={extraStyles.optionChip}
+                                    style={{ borderStyle: 'dashed', opacity: 0.7 }}
                                     onClick={() => {
-                                        const input = document.getElementById('new-status-input') as HTMLInputElement;
-                                        if (input && input.value.trim()) {
-                                            addCustomStatus(input.value.trim());
-                                            input.value = '';
-                                        }
+                                        const newStatus = prompt(t('newStatus'));
+                                        if (newStatus) addCustomStatus(newStatus);
                                     }}
                                 >
-                                    <Plus size={20} />
+                                    <Plus size={16} />
                                 </button>
                             </div>
                         </div>

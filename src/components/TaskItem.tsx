@@ -12,12 +12,13 @@ interface TaskItemProps {
     onToggle: (id: string) => void;
     onDelete: (id: string) => void;
     onEdit: (task: Task) => void;
+    onSubtaskToggle?: (taskId: string, subtaskId: string) => void;
     isDeleting?: boolean;
     locale: any;
     t: any;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, isDeleting, locale, t }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, onSubtaskToggle, isDeleting, locale, t }) => {
     const [offset, setOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const startX = React.useRef(0);
@@ -90,13 +91,30 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                             {task.title}
                         </span>
                     </div>
-                    {/* Description removed */}
-                    {(task.subtasks && task.subtasks.length > 0) && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4, marginBottom: 8 }}>
-                            <CheckSquare size={14} color="var(--color-text-secondary)" />
-                            <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                                {task.subtasks.filter(s => s.completed).length}/{task.subtasks.length}
-                            </span>
+                    {/* Subtasks List */}
+                    {(task.subtasks && task.subtasks.filter(s => !s.completed).length > 0) && (
+                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            {task.subtasks.filter(s => !s.completed).map(sub => (
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (onSubtaskToggle) onSubtaskToggle(task.id, sub.id);
+                                        }}
+                                        className={styles.checkbox}
+                                        style={{
+                                            width: 18, height: 18, borderWidth: 1.5,
+                                            borderColor: 'var(--color-text-secondary)',
+                                            marginRight: 0
+                                        }}
+                                    >
+                                        {/* Empty when not completed */}
+                                    </button>
+                                    <span style={{ fontSize: 13, color: 'var(--color-text-primary)' }}>
+                                        {sub.title}
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     )}
 
