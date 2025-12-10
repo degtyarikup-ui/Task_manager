@@ -51,8 +51,8 @@ function BottomNavWrapper() {
 
 function Layout() {
   const location = useLocation();
-  // Show Nav on main pages only
-  const showBottomNav = ['/tasks', '/clients', '/profile'].includes(location.pathname) || location.pathname === '/';
+  // Show Nav on main tabs and client details
+  const showBottomNav = ['/tasks', '/profile'].includes(location.pathname) || location.pathname.startsWith('/clients') || location.pathname === '/';
 
   return (
     <div className={styles.appContainer}>
