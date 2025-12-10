@@ -34,8 +34,12 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 // Helper to determine initial language
 const getInitialLanguage = (): Language => {
     // 1. Saved choice
-    const saved = localStorage.getItem('user_language') as Language;
-    if (saved && (saved === 'ru' || saved === 'en')) return saved;
+    try {
+        const saved = localStorage.getItem('user_language') as Language;
+        if (saved && (saved === 'ru' || saved === 'en')) return saved;
+    } catch (e) {
+        console.warn('localStorage access failed', e);
+    }
 
     // 2. System detection
     try {
@@ -71,9 +75,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [customStatuses, setCustomStatuses] = useState<string[]>([]);
 
     useEffect(() => {
-        const saved = localStorage.getItem('custom_statuses');
-        if (saved) {
-            try { setCustomStatuses(JSON.parse(saved)); } catch (e) { }
+        try {
+            const saved = localStorage.getItem('custom_statuses');
+            if (saved) {
+                setCustomStatuses(JSON.parse(saved));
+            }
+        } catch (e) {
+            console.warn('Failed to load custom statuses', e);
         }
     }, []);
 
@@ -84,27 +92,29 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (!availableStatuses.includes(s)) {
             const updated = [...customStatuses, s];
             setCustomStatuses(updated);
-            localStorage.setItem('custom_statuses', JSON.stringify(updated));
+            try { localStorage.setItem('custom_statuses', JSON.stringify(updated)); } catch (e) { }
         }
     };
 
     const deleteCustomStatus = (s: string) => {
         const updated = customStatuses.filter(st => st !== s);
         setCustomStatuses(updated);
-        localStorage.setItem('custom_statuses', JSON.stringify(updated));
+        try { localStorage.setItem('custom_statuses', JSON.stringify(updated)); } catch (e) { }
     };
 
     // 1. Initialize Telegram & Auth
     useEffect(() => {
         initTelegramApp();
         const tgUser = getTelegramUser();
-        // Use Telegram ID or fallback to a demo ID (e.g., 1 for dev)
-        // In production, you might want to force Telegram auth
         const uid = tgUser?.id || 1;
         setUserId(uid);
 
         // Load Theme
-        const savedTheme = localStorage.getItem('user_theme') as 'light' | 'dark' | null;
+        let savedTheme: 'light' | 'dark' | null = null;
+        try {
+            savedTheme = localStorage.getItem('user_theme') as 'light' | 'dark' | null;
+        } catch (e) { }
+
         if (savedTheme) {
             setState(prev => ({ ...prev, theme: savedTheme }));
         } else if (isTelegramWebApp()) {
@@ -209,7 +219,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const toggleTheme = () => {
         setState(prev => {
             const newTheme = prev.theme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('user_theme', newTheme);
+            try { localStorage.setItem('user_theme', newTheme); } catch (e) { }
             return {
                 ...prev,
                 theme: newTheme
@@ -220,7 +230,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const toggleLanguage = () => {
         setState(prev => {
             const newLang = prev.language === 'ru' ? 'en' : 'ru';
-            localStorage.setItem('user_language', newLang);
+            try { localStorage.setItem('user_language', newLang); } catch (e) { }
             return {
                 ...prev,
                 language: newLang
