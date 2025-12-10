@@ -396,7 +396,7 @@ export const Tasks: React.FC = () => {
                                 className={formStyles.input}
                                 value={newSubtaskTitle}
                                 onChange={e => setNewSubtaskTitle(e.target.value)}
-                                placeholder="Add subtask"
+                                placeholder={t('addSubtask')}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         e.preventDefault();

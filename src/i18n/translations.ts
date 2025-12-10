@@ -15,6 +15,7 @@ export const translations = {
         taskName: 'Название задачи',
         description: 'Описание',
         taskDescription: 'Описание (необязательно)',
+        addSubtask: 'Добавить подзадачу',
 
         // Task Tools
         deadline: 'Дедлайн',
@@ -141,6 +142,7 @@ export const translations = {
         taskName: 'Task Name',
         description: 'Description',
         taskDescription: 'Description (optional)',
+        addSubtask: 'Add subtask',
 
         // Task Tools
         deadline: 'Deadline',
