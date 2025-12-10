@@ -60,7 +60,7 @@ const getStatusLabel = (s: Status, t: any) => {
 }
 
 // Simple Task Card Component
-const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting, locale }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean, locale: any }) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit, isDeleting, locale, t }: { task: Task, onToggle: (id: string) => void, onDelete: (id: string) => void, onEdit: (task: Task) => void, isDeleting?: boolean, locale: any, t: any }) => {
     const [offset, setOffset] = useState(0);
     const startX = React.useRef(0);
     const isDragging = React.useRef(false);
@@ -463,26 +463,27 @@ export const Tasks: React.FC = () => {
                         <small>{t('clickToAdd')}</small>
                     </div>
                 ) : (
-                    filteredTasks.map(t => <TaskItem
-                        key={t.id}
-                        task={t}
+                    filteredTasks.map(task => <TaskItem
+                        key={task.id}
+                        task={task}
                         onToggle={toggleTask}
                         onDelete={handleDelete}
-                        onEdit={(task) => {
-                            setEditingId(task.id);
+                        onEdit={(tToEdit) => {
+                            setEditingId(tToEdit.id);
                             setFormData({
-                                title: task.title,
-                                description: task.description || '',
-                                status: task.status,
-                                priority: task.priority,
-                                projectId: task.projectId,
-                                deadline: task.deadline,
-                                client: task.client
+                                title: tToEdit.title,
+                                description: tToEdit.description || '',
+                                status: tToEdit.status,
+                                priority: tToEdit.priority,
+                                projectId: tToEdit.projectId,
+                                deadline: tToEdit.deadline,
+                                client: tToEdit.client
                             });
                             setIsModalOpen(true);
                         }}
-                        isDeleting={deletingId === t.id}
+                        isDeleting={deletingId === task.id}
                         locale={locale}
+                        t={t}
                     />)
                 )}
             </div>
