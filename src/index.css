@@ -9,8 +9,8 @@
   /* Standard gray input */
   --bg-chip: #E5E5EA;
   /* Standard gray chip */
-  --bg-nav-item-active: #F2F2F7;
-  /* Very light gray for nav active state */
+  --bg-nav-item-active: #EFF0F5;
+  /* Light gray to maintain visibility but softer than E5E5EA */
 
   /* iOS secondary system fill */
   --bg-chip-active: #1C1C1E;
