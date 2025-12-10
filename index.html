@@ -10,6 +10,13 @@
   <title>Task Manager</title>
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    // Immediate initialization to remove loader instantly
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.expand();
+      window.Telegram.WebApp.ready();
+    }
+  </script>
 </head>
 
 <body>
