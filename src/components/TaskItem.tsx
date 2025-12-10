@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Trash2, Calendar, AlertTriangle, CheckSquare } from 'lucide-react';
+import { Check, Trash2, Calendar, AlertTriangle } from 'lucide-react';
 import type { Task } from '../types';
 import styles from '../pages/Tasks.module.css';
 import extraStyles from '../pages/TasksExtra.module.css';
