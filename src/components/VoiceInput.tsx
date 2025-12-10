@@ -18,29 +18,33 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
 
     // Initialize Speech Recognition
     useEffect(() => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = false;
-            recognitionRef.current.interimResults = false;
-            recognitionRef.current.lang = 'ru-RU'; // Default to Russian as per user preference
+        try {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                recognitionRef.current = new SpeechRecognition();
+                recognitionRef.current.continuous = false;
+                recognitionRef.current.interimResults = false;
+                recognitionRef.current.lang = 'ru-RU'; // Default to Russian as per user preference
 
-            recognitionRef.current.onresult = async (event: any) => {
-                const transcript = event.results[0][0].transcript;
-                await processVoiceCommand(transcript);
-            };
+                recognitionRef.current.onresult = async (event: any) => {
+                    const transcript = event.results[0][0].transcript;
+                    await processVoiceCommand(transcript);
+                };
 
-            recognitionRef.current.onerror = (event: any) => {
-                console.error('Speech recognition error', event.error);
-                setError('Ошибка распознавания');
-                setIsListening(false);
-            };
+                recognitionRef.current.onerror = (event: any) => {
+                    console.error('Speech recognition error', event.error);
+                    setError('Ошибка распознавания');
+                    setIsListening(false);
+                };
 
-            recognitionRef.current.onend = () => {
-                if (!isProcessing) setIsListening(false);
-            };
-        } else {
-            console.warn('Browser does not support Speech Recognition');
+                recognitionRef.current.onend = () => {
+                    if (!isProcessing) setIsListening(false);
+                };
+            } else {
+                console.warn('Browser does not support Speech Recognition');
+            }
+        } catch (e) {
+            console.error('Failed to initialize speech recognition:', e);
         }
     }, []);
 
