@@ -479,8 +479,8 @@ export const Tasks: React.FC = () => {
                                                         style={{
                                                             display: 'flex',
                                                             alignItems: 'center',
-                                                            background: 'var(--bg-input)',
-                                                            padding: '8px 12px',
+                                                            background: 'transparent',
+                                                            padding: '8px 0',
                                                             borderRadius: 12,
                                                             marginBottom: 8,
                                                             ...provided.draggableProps.style

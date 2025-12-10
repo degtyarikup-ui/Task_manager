@@ -8,7 +8,7 @@ import styles from './Tasks.module.css'; // Reuse basic styles
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { ru, enUS } from 'date-fns/locale';
 import { Modal } from '../components/Modal';
-import { Calendar, AlertTriangle, List, Trash2, Plus, Check } from 'lucide-react';
+import { Calendar, AlertTriangle, List, Trash2, Plus, Check, Edit2 } from 'lucide-react';
 import formStyles from '../components/ui/Form.module.css';
 import extraStyles from './TasksExtra.module.css';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
@@ -19,7 +19,7 @@ import type { Task, Status, Priority } from '../types';
 export const ClientDetails: React.FC = () => {
     const { clientId } = useParams();
     const navigate = useNavigate();
-    const { clients, tasks, language, updateTask, deleteTask, deleteClient } = useStore();
+    const { clients, tasks, language, updateTask, deleteTask, deleteClient, updateClient } = useStore();
     const { t } = useTranslation();
     const locale = language === 'ru' ? ru : enUS;
 
@@ -42,6 +42,10 @@ export const ClientDetails: React.FC = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [activeTool, setActiveTool] = useState<string | null>(null);
     const { availableStatuses, projects } = useStore(); // Cleaned up
+
+    // Client Edit State
+    const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+    const [clientFormData, setClientFormData] = useState({ name: '', contact: '' });
 
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
@@ -174,6 +178,20 @@ export const ClientDetails: React.FC = () => {
         }
     };
 
+    const handleEditClient = () => {
+        if (!client) return;
+        setClientFormData({ name: client.name, contact: client.contact || '' });
+        setIsEditClientModalOpen(true);
+    };
+
+    const handleClientSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (client && clientFormData.name) {
+            updateClient(client.id, clientFormData);
+            setIsEditClientModalOpen(false);
+        }
+    };
+
     const handleSubtaskToggle = (taskId: string, subId: string) => {
         const task = tasks.find(t => t.id === taskId);
         if (task && task.subtasks) {
@@ -211,6 +229,21 @@ export const ClientDetails: React.FC = () => {
                     }}
                 >
                     <Trash2 size={20} />
+                </button>
+
+                <button
+                    onClick={handleEditClient}
+                    style={{
+                        position: 'absolute',
+                        top: 16,
+                        right: 56,
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-text-secondary)',
+                        padding: 8
+                    }}
+                >
+                    <Edit2 size={20} />
                 </button>
 
                 <div style={{
@@ -298,7 +331,7 @@ export const ClientDetails: React.FC = () => {
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {(formData.subtasks || []).map(sub => (
-                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: 12 }}>
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', padding: '8px 0', borderRadius: 12 }}>
                                     <button
                                         type="button"
                                         onClick={() => toggleSubtaskValid(sub.id)}
@@ -418,6 +451,40 @@ export const ClientDetails: React.FC = () => {
                     )}
 
                     <button type="submit" className={styles.submitBtn}>
+                        {t('save')}
+                    </button>
+                </form>
+            </Modal>
+
+            {/* Client Edit Modal */}
+            <Modal
+                isOpen={isEditClientModalOpen}
+                onClose={() => setIsEditClientModalOpen(false)}
+                title={t('edit')}
+            >
+                <form onSubmit={handleClientSubmit}>
+                    <div className={formStyles.inputGroup}>
+                        <label className={formStyles.label}>{t('clientNameCompany')}</label>
+                        <input
+                            className={formStyles.input}
+                            value={clientFormData.name}
+                            onChange={e => setClientFormData({ ...clientFormData, name: e.target.value })}
+                            placeholder={t('newClient')}
+                            autoFocus
+                            required
+                        />
+                    </div>
+                    <div className={formStyles.inputGroup}>
+                        <label className={formStyles.label}>{t('contacts')}</label>
+                        <input
+                            className={formStyles.input}
+                            value={clientFormData.contact}
+                            onChange={e => setClientFormData({ ...clientFormData, contact: e.target.value })}
+                            placeholder={t('contactPlaceholder')}
+                        />
+                    </div>
+
+                    <button type="submit" className={formStyles.submitBtn}>
                         {t('save')}
                     </button>
                 </form>
