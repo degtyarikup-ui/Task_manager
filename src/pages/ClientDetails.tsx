@@ -329,9 +329,9 @@ export const ClientDetails: React.FC = () => {
                                 <Plus size={20} />
                             </button>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                             {(formData.subtasks || []).map(sub => (
-                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', padding: '8px 0', borderRadius: 12 }}>
+                                <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'transparent', padding: '4px 0', borderRadius: 12 }}>
                                     <button
                                         type="button"
                                         onClick={() => toggleSubtaskValid(sub.id)}

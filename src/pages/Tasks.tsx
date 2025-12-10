@@ -468,7 +468,7 @@ export const Tasks: React.FC = () => {
                                     <div
                                         {...provided.droppableProps}
                                         ref={provided.innerRef}
-                                        style={{ display: 'flex', flexDirection: 'column', gap: 8 }}
+                                        style={{ display: 'flex', flexDirection: 'column', gap: 0 }}
                                     >
                                         {(formData.subtasks || []).map((sub, index) => (
                                             <Draggable key={sub.id} draggableId={sub.id} index={index}>
@@ -480,9 +480,9 @@ export const Tasks: React.FC = () => {
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             background: 'transparent',
-                                                            padding: '8px 0',
+                                                            padding: '4px 0',
                                                             borderRadius: 12,
-                                                            marginBottom: 8,
+                                                            marginBottom: 0,
                                                             ...provided.draggableProps.style
                                                         }}
                                                     >
