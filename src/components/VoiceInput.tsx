@@ -51,16 +51,14 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onTaskCreated }) => {
         haptic.impact('medium');
 
         try {
-            // Get API Key (Env or LocalStorage)
-            let apiKey = import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('gemini_api_key');
+            // Get API Key from Environment Variables (set by developer)
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
             if (!apiKey) {
-                apiKey = prompt('Пожалуйста, введите ваш Google Gemini API Key (он будет сохранен локально):');
-                if (apiKey) {
-                    localStorage.setItem('gemini_api_key', apiKey);
-                } else {
-                    throw new Error('API Key required');
-                }
+                console.error('Gemini API Key is missing is environment variables');
+                alert('Голосовой ввод не настроен администратором (API Key missing).');
+                setIsProcessing(false);
+                return;
             }
 
             const taskData = await parseTaskFromVoice(text, clients, apiKey);
