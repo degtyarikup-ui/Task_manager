@@ -79,7 +79,7 @@ export const Tasks: React.FC = () => {
         title: '',
         // description removed
         subtasks: [],
-        status: 'in-progress',
+        status: '',
         priority: 'low',
         deadline: '',
         client: ''
@@ -122,7 +122,7 @@ export const Tasks: React.FC = () => {
                     title: formData.title,
                     // description removed
                     subtasks: formData.subtasks || [],
-                    status: (formData.status as Status) || 'in-progress',
+                    status: (formData.status as Status) || '',
                     priority: formData.priority || 'low',
                     projectId: formData.projectId, // Allow moving lists
                     deadline: formData.deadline,
@@ -134,7 +134,7 @@ export const Tasks: React.FC = () => {
                     title: formData.title,
                     // description removed
                     subtasks: formData.subtasks || [],
-                    status: (formData.status as Status) || 'in-progress',
+                    status: (formData.status as Status) || '',
                     priority: formData.priority || 'low',
                     projectId: targetProjectId,
                     deadline: formData.deadline,
@@ -639,8 +639,8 @@ export const Tasks: React.FC = () => {
                             className={`${extraStyles.toolBtn} ${activeTool === 'status' ? extraStyles.active : ''} `}
                             onClick={() => toggleTool('status')}
                         >
-                            {getStatusIcon((formData.status as Status) || 'in-progress', 18)}
-                            {getStatusLabel((formData.status as Status) || 'in-progress', t)}
+                            {formData.status ? getStatusIcon(formData.status as Status, 18) : <div style={{ width: 16, height: 16, borderRadius: '50%', border: '1.5px solid var(--color-text-secondary)' }} />}
+                            {formData.status ? getStatusLabel(formData.status as Status, t) : t('status')}
                         </button>
 
                         <button type="button"
@@ -688,7 +688,8 @@ export const Tasks: React.FC = () => {
                                                     type="button"
                                                     className={`${extraStyles.optionChip} ${formData.status === s ? extraStyles.active : ''}`}
                                                     onClick={() => {
-                                                        setFormData({ ...formData, status: s as Status });
+                                                        const newStatus = formData.status === s ? '' : s;
+                                                        setFormData({ ...formData, status: newStatus as Status });
                                                         setActiveTool(null);
                                                     }}
                                                 >
