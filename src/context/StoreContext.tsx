@@ -237,172 +237,165 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     // Filter out invalid User 0 members
                     projectMembers = (members || []).filter((m: any) => m.user_id !== 0);
 
-                    const userIds = [...new Set([
-                        ...projectMembers.map(m => m.user_id),
-                        ...projectsData.map(p => p.user_id) // include owners
-                    ])];
-
                     // Check for Premium License Task
-                    const hasLicense = (allProjectsRaw.some(p => false)) || // Placeholder
-                        // Check in fetched tasks? Wait, tasks are not fetched yet here?
-                        // Wait, StoreContext loads tasks LATER? No, earlier I saw tasks filter?
-                        // lines 256+ is Profiles.
-                        false;
-
-                    // We need to fetch tasks somewhere or check it separately
+                    // We need to fetch tasks specifically for this check
                     const { data: licenseTask } = await supabase
                         .from('tasks')
                         .select('id')
                         .eq('user_id', userId)
                         .eq('title', '⭐️ Premium License')
                         .limit(1);
+                        .from('tasks')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('title', '⭐️ Premium License')
+        .limit(1);
 
-                    const isPremiumUser = (licenseTask && licenseTask.length > 0) || false;
+    const isPremiumUser = (licenseTask && licenseTask.length > 0) || false;
 
-                    setState(prev => ({
-                        ...prev,
-                        projects: projectsData,
-                        projectMembers,
-                        profiles: profilesMap,
-                        isPremium: isPremiumUser // Set state
-                    }));
-                    profilesCache.current = profilesMap;
+    setState(prev => ({
+        ...prev,
+        projects: projectsData,
+        projectMembers,
+        profiles: profilesMap,
+        isPremium: isPremiumUser // Set state
+    }));
+    profilesCache.current = profilesMap;
+}
+// ----------------------------------------
+
+// Fetch Clients
+const { data: clientsData, error: clientError } = await supabase
+    .from('clients')
+    .select('*')
+    .eq('user_id', userId);
+
+if (clientError) console.error('Error fetching clients:', clientError);
+
+// Fetch Tasks (Own + In Shared Projects)
+// We fetch tasks that are EITHER created by me OR belong to a project I have access to
+let tasksQuery = supabase
+    .from('tasks')
+    .select('*');
+
+if (allProjectIds.length > 0) {
+    tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
+} else {
+    tasksQuery = tasksQuery.eq('user_id', userId);
+}
+
+const { data: tasksData, error: taskError } = await tasksQuery;
+
+if (taskError) console.error('Error fetching tasks:', taskError);
+
+// Map DB types to App types
+const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => {
+    // Resolve members
+    const members = projectMembers
+        .filter(m => m.project_id === p.id)
+        .map(m => {
+            // If it's the current user, prefer live Telegram data for consistency with Profile
+            if (m.user_id === userId) {
+                const tgUser = getTelegramUser();
+                if (tgUser) {
+                    return {
+                        id: m.user_id,
+                        name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
+                        avatar: tgUser.photo_url,
+                        role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
+                    };
                 }
             }
-                // ----------------------------------------
 
-                // Fetch Clients
-                const { data: clientsData, error: clientError } = await supabase
-                .from('clients')
-                .select('*')
-                .eq('user_id', userId);
+            const profile = profilesMap.get(m.user_id);
+            return {
+                id: m.user_id,
+                name: profile?.first_name || profile?.username || `User ${m.user_id}`,
+                avatar: profile?.avatar_url,
+                role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
+            };
+        });
 
-            if (clientError) console.error('Error fetching clients:', clientError);
+    // Add Owner if not in members list (implicitly owner)
+    const ownerProfile = profilesMap.get(p.user_id);
+    const ownerInMembers = members.find(m => m.id === p.user_id);
+    if (!ownerInMembers) {
+        members.unshift({
+            id: p.user_id,
+            name: ownerProfile?.first_name || ownerProfile?.username || `User ${p.user_id}`,
+            avatar: ownerProfile?.avatar_url,
+            role: 'owner'
+        });
+    }
 
-            // Fetch Tasks (Own + In Shared Projects)
-            // We fetch tasks that are EITHER created by me OR belong to a project I have access to
-            let tasksQuery = supabase
-                .from('tasks')
-                .select('*');
-
-            if (allProjectIds.length > 0) {
-                tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
-            } else {
-                tasksQuery = tasksQuery.eq('user_id', userId);
-            }
-
-            const { data: tasksData, error: taskError } = await tasksQuery;
-
-            if (taskError) console.error('Error fetching tasks:', taskError);
-
-            // Map DB types to App types
-            const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => {
-                // Resolve members
-                const members = projectMembers
-                    .filter(m => m.project_id === p.id)
-                    .map(m => {
-                        // If it's the current user, prefer live Telegram data for consistency with Profile
-                        if (m.user_id === userId) {
-                            const tgUser = getTelegramUser();
-                            if (tgUser) {
-                                return {
-                                    id: m.user_id,
-                                    name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
-                                    avatar: tgUser.photo_url,
-                                    role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
-                                };
-                            }
-                        }
-
-                        const profile = profilesMap.get(m.user_id);
-                        return {
-                            id: m.user_id,
-                            name: profile?.first_name || profile?.username || `User ${m.user_id}`,
-                            avatar: profile?.avatar_url,
-                            role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
-                        };
-                    });
-
-                // Add Owner if not in members list (implicitly owner)
-                const ownerProfile = profilesMap.get(p.user_id);
-                const ownerInMembers = members.find(m => m.id === p.user_id);
-                if (!ownerInMembers) {
-                    members.unshift({
-                        id: p.user_id,
-                        name: ownerProfile?.first_name || ownerProfile?.username || `User ${p.user_id}`,
-                        avatar: ownerProfile?.avatar_url,
-                        role: 'owner'
-                    });
-                }
-
-                return {
-                    id: p.id,
-                    title: p.title,
-                    description: p.description || '',
-                    status: p.status as Status,
-                    createdAt: new Date(p.created_at).getTime(),
-                    members: members
-                };
-            });
-
-            const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
-                id: c.id,
-                name: c.name,
-                contact: c.contact || ''
-            }));
-
-            const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
-                let subtasks = [];
-                try {
-                    if (t.description && t.description.startsWith('[')) {
-                        subtasks = JSON.parse(t.description);
-                    }
-                } catch (e) { }
-
-                return {
-                    id: t.id,
-                    userId: t.user_id,
-                    title: t.title,
-                    subtasks: subtasks,
-                    status: t.status as Status,
-                    priority: t.priority as Priority,
-                    deadline: t.deadline || '',
-                    client: t.client || '',
-                    projectId: t.project_id || undefined,
-                    createdAt: new Date(t.created_at).getTime(),
-                    updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
-                };
-            });
-
-            // Check Premium Status
-            let isPremium = false;
-            const { data: myProfile } = await supabase
-                .from('profiles')
-                .select('subscription_end_date')
-                .eq('id', userId)
-                .single();
-
-            if (myProfile?.subscription_end_date) {
-                isPremium = new Date(myProfile.subscription_end_date) > new Date();
-            }
-
-            setState(prev => ({
-                ...prev,
-                projects,
-                clients,
-                tasks,
-                isPremium
-            }));
-
-        } catch (error) {
-            console.error('Failed to load data:', error);
-        } finally {
-            setIsLoading(false);
-        }
+    return {
+        id: p.id,
+        title: p.title,
+        description: p.description || '',
+        status: p.status as Status,
+        createdAt: new Date(p.created_at).getTime(),
+        members: members
     };
+});
 
-    loadData();
-}, [userId]);
+const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
+    id: c.id,
+    name: c.name,
+    contact: c.contact || ''
+}));
+
+const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
+    let subtasks = [];
+    try {
+        if (t.description && t.description.startsWith('[')) {
+            subtasks = JSON.parse(t.description);
+        }
+    } catch (e) { }
+
+    return {
+        id: t.id,
+        userId: t.user_id,
+        title: t.title,
+        subtasks: subtasks,
+        status: t.status as Status,
+        priority: t.priority as Priority,
+        deadline: t.deadline || '',
+        client: t.client || '',
+        projectId: t.project_id || undefined,
+        createdAt: new Date(t.created_at).getTime(),
+        updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
+    };
+});
+
+// Check Premium Status
+let isPremium = false;
+const { data: myProfile } = await supabase
+    .from('profiles')
+    .select('subscription_end_date')
+    .eq('id', userId)
+    .single();
+
+if (myProfile?.subscription_end_date) {
+    isPremium = new Date(myProfile.subscription_end_date) > new Date();
+}
+
+setState(prev => ({
+    ...prev,
+    projects,
+    clients,
+    tasks,
+    isPremium
+}));
+
+            } catch (error) {
+    console.error('Failed to load data:', error);
+} finally {
+    setIsLoading(false);
+}
+        };
+
+loadData();
+    }, [userId]);
 
 // Apply theme changes to DOM
 useEffect(() => {
