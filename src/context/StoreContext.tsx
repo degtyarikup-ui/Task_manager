@@ -15,7 +15,7 @@ interface StoreContextType extends AppState {
     updateTask: (id: string, data: Partial<Task>) => void;
     deleteTask: (id: string) => void;
 
-    addClient: (client: Omit<Client, 'id'>) => void;
+    addClient: (data: Omit<Client, 'id'>) => Promise<string | undefined>;
     updateClient: (id: string, client: Partial<Client>) => void;
     deleteClient: (id: string) => void;
     reorderClients: (clients: Client[]) => void;
@@ -627,19 +627,28 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             .insert({
                 user_id: userId,
                 name: data.name,
-                contact: data.contact
+                contact: data.contact,
+                avatar_url: data.avatar_url,
+                telegram_id: data.telegram_id,
+                notes: data.notes
             })
             .select()
             .single();
 
-        if (error) console.error('Error adding client:', error);
+        if (error) {
+            console.error('Error adding client:', error);
+            // Revert state if needed, or simple logging
+            return undefined;
+        }
 
         if (inserted) {
             setState(prev => ({
                 ...prev,
                 clients: prev.clients.map(c => c.id === tempId ? { ...c, id: inserted.id } : c)
             }));
+            return inserted.id; // Return Real ID
         }
+        return undefined;
     };
 
     const updateClient = async (id: string, data: Partial<Client>) => {

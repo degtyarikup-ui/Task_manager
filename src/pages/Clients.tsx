@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { Modal } from '../components/Modal';
 import { ConfirmModal } from '../components/ConfirmModal';
-import { Plus } from 'lucide-react';
+import { Plus, Camera } from 'lucide-react';
 import styles from './Clients.module.css';
 import formStyles from '../components/ui/Form.module.css';
 import type { Client } from '../types';
@@ -14,7 +14,7 @@ import { haptic } from '../utils/haptics';
 
 export const Clients: React.FC = () => {
     const navigate = useNavigate();
-    const { clients, addClient, updateClient, deleteClient, reorderClients, language } = useStore();
+    const { clients, addClient, updateClient, deleteClient, reorderClients, language, uploadClientAvatar } = useStore();
 
     const onDragEnd = (result: DropResult) => {
         if (!result.destination) return;
@@ -40,6 +40,17 @@ export const Clients: React.FC = () => {
         name: '',
         contact: ''
     });
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
 
     const [confirmConfig, setConfirmConfig] = useState({
         isOpen: false,
@@ -86,32 +97,48 @@ export const Clients: React.FC = () => {
             name: client.name,
             contact: client.contact
         });
+        setPreviewUrl(client.avatar_url || null);
+        setSelectedFile(null);
         setEditingId(client.id);
         setIsModalOpen(true);
     };
 
     const handleCreate = () => {
         setFormData({ name: '', contact: '' });
+        setPreviewUrl(null);
+        setSelectedFile(null);
         setEditingId(null);
         setIsModalOpen(true);
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.name) {
+            let targetId = editingId;
             if (editingId) {
                 updateClient(editingId, {
                     name: formData.name,
                     contact: formData.contact || ''
                 });
             } else {
-                addClient({
+                targetId = await addClient({
                     name: formData.name,
                     contact: formData.contact || ''
-                });
+                }) || null;
             }
+
+            if (selectedFile && targetId) {
+                try {
+                    await uploadClientAvatar(targetId, selectedFile);
+                } catch (error) {
+                    console.error('Failed to upload avatar', error);
+                }
+            }
+
             setIsModalOpen(false);
             setFormData({ name: '', contact: '' });
+            setSelectedFile(null);
+            setPreviewUrl(null);
             setEditingId(null);
         }
     };
@@ -212,6 +239,43 @@ export const Clients: React.FC = () => {
                 title={editingId ? t('edit') : t('newClientBtn')}
             >
                 <form onSubmit={handleSubmit}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleFileChange}
+                        />
+                        <div
+                            onClick={() => fileInputRef.current?.click()}
+                            style={{
+                                width: 80, height: 80, borderRadius: '50%',
+                                background: previewUrl ? 'transparent' : (formData.name ? generateAvatarColor(formData.name) : '#f2f2f7'),
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                position: 'relative', overflow: 'hidden', cursor: 'pointer',
+                                border: '1px solid var(--color-border)'
+                            }}
+                        >
+                            {previewUrl ? (
+                                <img src={previewUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                formData.name ? (
+                                    <div style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>{getInitials(formData.name)}</div>
+                                ) : (
+                                    <Camera size={32} color="var(--color-text-secondary)" />
+                                )
+                            )}
+                            <div style={{
+                                position: 'absolute', bottom: 0, left: 0, right: 0,
+                                background: 'rgba(0,0,0,0.3)', color: 'white',
+                                fontSize: 10, textAlign: 'center', padding: 2
+                            }}>
+                                {previewUrl ? 'Edit' : 'Add user photo'}
+                            </div>
+                        </div>
+                    </div>
+
                     <div className={formStyles.inputGroup}>
                         <label className={formStyles.label}>{t('clientNameCompany')}</label>
                         <input
