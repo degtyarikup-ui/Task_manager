@@ -22,7 +22,7 @@ import styles from './Profile.module.css';
 
 
 export const Profile: React.FC = () => {
-    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, togglePremiumDebug } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, togglePremiumDebug, userId } = useStore();
     const { t } = useTranslation();
     const navigate = useNavigate();
 
@@ -253,19 +253,21 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8, opacity: 0.5 }}>
-                <button onClick={togglePremiumDebug} style={{
-                    background: 'transparent',
-                    border: '1px dashed var(--color-text-secondary)',
-                    color: 'var(--color-text-secondary)',
-                    padding: '6px 12px',
-                    borderRadius: 8,
-                    fontSize: 11,
-                    cursor: 'pointer'
-                }}>
-                    Dev: Toggle Premium
-                </button>
-            </div>
+            {userId === 6034524743 && (
+                <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8, opacity: 0.5 }}>
+                    <button onClick={togglePremiumDebug} style={{
+                        background: 'transparent',
+                        border: '1px dashed var(--color-text-secondary)',
+                        color: 'var(--color-text-secondary)',
+                        padding: '6px 12px',
+                        borderRadius: 8,
+                        fontSize: 11,
+                        cursor: 'pointer'
+                    }}>
+                        Dev: Toggle Premium
+                    </button>
+                </div>
+            )}
 
             <div className={styles.version}>
                 {t('version')} 1.0.3 • Build 242
