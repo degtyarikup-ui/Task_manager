@@ -22,9 +22,10 @@ import styles from './Profile.module.css';
 
 
 export const Profile: React.FC = () => {
-    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, togglePremiumDebug, userId } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, togglePremiumDebug, userId, userProfile, uploadProfileAvatar } = useStore();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Calculated Statistics
     const completedTasks = tasks.filter(t => t.status === 'completed').length;
@@ -43,11 +44,25 @@ export const Profile: React.FC = () => {
         initials: telegramUser?.first_name
             ? `${telegramUser.first_name[0]}${telegramUser.last_name?.[0] || ''}`
             : 'П',
-        gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id), // Use shared util
-        avatarUrl: telegramUser?.photo_url
+        gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id),
+        avatarUrl: userProfile?.avatar_url || telegramUser?.photo_url
     };
 
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
 
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            try {
+                await uploadProfileAvatar(file);
+            } catch (error) {
+                console.error('Failed to upload avatar', error);
+                alert('Failed to upload avatar');
+            }
+        }
+    };
 
     const [confirmConfig, setConfirmConfig] = useState({
         isOpen: false,
@@ -113,12 +128,22 @@ export const Profile: React.FC = () => {
 
             {/* Profile Header */}
             <div className={styles.profileCard}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
                 <div
                     className={styles.avatar}
                     style={{
                         background: user.avatarUrl ? 'transparent' : (user?.gradient || 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)'),
-                        overflow: 'hidden' // Ensure image respects border radius
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        position: 'relative'
                     }}
+                    onClick={handleAvatarClick}
                 >
                     {user.avatarUrl ? (
                         <img
@@ -129,6 +154,13 @@ export const Profile: React.FC = () => {
                     ) : (
                         user.initials
                     )}
+                    <div style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0,
+                        background: 'rgba(0,0,0,0.3)', color: 'white',
+                        fontSize: 10, textAlign: 'center', padding: 2
+                    }}>
+                        Edit
+                    </div>
                 </div>
                 <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.name}</div>

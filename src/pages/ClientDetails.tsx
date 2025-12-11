@@ -19,9 +19,27 @@ import type { Task, Status, Priority } from '../types';
 export const ClientDetails: React.FC = () => {
     const { clientId } = useParams();
     const navigate = useNavigate();
-    const { clients, tasks, language, updateTask, deleteTask, deleteClient, updateClient } = useStore();
+    const { clients, tasks, language, updateTask, deleteTask, deleteClient, updateClient, uploadClientAvatar } = useStore();
     const { t } = useTranslation();
     const locale = language === 'ru' ? ru : enUS;
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        const client = clients.find(c => c.id === clientId);
+        if (file && client) {
+            try {
+                await uploadClientAvatar(client.id, file);
+            } catch (error) {
+                console.error('Failed to upload client avatar', error);
+                alert('Failed to upload avatar');
+            }
+        }
+    };
 
     useEffect(() => {
         const tg = (window as any).Telegram?.WebApp;
@@ -216,6 +234,13 @@ export const ClientDetails: React.FC = () => {
                 boxShadow: 'var(--shadow-sm)',
                 position: 'relative'
             }}>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleFileChange}
+                />
                 <button
                     onClick={handleDeleteClient}
                     style={{
@@ -246,27 +271,43 @@ export const ClientDetails: React.FC = () => {
                     <Edit2 size={20} />
                 </button>
 
-                {client.avatar_url ? (
-                    <img
-                        src={client.avatar_url}
-                        alt={client.name}
-                        style={{
-                            width: 64, height: 64, borderRadius: '50%',
-                            objectFit: 'cover',
-                            flexShrink: 0
-                        }}
-                    />
-                ) : (
-                    <div style={{
+                <div
+                    onClick={handleAvatarClick}
+                    style={{
+                        position: 'relative',
+                        cursor: 'pointer',
                         width: 64, height: 64, borderRadius: '50%',
-                        background: generateAvatarColor(client.name),
-                        color: 'white', fontSize: 24, fontWeight: 'bold',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        overflow: 'hidden'
+                    }}
+                >
+                    {client.avatar_url ? (
+                        <img
+                            src={client.avatar_url}
+                            alt={client.name}
+                            style={{
+                                width: '100%', height: '100%',
+                                objectFit: 'cover'
+                            }}
+                        />
+                    ) : (
+                        <div style={{
+                            width: '100%', height: '100%',
+                            background: generateAvatarColor(client.name),
+                            color: 'white', fontSize: 24, fontWeight: 'bold',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                            {getInitials(client.name)}
+                        </div>
+                    )}
+                    <div style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0,
+                        background: 'rgba(0,0,0,0.3)', color: 'white',
+                        fontSize: 10, textAlign: 'center', padding: 2
                     }}>
-                        {getInitials(client.name)}
+                        Edit
                     </div>
-                )}
+                </div>
                 <div>
                     <div style={{ fontSize: 20, fontWeight: 600, color: 'var(--color-text-primary)' }}>{client.name}</div>
                     {client.contact && <div style={{ color: 'var(--color-text-secondary)', fontSize: 15, marginTop: 4 }}>{client.contact}</div>}

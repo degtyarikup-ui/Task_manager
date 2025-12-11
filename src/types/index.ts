@@ -57,4 +57,5 @@ export interface AppState {
     theme: 'light' | 'dark';
     language: Language;
     isPremium: boolean;
+    userProfile?: { avatar_url?: string };
 }

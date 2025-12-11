@@ -33,6 +33,8 @@ interface StoreContextType extends AppState {
     deleteAccount: () => Promise<void>;
     getUserInfo: (userId: number) => { name: string; avatar?: string; id: number } | undefined;
     togglePremiumDebug: () => void;
+    uploadClientAvatar: (clientId: string, file: File) => Promise<void>;
+    uploadProfileAvatar: (file: File) => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -389,7 +391,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 let isPremium = false;
                 const { data: myProfile } = await supabase
                     .from('profiles')
-                    .select('subscription_end_date')
+                    .select('subscription_end_date, avatar_url')
                     .eq('id', userId)
                     .single();
 
@@ -402,7 +404,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     projects,
                     clients,
                     tasks,
-                    isPremium
+                    isPremium,
+                    userProfile: { avatar_url: myProfile?.avatar_url }
                 }));
 
             } catch (error) {
@@ -699,6 +702,47 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return undefined;
     };
 
+    const uploadClientAvatar = async (clientId: string, file: File) => {
+        const fileName = `client_${clientId}_${Date.now()}.${file.name.split('.').pop()}`;
+        const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { upsert: true });
+        if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw uploadError;
+        }
+
+        const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        const avatarUrl = publicData.publicUrl;
+
+        const { error: dbError } = await supabase.from('clients').update({ avatar_url: avatarUrl }).eq('id', clientId);
+        if (dbError) console.error('DB Update error:', dbError);
+
+        setState(prev => ({
+            ...prev,
+            clients: prev.clients.map(c => c.id === clientId ? { ...c, avatar_url: avatarUrl } : c)
+        }));
+    };
+
+    const uploadProfileAvatar = async (file: File) => {
+        if (!userId) return;
+        const fileName = `user_${userId}_${Date.now()}.${file.name.split('.').pop()}`;
+        const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, file, { upsert: true });
+        if (uploadError) {
+            console.error('Upload error:', uploadError);
+            throw uploadError;
+        }
+
+        const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+        const avatarUrl = publicData.publicUrl;
+
+        const { error: dbError } = await supabase.from('profiles').upsert({ id: userId, avatar_url: avatarUrl });
+        if (dbError) console.error('DB Update error:', dbError);
+
+        setState(prev => ({
+            ...prev,
+            userProfile: { ...prev.userProfile, avatar_url: avatarUrl }
+        }));
+    };
+
     return (
         <StoreContext.Provider value={{
             ...state,
@@ -723,7 +767,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             isLoading,
             userId,
             deleteAccount,
-            togglePremiumDebug
+            togglePremiumDebug,
+            uploadClientAvatar,
+            uploadProfileAvatar
         }}>
             {children}
         </StoreContext.Provider>
