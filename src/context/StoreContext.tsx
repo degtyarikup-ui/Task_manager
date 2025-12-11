@@ -422,9 +422,11 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setState(prev => ({ ...prev, isPremium: newStatus }));
 
         if (userId) {
-            await supabase.from('profiles').update({
+            // Use upsert to create profile if it doesn't exist
+            await supabase.from('profiles').upsert({
+                id: userId,
                 is_premium: newStatus
-            }).eq('id', userId);
+            });
         }
     };
 
