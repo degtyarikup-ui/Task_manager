@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 
-import { Star, BarChart2, ShieldCheck, Sparkles } from 'lucide-react';
+import { Star, BarChart2, ShieldCheck, Sparkles, Mic, Lock } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -117,6 +117,16 @@ export const Premium: React.FC = () => {
                     <div className={styles.featureText}>
                         <h3>{t('supportDev')}</h3>
                         <p>{t('supportDevDesc')}</p>
+                    </div>
+                </div>
+
+                <div className={styles.featureCard}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(42, 171, 238, 0.1)', color: '#2AABEE' }}>
+                        <Mic size={24} />
+                    </div>
+                    <div className={styles.featureText}>
+                        <h3>{t('featureBot')}</h3>
+                        <p>{t('featureBotDesc')}</p>
                     </div>
                 </div>
 
