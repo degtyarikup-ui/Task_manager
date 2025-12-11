@@ -17,7 +17,7 @@ const GRADIENTS = [
 // Generate a consistent gradient from a string using predetermined palettes
 export const generateAvatarColor = (name: string, userId?: number): string => {
     // If userId is provided, use exact same logic as Profile.tsx for consistency
-    if (userId) {
+    if (userId !== undefined) {
         const hue1 = (userId * 137) % 360;
         const hue2 = (hue1 + 60) % 360;
         return `linear-gradient(135deg, hsl(${hue1}, 70%, 55%), hsl(${hue2}, 70%, 50%))`;
