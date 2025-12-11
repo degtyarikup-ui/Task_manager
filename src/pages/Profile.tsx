@@ -41,7 +41,8 @@ export const Profile: React.FC = () => {
         initials: telegramUser?.first_name
             ? `${telegramUser.first_name[0]}${telegramUser.last_name?.[0] || ''}`
             : 'П',
-        gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id) // Use shared util
+        gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id), // Use shared util
+        avatarUrl: telegramUser?.photo_url
     };
 
     const [confirmConfig, setConfirmConfig] = useState({
@@ -111,10 +112,19 @@ export const Profile: React.FC = () => {
                 <div
                     className={styles.avatar}
                     style={{
-                        background: user?.gradient || 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)'
+                        background: user.avatarUrl ? 'transparent' : (user?.gradient || 'linear-gradient(135deg, #6B73FF 0%, #000DFF 100%)'),
+                        overflow: 'hidden' // Ensure image respects border radius
                     }}
                 >
-                    {user.initials}
+                    {user.avatarUrl ? (
+                        <img
+                            src={user.avatarUrl}
+                            alt={user.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    ) : (
+                        user.initials
+                    )}
                 </div>
                 <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.name}</div>
