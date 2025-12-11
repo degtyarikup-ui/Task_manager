@@ -20,6 +20,7 @@ import { Tooltip } from '../components/Tooltip';
 
 import { TaskItem } from '../components/TaskItem';
 import { ProjectMembersHeader } from '../components/ProjectMembersHeader';
+import { UndoToast } from '../components/UndoToast';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
 // ... logic ...
@@ -475,38 +476,13 @@ export const Tasks: React.FC = () => {
                 pointerEvents: 'none' // Allow clicks through transparent areas
             }}>
                 {Array.from(pendingDeletes.keys()).map(id => (
-                    <div
+                    <UndoToast
                         key={id}
-                        style={{
-                            background: 'var(--bg-card)',
-                            color: 'var(--color-text-primary)',
-                            padding: '12px 16px',
-                            borderRadius: 12,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            animation: 'slideUp 0.3s ease-out',
-                            pointerEvents: 'auto', // Re-enable clicks
-                            border: '1px solid var(--border-color)'
-                        }}
-                    >
-                        <span style={{ fontSize: 14, fontWeight: 500 }}>{t('taskDeleted')}</span>
-                        <button
-                            onClick={() => undoDelete(id)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--color-accent)',
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                padding: '4px 8px'
-                            }}
-                        >
-                            {t('undo')}
-                        </button>
-                    </div>
+                        onUndo={() => undoDelete(id)}
+                        label={t('taskDeleted')}
+                        undoLabel={t('undo')}
+                        duration={5000}
+                    />
                 ))}
             </div>
 
