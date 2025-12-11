@@ -33,5 +33,8 @@ export type DatabaseClient = {
     user_id: number;
     name: string;
     contact?: string;
+    avatar_url?: string;
+    telegram_id?: number;
+    notes?: string;
     created_at: string;
 };

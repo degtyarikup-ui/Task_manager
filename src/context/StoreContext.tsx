@@ -356,7 +356,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
                     id: c.id,
                     name: c.name,
-                    contact: c.contact || ''
+                    contact: c.contact || '',
+                    avatar_url: c.avatar_url,
+                    telegram_id: c.telegram_id,
+                    notes: c.notes
                 }));
 
                 const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
