@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const GEMINI_API_KEY = "AIzaSyC1mXilo0OI71fJpnNSQdckbWafG7TWxUw"; // TODO: Move to Supabase Secrets in production
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || "";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -30,19 +30,42 @@ serve(async (req) => {
       Example: ["Buy materials", "Call contractor"]
     `;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
-        });
+        const models = ['gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-pro', 'gemini-1.0-pro'];
+        let data;
+        let lastError;
 
-        const data = await response.json();
-        console.log("Gemini Response:", JSON.stringify(data));
+        for (const model of models) {
+            try {
+                console.log(`Trying model: ${model}`);
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
 
-        if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-            throw new Error("Failed to generate content from Gemini");
+                data = await response.json();
+
+                if (data.error) {
+                    console.warn(`Model ${model} error:`, data.error);
+                    lastError = data.error;
+                    continue; // Try next model
+                }
+
+                if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                    console.log(`Success with model: ${model}`);
+                    break; // Success!
+                }
+            } catch (e) {
+                console.error(`Fetch error for ${model}:`, e);
+                lastError = e;
+            }
+        }
+
+        if (!data || !data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+            console.error("All models failed. Last error:", JSON.stringify(lastError));
+            throw new Error(`Failed to generate content. Google Error: ${lastError?.message || 'Unknown'}`);
         }
 
         let text = data.candidates[0].content.parts[0].text.trim();
