@@ -148,10 +148,12 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                                 {task.client}
                             </span>
                         )}
-                        <span className={extraStyles.metaBadge}>
-                            {getStatusIcon(task.status, 10)}
-                            {getStatusLabel(task.status, t)}
-                        </span>
+                        {task.status && (
+                            <span className={extraStyles.metaBadge}>
+                                {getStatusIcon(task.status, 10)}
+                                {getStatusLabel(task.status, t)}
+                            </span>
+                        )}
                         {owner && (
                             <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
                                 <div style={{
