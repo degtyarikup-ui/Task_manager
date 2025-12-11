@@ -385,11 +385,12 @@ export const Tasks: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <h1 className={styles.title}>{t('tasks')}</h1>
                 </div>
+            </header>
 
+            <div className={styles.stickyHeader}>
                 <ProjectToolbar
                     projects={projects}
                     activeTab={activeTab}
@@ -398,13 +399,13 @@ export const Tasks: React.FC = () => {
                     onEditList={handleEditList}
                     t={t}
                 />
+            </div>
 
-                {activeTab !== 'all' && (() => {
-                    const project = projects.find(p => p.id === activeTab);
-                    if (!project) return null;
-                    return <ProjectMembersHeader project={project} t={t as any} />;
-                })()}
-            </header>
+            {activeTab !== 'all' && (() => {
+                const project = projects.find(p => p.id === activeTab);
+                if (!project) return null;
+                return <ProjectMembersHeader project={project} t={t as any} />;
+            })()}
 
             <div className={styles.taskList}>
                 {isLoading ? (

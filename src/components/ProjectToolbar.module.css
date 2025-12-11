@@ -3,16 +3,15 @@
     align-items: center;
     gap: 0;
     /* Removed gap, handled by scrollArea padding for fade effect */
-    width: calc(100% + 32px);
+    width: 100%;
     /* Break out of parent padding */
     padding: 0 0 0 20px;
     /* Internal padding to align button with content */
-    margin-left: -16px;
-    /* Shift left to screen edge */
-    margin-top: 16px;
+    /* margin-left removed, moved to sticky wrapper */
+    /* width removed or 100% */
+    /* margin-top: 16px; removed */
     box-sizing: border-box;
     position: relative;
-    max-width: 100vw;
     overflow: hidden;
 }
 
