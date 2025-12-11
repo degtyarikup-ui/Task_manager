@@ -34,12 +34,15 @@ function TelegramThemeHandler() {
   }, [joinProject]);
 
   useEffect(() => {
-
     const tg = (window as any).Telegram?.WebApp;
     if (tg) {
+      // Ensure header matches app background
       const color = theme === 'dark' ? '#000000' : '#F5F5F7';
+
       if (tg.setHeaderColor) tg.setHeaderColor(color);
       if (tg.setBackgroundColor) tg.setBackgroundColor(color);
+      if (tg.setBottomBarColor) tg.setBottomBarColor(color); // For newer versions
+
       if (tg.expand) tg.expand();
     }
   }, [theme]);
