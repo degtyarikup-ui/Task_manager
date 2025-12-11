@@ -244,7 +244,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                                         id: m.user_id,
                                         name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
                                         avatar: tgUser.photo_url,
-                                        role: m.role as 'member' | 'owner'
+                                        role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
                                     };
                                 }
                             }
@@ -254,7 +254,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                                 id: m.user_id,
                                 name: profile?.first_name || profile?.username || `User ${m.user_id}`,
                                 avatar: profile?.avatar_url,
-                                role: m.role as 'member' | 'owner'
+                                role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
                             };
                         });
 

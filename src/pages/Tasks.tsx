@@ -313,47 +313,9 @@ export const Tasks: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
+
                 <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                     <h1 className={styles.title}>{t('tasks')}</h1>
-                    {activeTab !== 'all' && (() => {
-                        const project = projects.find(p => p.id === activeTab);
-                        if (!project) return null;
-
-                        return <ProjectMembersHeader project={project} t={t as any} />;
-                    })()}
-
-                    {activeTab !== 'all' && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                const project = projects.find(p => p.id === activeTab);
-                                if (!project) return;
-                                const inviteLink = `https://t.me/track_it1_bot?startapp=invite_${project.id}`;
-                                const shareText = t('shareMessage').replace('{listName}', project.title);
-                                const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(shareText)}`;
-
-                                const tg = (window as any).Telegram?.WebApp;
-                                if (tg && tg.openTelegramLink) {
-                                    tg.openTelegramLink(url);
-                                } else {
-                                    window.open(url, '_blank');
-                                }
-                            }}
-                            style={{
-                                position: 'absolute',
-                                right: 60,
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--color-text-primary)',
-                                padding: 8,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Share2 size={24} strokeWidth={2.5} />
-                        </button>
-                    )}
                 </div>
 
                 <div className={extraStyles.toolbar} style={{ marginTop: 12, padding: 0 }}>
@@ -399,6 +361,12 @@ export const Tasks: React.FC = () => {
 
 
                 </div>
+
+                {activeTab !== 'all' && (() => {
+                    const project = projects.find(p => p.id === activeTab);
+                    if (!project) return null;
+                    return <ProjectMembersHeader project={project} t={t as any} />;
+                })()}
             </header>
 
             <div className={styles.taskList}>

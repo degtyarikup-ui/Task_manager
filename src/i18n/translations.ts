@@ -132,6 +132,8 @@ export const translations = {
         removeMember: 'Удалить участника',
         removeMemberConfirm: 'Вы уверены, что хотите удалить участника',
         you: 'Вы',
+        owner: 'Владелец',
+        member: 'Участник',
     },
     en: {
         // Bottom Navigation
@@ -266,6 +268,8 @@ export const translations = {
         removeMember: 'Remove Member',
         removeMemberConfirm: 'Are you sure you want to remove member',
         you: 'You',
+        owner: 'Owner',
+        member: 'Member',
     },
 };
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { Modal } from './Modal';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Share2, Users } from 'lucide-react';
 import type { Project } from '../types';
 
 interface ProjectMembersHeaderProps {
@@ -21,65 +21,97 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
     const myRole = members.find(m => m.id === userId)?.role;
     const canManage = myRole === 'owner';
 
+    const handleShare = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const inviteLink = `https://t.me/track_it1_bot?startapp=invite_${project.id}`;
+        const shareText = t('shareMessage').replace('{listName}', project.title);
+        const url = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(shareText)}`;
+
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg && tg.openTelegramLink) {
+            tg.openTelegramLink(url);
+        } else {
+            window.open(url, '_blank');
+        }
+    };
+
     return (
         <>
-            <div
-                onClick={() => setIsMembersModalOpen(true)}
-                style={{
-                    position: 'absolute',
-                    left: 60,
-                    display: 'flex',
-                    alignItems: 'center',
-                    cursor: 'pointer'
-                }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {members.slice(0, 3).map((m, i) => (
-                        <div
-                            key={m.id}
-                            style={{
-                                width: 28,
-                                height: 28,
-                                borderRadius: '50%',
-                                border: '2px solid var(--bg-page)',
-                                marginLeft: i > 0 ? -10 : 0,
-                                overflow: 'hidden',
-                                backgroundColor: generateAvatarColor(m.name, m.id),
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#fff',
-                                fontSize: 10,
-                                fontWeight: 'bold',
-                                zIndex: members.length - i
-                            }}
-                        >
-                            {m.avatar ? (
-                                <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                getInitials(m.name)
-                            )}
-                        </div>
-                    ))}
-                    {members.length > 3 && (
-                        <div style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: '50%',
-                            border: '2px solid var(--bg-page)',
-                            marginLeft: -10,
-                            backgroundColor: 'var(--bg-card)',
-                            color: 'var(--color-text-primary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: 10,
-                            fontWeight: 'bold',
-                            zIndex: 0
-                        }}>
-                            +{members.length - 3}
-                        </div>
-                    )}
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 16,
+                paddingBottom: 16,
+                marginTop: -8 // Pull up slightly towards title
+            }}>
+                {/* Members Pill */}
+                <div
+                    onClick={() => setIsMembersModalOpen(true)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        background: 'var(--bg-card)',
+                        padding: '6px 12px',
+                        borderRadius: 20,
+                        cursor: 'pointer',
+                        boxShadow: 'var(--shadow-sm)'
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginRight: 8 }}>
+                        {members.slice(0, 3).map((m, i) => (
+                            <div
+                                key={m.id}
+                                style={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: '50%',
+                                    border: '2px solid var(--bg-card)',
+                                    marginLeft: i > 0 ? -8 : 0,
+                                    overflow: 'hidden',
+                                    backgroundColor: generateAvatarColor(m.name, m.id),
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#fff',
+                                    fontSize: 9,
+                                    fontWeight: 'bold',
+                                    zIndex: members.length - i
+                                }}
+                            >
+                                {m.avatar ? (
+                                    <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    getInitials(m.name)
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+                        {members.length > 3 ? `+${members.length - 3}` : t('members')}
+                    </span>
                 </div>
+
+                {/* Share Button Pill */}
+                <button
+                    onClick={handleShare}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        background: 'var(--bg-card)',
+                        padding: '6px 16px',
+                        borderRadius: 20,
+                        border: 'none',
+                        color: 'var(--color-accent)', // Use accent color for action visibility
+                        cursor: 'pointer',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        boxShadow: 'var(--shadow-sm)'
+                    }}
+                >
+                    <Share2 size={16} />
+                    {t('share')}
+                </button>
             </div>
 
             <Modal
@@ -106,13 +138,15 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                                 <div>
                                     <div style={{ fontWeight: 500 }}>{m.name}</div>
                                     <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                                        {m.role === 'owner' ? t('lists') : m.role}
-                                        {m.role === 'owner' ? '👑' : ''}
-                                        {m.id === userId ? ` (${t('you') || 'You'})` : ''}
+                                        {/* Translate role: owner/member */}
+                                        {t(m.role)}
+                                        {m.role === 'owner' ? ' 👑' : ''}
+                                        {m.id === userId ? ` (${t('you')})` : ''}
                                     </div>
                                 </div>
                             </div>
 
+                            {/* Show delete button if I am owner AND target is NOT me */}
                             {canManage && m.id !== userId && (
                                 <button
                                     onClick={() => {
