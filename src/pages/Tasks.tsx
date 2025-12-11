@@ -6,7 +6,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Trash2, Calendar, GripVertical, Plus, Check, X, User, Share2, AlertTriangle, List } from 'lucide-react';
+import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { Modal } from './Modal';
-import { Trash2, Share2, Users } from 'lucide-react';
+import { Trash2, Share2 } from 'lucide-react';
 import type { Project } from '../types';
 
 interface ProjectMembersHeaderProps {
