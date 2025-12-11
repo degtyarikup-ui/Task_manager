@@ -124,12 +124,19 @@ textarea {
 /* Disable selection highlight on touch devices */
 * {
   -webkit-touch-callout: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 
 /* Allow text selection in inputs */
 input,
 textarea {
   -webkit-touch-callout: default;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
   user-select: text;
 }
 

@@ -344,7 +344,7 @@ export const Tasks: React.FC = () => {
                                 right: 16,
                                 background: 'transparent',
                                 border: 'none',
-                                color: 'var(--color-accent)',
+                                color: 'var(--color-text-primary)',
                                 padding: 8,
                                 display: 'flex',
                                 alignItems: 'center',
