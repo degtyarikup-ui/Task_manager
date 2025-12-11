@@ -1,0 +1,81 @@
+.container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0 16px;
+    /* Match app padding */
+    margin-top: 16px;
+    box-sizing: border-box;
+    position: relative;
+    /* Ensure no overflow out of container */
+    max-width: 100vw;
+    overflow: hidden;
+}
+
+.addButton {
+    flex-shrink: 0;
+    width: 44px;
+    height: 36px;
+    border-radius: 12px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+    /* Sticky behavior if requested, but flex row separation is safer for scroll */
+    z-index: 2;
+}
+
+.addButton:active {
+    background-color: var(--bg-input);
+    transform: scale(0.96);
+}
+
+.scrollArea {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 16px;
+    /* Allow scrolling to the very end */
+    align-items: center;
+    /* Crucial for flex child scroll */
+    min-width: 0;
+}
+
+.scrollArea::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.chip.active {
+    background-color: var(--bg-chip) !important;
+    /* Force visible bg */
+    color: var(--color-text-primary);
+    font-weight: 600;
+}
+
+/* Light/Dark mode adjustments handled by vars */
+[data-theme='dark'] .chip.active {
+    background-color: var(--bg-chip);
+}

@@ -21,6 +21,7 @@ import { Tooltip } from '../components/Tooltip';
 import { TaskItem } from '../components/TaskItem';
 import { ProjectMembersHeader } from '../components/ProjectMembersHeader';
 import { UndoToast } from '../components/UndoToast';
+import { ProjectToolbar } from '../components/ProjectToolbar';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
 // ... logic ...
@@ -310,24 +311,7 @@ export const Tasks: React.FC = () => {
         });
     };
 
-    const longPressTimer = React.useRef<any>(null);
-    const isLongPress = React.useRef(false);
 
-    const handleTouchStart = (project: Project) => {
-        isLongPress.current = false;
-        longPressTimer.current = setTimeout(() => {
-            isLongPress.current = true;
-            haptic.impact('medium');
-            handleEditList(project);
-        }, 600);
-    };
-
-    const handleTouchEnd = () => {
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-        }
-    };
 
     const handleSubtaskToggle = (taskId: string, subId: string) => {
         const task = tasks.find(t => t.id === taskId);
@@ -348,47 +332,14 @@ export const Tasks: React.FC = () => {
                     <h1 className={styles.title}>{t('tasks')}</h1>
                 </div>
 
-                <div className={extraStyles.toolbar}>
-                    {/* Fixed 'All' tab */}
-                    <button
-                        className={`${styles.filterChip} ${activeTab === 'all' ? styles.activeChip : ''} `}
-                        onClick={() => setActiveTab('all')}
-                        style={{ whiteSpace: 'nowrap' }}
-                    >
-                        {t('all')}
-                    </button>
-
-                    {/* Project Tabs */}
-                    {projects.map(p => (
-                        <button
-                            key={p.id}
-                            className={`${styles.filterChip} ${activeTab === p.id ? styles.activeChip : ''} `}
-                            onClick={() => {
-                                if (!isLongPress.current) {
-                                    setActiveTab(p.id);
-                                }
-                            }}
-                            onTouchStart={() => handleTouchStart(p)}
-                            onTouchEnd={handleTouchEnd}
-                            onTouchMove={handleTouchEnd}
-                            onContextMenu={(e) => e.preventDefault()}
-                            style={{ whiteSpace: 'nowrap', userSelect: 'none' }}
-                        >
-                            {p.title}
-                        </button>
-                    ))}
-                    <button
-                        className={styles.filterChip}
-                        onClick={handleAddList}
-                        style={{
-                            backgroundColor: 'var(--bg-card)',
-                            color: 'var(--color-text-primary)',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        {t('createList')}
-                    </button>
-                </div>
+                <ProjectToolbar
+                    projects={projects}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                    onAddList={handleAddList}
+                    onEditList={handleEditList}
+                    t={t}
+                />
 
                 {activeTab !== 'all' && (() => {
                     const project = projects.find(p => p.id === activeTab);
