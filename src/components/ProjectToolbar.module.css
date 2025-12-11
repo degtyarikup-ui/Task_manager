@@ -5,7 +5,7 @@
     /* Removed gap, handled by scrollArea padding for fade effect */
     width: calc(100% + 32px);
     /* Break out of parent padding */
-    padding: 0 0 0 16px;
+    padding: 0 0 0 20px;
     /* Internal padding to align button with content */
     margin-left: -16px;
     /* Shift left to screen edge */
