@@ -53,4 +53,5 @@ export interface AppState {
     clients: Client[];
     theme: 'light' | 'dark';
     language: Language;
+    isPremium: boolean;
 }

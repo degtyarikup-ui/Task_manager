@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
+import { supabase } from '../lib/supabase';
 import { useTranslation } from '../i18n/useTranslation';
 import { getTelegramUser } from '../utils/telegram';
 import { generateAvatarColor } from '../utils/colors'; // Import shared util
@@ -21,7 +22,7 @@ import styles from './Profile.module.css';
 
 
 export const Profile: React.FC = () => {
-    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, userId } = useStore();
     const { t } = useTranslation();
 
     // Calculated Statistics
@@ -43,6 +44,34 @@ export const Profile: React.FC = () => {
             : 'П',
         gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id), // Use shared util
         avatarUrl: telegramUser?.photo_url
+    };
+
+    const handleBuyPremium = async () => {
+        try {
+            const { data, error } = await supabase.functions.invoke('telegram-payment', {
+                body: { action: 'create_invoice', userId: userId }
+            });
+
+            if (error) throw error;
+            if (data?.invoiceLink) {
+                const tg = (window as any).Telegram?.WebApp;
+                if (tg && tg.openInvoice) {
+                    tg.openInvoice(data.invoiceLink, (status: string) => {
+                        if (status === 'paid' || status === 'paid_med') { // pending or paid
+                            // Ideally wait for webhook, but we can't easily.
+                            // Just tell user.
+                            if (tg.showAlert) tg.showAlert('Payment Successful! Processing...');
+                            setTimeout(() => window.location.reload(), 2000);
+                        }
+                    });
+                } else {
+                    window.open(data.invoiceLink, '_blank');
+                }
+            }
+        } catch (e) {
+            console.error('Payment Error', e);
+            alert('Payment failed. Ensure Bot Token is set in Supabase Functions.');
+        }
     };
 
     const [confirmConfig, setConfirmConfig] = useState({
@@ -133,24 +162,62 @@ export const Profile: React.FC = () => {
             </div>
 
             {/* Statistics */}
-            <div className={styles.sectionTitle}>{t('statistics')}</div>
-            <div className={styles.statsGrid}>
-                <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
-                    <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
-                    <div className={styles.statLabel}>{t('completedTasks')}</div>
+            <div className={styles.sectionTitle}>
+                {t('statistics')}
+                {isPremium && <span style={{ marginLeft: 8, fontSize: 12, color: '#FFD700' }}>★ Premium</span>}
+            </div>
+
+            <div style={{ position: 'relative' }}>
+                <div className={styles.statsGrid} style={!isPremium ? { filter: 'blur(8px)', opacity: 0.5, pointerEvents: 'none' } : {}}>
+                    <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
+                        <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
+                        <div className={styles.statLabel}>{t('completedTasks')}</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
+                        <div className={styles.statLabel}>{t('activeTasks')}</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldTasks}</div>
+                        <div className={styles.statLabel}>{t('lists')}</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{totalClients}</div>
+                        <div className={styles.statLabel}>{t('clientsStats')}</div>
+                    </div>
                 </div>
-                <div className={styles.statCard}>
-                    <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
-                    <div className={styles.statLabel}>{t('activeTasks')}</div>
-                </div>
-                <div className={styles.statCard}>
-                    <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldTasks}</div>
-                    <div className={styles.statLabel}>{t('lists')}</div>
-                </div>
-                <div className={styles.statCard}>
-                    <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{totalClients}</div>
-                    <div className={styles.statLabel}>{t('clientsStats')}</div>
-                </div>
+
+                {!isPremium && (
+                    <div style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 10
+                    }}>
+                        <div style={{
+                            background: 'var(--bg-card)', padding: '20px 24px', borderRadius: 20,
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+                            textAlign: 'center',
+                            border: '1px solid var(--color-border)'
+                        }}>
+                            <div style={{ fontSize: 32 }}>📊</div>
+                            <div style={{ fontWeight: 700, fontSize: 17 }}>{t('statistics')}</div>
+                            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                                Unlock detailed statistics<br />for 1 week
+                            </div>
+                            <button onClick={handleBuyPremium} style={{
+                                background: 'linear-gradient(135deg, #007AFF 0%, #00C6FF 100%)',
+                                color: 'white', border: 'none',
+                                padding: '12px 24px', borderRadius: 12, fontWeight: 600,
+                                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                                marginTop: 8,
+                                boxShadow: '0 4px 12px rgba(0,122,255,0.3)'
+                            }}>
+                                Unlock - 5 ⭐
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Settings Menu */}

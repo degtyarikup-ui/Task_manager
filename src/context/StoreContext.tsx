@@ -69,7 +69,8 @@ const initialState: AppState = {
     tasks: [],
     clients: [],
     theme: 'light',
-    language: getInitialLanguage()
+    language: getInitialLanguage(),
+    isPremium: false
 };
 
 export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -354,11 +355,24 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     };
                 });
 
+                // Check Premium Status
+                let isPremium = false;
+                const { data: myProfile } = await supabase
+                    .from('profiles')
+                    .select('subscription_end_date')
+                    .eq('id', userId)
+                    .single();
+
+                if (myProfile?.subscription_end_date) {
+                    isPremium = new Date(myProfile.subscription_end_date) > new Date();
+                }
+
                 setState(prev => ({
                     ...prev,
                     projects,
                     clients,
-                    tasks
+                    tasks,
+                    isPremium
                 }));
 
             } catch (error) {
