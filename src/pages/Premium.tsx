@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 
-import { Star, BarChart2, X, ShieldCheck } from 'lucide-react';
+import { Star, BarChart2, ShieldCheck } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +9,19 @@ export const Premium: React.FC = () => {
     const { userId, isPremium } = useStore();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+            tg.BackButton.show();
+            const handleBack = () => navigate(-1);
+            tg.BackButton.onClick(handleBack);
+            return () => {
+                tg.BackButton.offClick(handleBack);
+                tg.BackButton.hide();
+            };
+        }
+    }, [navigate]);
 
     const handleBuyPremium = async () => {
         setIsLoading(true);
@@ -58,18 +71,7 @@ export const Premium: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <button
-                onClick={() => navigate(-1)}
-                style={{
-                    position: 'absolute', top: 16, right: 16,
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: 'var(--bg-input)', border: 'none',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', zIndex: 10
-                }}
-            >
-                <X size={20} color="var(--color-text-secondary)" />
-            </button>
+
 
             <div className={styles.header}>
                 <div className={styles.iconWrapper}>
