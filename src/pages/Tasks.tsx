@@ -107,11 +107,21 @@ export const Tasks: React.FC = () => {
         if (!formData.title) return;
         setIsGenerating(true);
         try {
-            const { data, error } = await supabase.functions.invoke('generate-subtasks', {
-                body: { title: formData.title, language: language }
+            // Direct fetch to bypass potential supabase-js client issues with custom keys
+            const response = await fetch('https://qysfycmynplwylnbnskw.supabase.co/functions/v1/generate-subtasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer sb_publishable_ZikJgvMJx7lj9c7OmICtNg_ctMzFDDu'
+                },
+                body: JSON.stringify({ title: formData.title, language })
             });
 
-            if (error) throw error;
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
+            }
 
             if (data?.subtasks && Array.isArray(data.subtasks)) {
                 const newSubs = data.subtasks.map((t: string) => ({
