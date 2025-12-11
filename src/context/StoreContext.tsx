@@ -32,6 +32,7 @@ interface StoreContextType extends AppState {
     userId: number;
     deleteAccount: () => Promise<void>;
     getUserInfo: (userId: number) => { name: string; avatar?: string; id: number } | undefined;
+    togglePremiumDebug: () => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -416,6 +417,10 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
     };
 
+    const togglePremiumDebug = () => {
+        setState(prev => ({ ...prev, isPremium: !prev.isPremium }));
+    };
+
     // --- Actions with Supabase Sync ---
 
     const addProject = async (data: Omit<Project, 'id' | 'createdAt'>) => {
@@ -678,7 +683,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             toggleLanguage,
             isLoading,
             userId,
-            deleteAccount
+            deleteAccount,
+            togglePremiumDebug
         }}>
             {children}
         </StoreContext.Provider>
