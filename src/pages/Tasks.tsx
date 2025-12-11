@@ -207,8 +207,8 @@ export const Tasks: React.FC = () => {
     };
 
     const resetForm = () => {
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
-        setFormData({ title: '', subtasks: [], status: 'in-progress', priority: 'low', deadline: todayStr, client: '' });
+        // const todayStr = format(new Date(), 'yyyy-MM-dd'); // User requested no default date
+        setFormData({ title: '', subtasks: [], status: 'in-progress', priority: 'low', deadline: '', client: '' });
         setNewSubtaskTitle('');
         setEditingId(null);
         setActiveTool(null);
