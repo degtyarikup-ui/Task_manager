@@ -120,25 +120,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                     )}
 
                     <div className={extraStyles.taskMeta}>
-                        {owner && (
-                            <span className={extraStyles.metaBadge} style={{ paddingLeft: 4, paddingRight: 8, borderRadius: 20, gap: 6 }}>
-                                <div style={{
-                                    width: 20, height: 20, borderRadius: '50%',
-                                    background: generateAvatarColor(owner.name, owner.id),
-                                    color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden'
-                                }}>
-                                    {owner.avatar ? (
-                                        <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        getInitials(owner.name)
-                                    )}
-                                </div>
-                                <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {owner.name}
-                                </span>
-                            </span>
-                        )}
+
                         {task.deadline && (
                             <span className={extraStyles.metaBadge} style={
                                 (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
@@ -170,6 +152,23 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                             {getStatusIcon(task.status, 10)}
                             {getStatusLabel(task.status, t)}
                         </span>
+                        {owner && (
+                            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+                                <div style={{
+                                    width: 22, height: 22, borderRadius: '50%',
+                                    background: generateAvatarColor(owner.name, owner.id),
+                                    color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden',
+                                    boxShadow: '0 0 0 1px var(--bg-card)'
+                                }}>
+                                    {owner.avatar ? (
+                                        <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        getInitials(owner.name)
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
