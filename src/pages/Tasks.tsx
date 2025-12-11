@@ -72,16 +72,7 @@ export const Tasks: React.FC = () => {
     });
 
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-
-    const handleDelete = (id: string) => {
-        haptic.notification('warning');
-        setDeletingId(id);
-        setTimeout(() => {
-            deleteTask(id);
-            setDeletingId(null);
-        }, 300); // Wait for animation
-    };
+    // [Deleted old state]
 
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
@@ -195,8 +186,45 @@ export const Tasks: React.FC = () => {
 
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
     const [now] = useState(Date.now());
+    const [pendingDeletes, setPendingDeletes] = useState<Map<string, any>>(new Map());
+
+    const undoDelete = (id: string) => {
+        const timer = pendingDeletes.get(id);
+        if (timer) clearTimeout(timer);
+        setPendingDeletes(prev => {
+            const next = new Map(prev);
+            next.delete(id);
+            return next;
+        });
+    };
+
+    const handleDelete = (id: string) => {
+        // Prevent double delete
+        if (pendingDeletes.has(id)) return;
+
+        haptic.impact('medium');
+
+        // Optimistically hide
+        const timer = setTimeout(() => {
+            deleteTask(id);
+            setPendingDeletes(prev => {
+                const next = new Map(prev);
+                next.delete(id);
+                return next;
+            });
+        }, 5000);
+
+        setPendingDeletes(prev => {
+            const next = new Map(prev);
+            next.set(id, timer);
+            return next;
+        });
+    };
 
     const filteredTasks = tasks.filter(t => {
+        // 0. Filter pending deletes
+        if (pendingDeletes.has(t.id)) return false;
+
         // 1. Filter by Project Tab
         if (activeTab !== 'all' && t.projectId !== activeTab) return false;
 
@@ -409,7 +437,7 @@ export const Tasks: React.FC = () => {
                             });
                             setIsModalOpen(true);
                         }}
-                        isDeleting={deletingId === task.id}
+                        isDeleting={false}
                         onSubtaskToggle={handleSubtaskToggle}
                         locale={locale}
                         t={t}
@@ -433,6 +461,54 @@ export const Tasks: React.FC = () => {
                     onDismiss={handleDismissTooltip}
                 />
             )}
+
+            {/* Undo Notification Stack */}
+            <div style={{
+                position: 'fixed',
+                bottom: 90, // Above FAB (FAB is usually bottom 24 + size)
+                left: 16,
+                right: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+                zIndex: 2000,
+                pointerEvents: 'none' // Allow clicks through transparent areas
+            }}>
+                {Array.from(pendingDeletes.keys()).map(id => (
+                    <div
+                        key={id}
+                        style={{
+                            background: 'var(--bg-card)',
+                            color: 'var(--color-text-primary)',
+                            padding: '12px 16px',
+                            borderRadius: 12,
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            animation: 'slideUp 0.3s ease-out',
+                            pointerEvents: 'auto', // Re-enable clicks
+                            border: '1px solid var(--border-color)'
+                        }}
+                    >
+                        <span style={{ fontSize: 14, fontWeight: 500 }}>{t('taskDeleted')}</span>
+                        <button
+                            onClick={() => undoDelete(id)}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: 'var(--color-accent)',
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                padding: '4px 8px'
+                            }}
+                        >
+                            {t('undo')}
+                        </button>
+                    </div>
+                ))}
+            </div>
 
             {/* Task Edit/Create Modal */}
             <Modal

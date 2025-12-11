@@ -134,6 +134,8 @@ export const translations = {
         you: 'Вы',
         owner: 'Владелец',
         member: 'Участник',
+        taskDeleted: 'Задача удалена',
+        undo: 'Отменить',
     },
     en: {
         // Bottom Navigation
@@ -270,6 +272,8 @@ export const translations = {
         you: 'You',
         owner: 'Owner',
         member: 'Member',
+        taskDeleted: 'Task deleted',
+        undo: 'Undo',
     },
 };
 
