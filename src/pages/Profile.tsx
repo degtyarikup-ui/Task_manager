@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
-import { supabase } from '../lib/supabase';
 import { useTranslation } from '../i18n/useTranslation';
 import { getTelegramUser } from '../utils/telegram';
 import { generateAvatarColor } from '../utils/colors'; // Import shared util
 import {
     Moon,
-
+    Star,
     Globe,
     Trash2,
     ChevronRight,
@@ -24,6 +24,7 @@ import styles from './Profile.module.css';
 export const Profile: React.FC = () => {
     const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, userId } = useStore();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     // Calculated Statistics
     const completedTasks = tasks.filter(t => t.status === 'completed').length;
@@ -46,33 +47,7 @@ export const Profile: React.FC = () => {
         avatarUrl: telegramUser?.photo_url
     };
 
-    const handleBuyPremium = async () => {
-        try {
-            const { data, error } = await supabase.functions.invoke('telegram-payment', {
-                body: { action: 'create_invoice', userId: userId }
-            });
 
-            if (error) throw error;
-            if (data?.invoiceLink) {
-                const tg = (window as any).Telegram?.WebApp;
-                if (tg && tg.openInvoice) {
-                    tg.openInvoice(data.invoiceLink, (status: string) => {
-                        if (status === 'paid' || status === 'paid_med') { // pending or paid
-                            // Ideally wait for webhook, but we can't easily.
-                            // Just tell user.
-                            if (tg.showAlert) tg.showAlert('Payment Successful! Processing...');
-                            setTimeout(() => window.location.reload(), 2000);
-                        }
-                    });
-                } else {
-                    window.open(data.invoiceLink, '_blank');
-                }
-            }
-        } catch (e) {
-            console.error('Payment Error', e);
-            alert('Payment failed. Ensure Bot Token is set in Supabase Functions.');
-        }
-    };
 
     const [confirmConfig, setConfirmConfig] = useState({
         isOpen: false,
@@ -205,7 +180,7 @@ export const Profile: React.FC = () => {
                             <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
                                 Unlock detailed statistics<br />for 1 week
                             </div>
-                            <button onClick={handleBuyPremium} style={{
+                            <button onClick={() => navigate('/premium')} style={{
                                 background: 'linear-gradient(135deg, #007AFF 0%, #00C6FF 100%)',
                                 color: 'white', border: 'none',
                                 padding: '12px 24px', borderRadius: 12, fontWeight: 600,
@@ -213,7 +188,7 @@ export const Profile: React.FC = () => {
                                 marginTop: 8,
                                 boxShadow: '0 4px 12px rgba(0,122,255,0.3)'
                             }}>
-                                Unlock - 5 ⭐
+                                {t('premium') || 'Premium'}
                             </button>
                         </div>
                     </div>
@@ -224,6 +199,13 @@ export const Profile: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
+                    <button className={styles.menuItem} onClick={() => navigate('/premium')}>
+                        <div className={styles.menuIcon} style={{ color: '#FFD700' }}>
+                            <Star size={20} />
+                        </div>
+                        <div className={styles.menuLabel}>Premium</div>
+                        <ChevronRight size={16} className={styles.menuValue} />
+                    </button>
                     <button className={styles.menuItem} onClick={handleSupport}>
                         <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>
                             <HelpCircle size={20} />
