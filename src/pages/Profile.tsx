@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { getTelegramUser } from '../utils/telegram';
+import { generateAvatarColor } from '../utils/colors'; // Import shared util
 import {
     Moon,
 
@@ -32,17 +33,6 @@ export const Profile: React.FC = () => {
     // Get user data from Telegram
     const telegramUser = getTelegramUser();
 
-    // Generate unique color based on user ID
-    const generateGradient = (userId?: number) => {
-        if (!userId) return 'linear-gradient(135deg, #FF9500, #FF2D55)';
-
-        // Simple hash function to generate colors from ID
-        const hue1 = (userId * 137) % 360; // Golden angle approximation
-        const hue2 = (hue1 + 60) % 360; // Complementary hue
-
-        return `linear-gradient(135deg, hsl(${hue1}, 70%, 55%), hsl(${hue2}, 70%, 50%))`;
-    };
-
     const user = {
         name: telegramUser?.first_name
             ? `${telegramUser.first_name}${telegramUser.last_name ? ' ' + telegramUser.last_name : ''}`
@@ -51,7 +41,7 @@ export const Profile: React.FC = () => {
         initials: telegramUser?.first_name
             ? `${telegramUser.first_name[0]}${telegramUser.last_name?.[0] || ''}`
             : 'П',
-        gradient: generateGradient(telegramUser?.id)
+        gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id) // Use shared util
     };
 
     const [confirmConfig, setConfirmConfig] = useState({

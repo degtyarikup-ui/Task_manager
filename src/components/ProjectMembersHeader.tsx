@@ -43,7 +43,7 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                 justifyContent: 'center',
                 gap: 16,
                 paddingBottom: 16,
-                marginTop: -8 // Pull up slightly towards title
+                marginTop: 12 // Push down away from tabs
             }}>
                 {/* Members Pill */}
                 <div
@@ -102,7 +102,7 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                         padding: '6px 16px',
                         borderRadius: 20,
                         border: 'none',
-                        color: 'var(--color-accent)', // Use accent color for action visibility
+                        color: 'var(--color-text-primary)', // Neutral color
                         cursor: 'pointer',
                         fontSize: 13,
                         fontWeight: 600,
