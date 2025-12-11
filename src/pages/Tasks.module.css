@@ -197,7 +197,9 @@
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 4px 0 12px;
+    padding: 4px 16px 12px;
+    margin: 0 -16px;
+    width: calc(100% + 32px);
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
