@@ -348,49 +348,7 @@ export const Tasks: React.FC = () => {
                     <h1 className={styles.title}>{t('tasks')}</h1>
                 </div>
 
-                <div className={extraStyles.toolbar} style={{ marginTop: 12, padding: 0 }}>
-                    {/* Fixed 'All' tab */}
-                    <button
-                        className={`${styles.filterChip} ${activeTab === 'all' ? styles.activeChip : ''} `}
-                        onClick={() => setActiveTab('all')}
-                        style={{ whiteSpace: 'nowrap' }}
-                    >
-                        {t('all')}
-                    </button>
 
-                    {/* Project Tabs */}
-                    {projects.map(p => (
-                        <button
-                            key={p.id}
-                            className={`${styles.filterChip} ${activeTab === p.id ? styles.activeChip : ''} `}
-                            onClick={() => {
-                                if (!isLongPress.current) {
-                                    setActiveTab(p.id);
-                                }
-                            }}
-                            onTouchStart={() => handleTouchStart(p)}
-                            onTouchEnd={handleTouchEnd}
-                            onTouchMove={handleTouchEnd}
-                            onContextMenu={(e) => e.preventDefault()}
-                            style={{ whiteSpace: 'nowrap', userSelect: 'none' }}
-                        >
-                            {p.title}
-                        </button>
-                    ))}
-                    <button
-                        className={styles.filterChip}
-                        onClick={handleAddList}
-                        style={{
-                            backgroundColor: 'var(--bg-card)',
-                            color: 'var(--color-text-primary)',
-                            whiteSpace: 'nowrap'
-                        }}
-                    >
-                        {t('createList')}
-                    </button>
-
-
-                </div>
 
                 {activeTab !== 'all' && (() => {
                     const project = projects.find(p => p.id === activeTab);

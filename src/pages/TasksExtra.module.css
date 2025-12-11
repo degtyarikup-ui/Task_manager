@@ -58,10 +58,10 @@
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 8px 24px;
+    padding: 8px 16px;
     margin-top: 24px;
-    margin-left: -24px;
-    margin-right: -24px;
+    margin-left: -16px;
+    margin-right: -16px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
