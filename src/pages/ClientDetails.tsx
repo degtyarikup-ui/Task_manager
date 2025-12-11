@@ -246,15 +246,27 @@ export const ClientDetails: React.FC = () => {
                     <Edit2 size={20} />
                 </button>
 
-                <div style={{
-                    width: 64, height: 64, borderRadius: '50%',
-                    background: generateAvatarColor(client.name),
-                    color: 'white', fontSize: 24, fontWeight: 'bold',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0
-                }}>
-                    {getInitials(client.name)}
-                </div>
+                {client.avatar_url ? (
+                    <img
+                        src={client.avatar_url}
+                        alt={client.name}
+                        style={{
+                            width: 64, height: 64, borderRadius: '50%',
+                            objectFit: 'cover',
+                            flexShrink: 0
+                        }}
+                    />
+                ) : (
+                    <div style={{
+                        width: 64, height: 64, borderRadius: '50%',
+                        background: generateAvatarColor(client.name),
+                        color: 'white', fontSize: 24, fontWeight: 'bold',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0
+                    }}>
+                        {getInitials(client.name)}
+                    </div>
+                )}
                 <div>
                     <div style={{ fontSize: 20, fontWeight: 600, color: 'var(--color-text-primary)' }}>{client.name}</div>
                     {client.contact && <div style={{ color: 'var(--color-text-secondary)', fontSize: 15, marginTop: 4 }}>{client.contact}</div>}

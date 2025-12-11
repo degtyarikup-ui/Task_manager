@@ -17,9 +17,10 @@ interface TaskItemProps {
     locale: any;
     t: any;
     owner?: { name: string; avatar?: string; id: number };
+    clientAvatar?: string;
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, onSubtaskToggle, isDeleting, locale, t, owner }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, onSubtaskToggle, isDeleting, locale, t, owner, clientAvatar }) => {
     const [offset, setOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const startX = React.useRef(0);
@@ -141,9 +142,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                                     width: 20, height: 20, borderRadius: '50%',
                                     background: generateAvatarColor(task.client),
                                     color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0, fontWeight: 'bold'
+                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden'
                                 }}>
-                                    {getInitials(task.client)}
+                                    {clientAvatar ? (
+                                        <img src={clientAvatar} alt={task.client} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        getInitials(task.client)
+                                    )}
                                 </div>
                                 {task.client}
                             </span>

@@ -451,6 +451,7 @@ export const Tasks: React.FC = () => {
                         locale={locale}
                         t={t}
                         owner={getUserInfo ? getUserInfo(task.userId) : undefined}
+                        clientAvatar={clients.find(c => c.name === task.client)?.avatar_url}
                     />)
                 )}
             </div>
@@ -699,9 +700,17 @@ export const Tasks: React.FC = () => {
                                     width: 18, height: 18, borderRadius: '50%',
                                     background: generateAvatarColor(formData.client),
                                     color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    marginRight: 6, fontWeight: 'bold', flexShrink: 0
+                                    marginRight: 6, fontWeight: 'bold', flexShrink: 0, overflow: 'hidden'
                                 }}>
-                                    {getInitials(formData.client)}
+                                    {clients.find(c => c.name === formData.client)?.avatar_url ? (
+                                        <img
+                                            src={clients.find(c => c.name === formData.client)?.avatar_url}
+                                            alt={formData.client}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        getInitials(formData.client)
+                                    )}
                                 </div>
                             ) : (
                                 <User size={18} className={extraStyles.toolIcon} />
@@ -809,15 +818,27 @@ export const Tasks: React.FC = () => {
                                                         setActiveTool(null);
                                                     }}
                                                 >
-                                                    <div style={{
-                                                        width: 24, height: 24, borderRadius: '50%',
-                                                        background: generateAvatarColor(c.name),
-                                                        color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        flexShrink: 0,
-                                                        fontWeight: 'bold'
-                                                    }}>
-                                                        {getInitials(c.name)}
-                                                    </div>
+                                                    {c.avatar_url ? (
+                                                        <img
+                                                            src={c.avatar_url}
+                                                            alt={c.name}
+                                                            style={{
+                                                                width: 24, height: 24, borderRadius: '50%',
+                                                                objectFit: 'cover',
+                                                                flexShrink: 0
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div style={{
+                                                            width: 24, height: 24, borderRadius: '50%',
+                                                            background: generateAvatarColor(c.name),
+                                                            color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            flexShrink: 0,
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            {getInitials(c.name)}
+                                                        </div>
+                                                    )}
                                                     {c.name}
                                                 </button>
                                             ))}
