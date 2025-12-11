@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 
-import { Star, BarChart2, ShieldCheck } from 'lucide-react';
+import { Star, BarChart2, ShieldCheck, Sparkles } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -90,6 +90,16 @@ export const Premium: React.FC = () => {
             </div>
 
             <div className={styles.features}>
+                <div className={styles.featureCard}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(155, 81, 224, 0.1)', color: '#9B51E0' }}>
+                        <Sparkles size={24} />
+                    </div>
+                    <div className={styles.featureText}>
+                        <h3>{t('featureAI')}</h3>
+                        <p>{t('featureAIDesc')}</p>
+                    </div>
+                </div>
+
                 <div className={styles.featureCard}>
                     <div className={styles.featureIcon} style={{ background: 'rgba(0,122,255,0.1)', color: '#007AFF' }}>
                         <BarChart2 size={24} />
