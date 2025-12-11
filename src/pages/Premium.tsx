@@ -14,11 +14,23 @@ export const Premium: React.FC = () => {
     const handleBuyPremium = async () => {
         setIsLoading(true);
         try {
-            const { data, error } = await supabase.functions.invoke('telegram-payment', {
-                body: { action: 'create_invoice', userId: userId }
+            // Используем прямой fetch для диагностики
+            const response = await fetch('https://qysfycmynplwylnbnskw.supabase.co/functions/v1/telegram-payment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer sb_publishable_ZikJgvMJx7lj9c7OmICtNg_ctMzFDDu'
+                },
+                body: JSON.stringify({ action: 'create_invoice', userId: userId })
             });
 
-            if (error) throw error;
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Server Error ${response.status}: ${text}`);
+            }
+
+            const data = await response.json();
+
             if (data?.invoiceLink) {
                 const tg = (window as any).Telegram?.WebApp;
                 if (tg && tg.openInvoice) {
@@ -34,10 +46,12 @@ export const Premium: React.FC = () => {
                 } else {
                     window.open(data.invoiceLink, '_blank');
                 }
+            } else {
+                throw new Error('No invoice link in response');
             }
         } catch (e: any) {
             console.error('Payment Error', e);
-            alert(`Payment failed: ${e.message || 'Unknown error'}`);
+            alert(`Debug Error: ${e.message}`);
         } finally {
             setIsLoading(false);
         }
