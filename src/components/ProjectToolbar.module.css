@@ -1,14 +1,14 @@
 .container {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0;
+    /* Removed gap, handled by scrollArea padding for fade effect */
     width: 100%;
-    padding: 0 16px;
-    /* Match app padding */
+    padding: 0 0 0 16px;
+    /* No right padding to allow edge-to-edge scroll */
     margin-top: 16px;
     box-sizing: border-box;
     position: relative;
-    /* Ensure no overflow out of container */
     max-width: 100vw;
     overflow: hidden;
 }
@@ -26,8 +26,9 @@
     color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.2s;
-    /* Sticky behavior if requested, but flex row separation is safer for scroll */
     z-index: 2;
+    position: relative;
+    /* Ensure z-index works */
 }
 
 .addButton:active {
@@ -42,10 +43,18 @@
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+
+    /* Right padding ensures last item isn't flush with screen edge */
     padding-right: 16px;
-    /* Allow scrolling to the very end */
+
+    /* Left padding creates visual gap AND fade zone */
+    padding-left: 12px;
+
+    /* Fade mask on the left side */
+    mask-image: linear-gradient(to right, transparent, black 12px);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 12px);
+
     align-items: center;
-    /* Crucial for flex child scroll */
     min-width: 0;
 }
 
