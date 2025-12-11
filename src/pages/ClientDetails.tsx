@@ -300,13 +300,6 @@ export const ClientDetails: React.FC = () => {
                             {getInitials(client.name)}
                         </div>
                     )}
-                    <div style={{
-                        position: 'absolute', bottom: 0, left: 0, right: 0,
-                        background: 'rgba(0,0,0,0.3)', color: 'white',
-                        fontSize: 10, textAlign: 'center', padding: 2
-                    }}>
-                        Edit
-                    </div>
                 </div>
                 <div>
                     <div style={{ fontSize: 20, fontWeight: 600, color: 'var(--color-text-primary)' }}>{client.name}</div>
