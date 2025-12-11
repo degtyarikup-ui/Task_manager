@@ -200,10 +200,8 @@ export const Profile: React.FC = () => {
                             textAlign: 'center',
                             border: '1px solid var(--color-border)'
                         }}>
-                            <div style={{ fontSize: 32 }}>📊</div>
-                            <div style={{ fontWeight: 700, fontSize: 17 }}>{t('statistics')}</div>
-                            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-                                Unlock detailed statistics<br />for 1 week
+                            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4, maxWidth: 200 }}>
+                                {t('unlockStats') || 'Detailed statistics available in Premium'}
                             </div>
                             <button onClick={() => navigate('/premium')} style={{
                                 background: 'linear-gradient(135deg, #007AFF 0%, #00C6FF 100%)',
