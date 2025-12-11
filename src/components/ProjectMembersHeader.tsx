@@ -27,7 +27,7 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                 onClick={() => setIsMembersModalOpen(true)}
                 style={{
                     position: 'absolute',
-                    left: 16,
+                    left: 60,
                     display: 'flex',
                     alignItems: 'center',
                     cursor: 'pointer'

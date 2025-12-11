@@ -236,6 +236,19 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     const members = projectMembers
                         .filter(m => m.project_id === p.id)
                         .map(m => {
+                            // If it's the current user, prefer live Telegram data for consistency with Profile
+                            if (m.user_id === userId) {
+                                const tgUser = getTelegramUser();
+                                if (tgUser) {
+                                    return {
+                                        id: m.user_id,
+                                        name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
+                                        avatar: tgUser.photo_url,
+                                        role: m.role as 'member' | 'owner'
+                                    };
+                                }
+                            }
+
                             const profile = profilesMap.get(m.user_id);
                             return {
                                 id: m.user_id,
