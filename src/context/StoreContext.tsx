@@ -417,8 +417,15 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
     };
 
-    const togglePremiumDebug = () => {
-        setState(prev => ({ ...prev, isPremium: !prev.isPremium }));
+    const togglePremiumDebug = async () => {
+        const newStatus = !state.isPremium;
+        setState(prev => ({ ...prev, isPremium: newStatus }));
+
+        if (userId) {
+            await supabase.from('profiles').update({
+                is_premium: newStatus
+            }).eq('id', userId);
+        }
     };
 
     // --- Actions with Supabase Sync ---

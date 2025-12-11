@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 
-import { Star, BarChart2, ShieldCheck, Sparkles, Mic, Lock } from 'lucide-react';
+import { Star, BarChart2, ShieldCheck, Sparkles, Mic } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
