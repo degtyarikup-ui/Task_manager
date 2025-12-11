@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
-import { supabase } from '../lib/supabase';
 
 import { Star, BarChart2, X, ShieldCheck } from 'lucide-react';
 import styles from './Premium.module.css';
