@@ -43,7 +43,7 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                                 border: '2px solid var(--bg-page)',
                                 marginLeft: i > 0 ? -10 : 0,
                                 overflow: 'hidden',
-                                backgroundColor: generateAvatarColor(m.name),
+                                backgroundColor: generateAvatarColor(m.name, m.id),
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -93,7 +93,7 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{
                                     width: 40, height: 40, borderRadius: '50%', overflow: 'hidden',
-                                    backgroundColor: generateAvatarColor(m.name),
+                                    backgroundColor: generateAvatarColor(m.name, m.id),
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     color: '#fff', fontWeight: 'bold'
                                 }}>
