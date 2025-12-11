@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Sparkles, Loader2 } from 'lucide-react';
+import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Sparkles, Loader2, Lock } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 import { supabase } from '../lib/supabase';
 import styles from './Tasks.module.css';
@@ -31,8 +32,9 @@ import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../util
 
 
 export const Tasks: React.FC = () => {
-    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading, getUserInfo, userId } = useStore();
+    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading, getUserInfo, userId, isPremium } = useStore();
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const locale = language === 'ru' ? ru : enUS;
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,6 +99,11 @@ export const Tasks: React.FC = () => {
     };
 
     const handleGenerateSubtasks = async () => {
+        if (!isPremium) {
+            navigate('/premium');
+            return;
+        }
+
         if (!formData.title) return;
         setIsGenerating(true);
         try {
@@ -516,7 +523,7 @@ export const Tasks: React.FC = () => {
                                     width: '100%',
                                     marginBottom: 12,
                                     padding: '8px 12px',
-                                    background: 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
+                                    background: !isPremium ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' : 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: 12,
@@ -528,11 +535,11 @@ export const Tasks: React.FC = () => {
                                     gap: 8,
                                     opacity: isGenerating ? 0.7 : 1,
                                     cursor: 'pointer',
-                                    boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
+                                    boxShadow: !isPremium ? '0 4px 12px rgba(255, 165, 0, 0.3)' : '0 4px 12px rgba(168, 85, 247, 0.3)'
                                 }}
                             >
-                                {isGenerating ? <Loader2 size={16} className={styles.spin} /> : <Sparkles size={16} />}
-                                {isGenerating ? (t('generating') || 'AI Generating...') : (t('generateSubtasks') || '✨ Сгенерировать подзадачи')}
+                                {isGenerating ? <Loader2 size={16} className={styles.spin} /> : (!isPremium ? <Lock size={16} /> : <Sparkles size={16} />)}
+                                {isGenerating ? (t('generating') || 'AI Generating...') : (!isPremium ? (t('premium') || 'Premium') : (t('generateSubtasks') || '✨ Сгенерировать подзадачи'))}
                             </button>
                         )}
                         <DragDropContext onDragEnd={onDragEnd}>
