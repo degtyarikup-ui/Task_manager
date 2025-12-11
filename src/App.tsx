@@ -69,6 +69,7 @@ function Layout() {
 
   return (
     <div className={styles.appContainer}>
+      <div className={styles.topGradient} />
       <main className={styles.mainContent}>
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />
@@ -80,6 +81,7 @@ function Layout() {
           <Route path="*" element={<Navigate to="/tasks" replace />} />
         </Routes>
       </main>
+      <div className={styles.bottomGradient} />
       {showBottomNav && <BottomNavWrapper />}
     </div>
   );
