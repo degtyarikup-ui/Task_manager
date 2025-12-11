@@ -205,8 +205,12 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            <div className={styles.version}>
-                {t('version')} 1.0.2 • Build 240
+            <div
+                className={styles.version}
+                onClick={() => alert(JSON.stringify(getTelegramUser() || 'No User Data', null, 2))}
+                style={{ cursor: 'pointer' }}
+            >
+                {t('version')} 1.0.3 • Build 241
             </div>
 
             <ConfirmModal
