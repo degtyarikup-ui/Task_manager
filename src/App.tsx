@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/StoreContext';
@@ -8,45 +9,39 @@ import { Profile } from './pages/Profile';
 import { ClientDetails } from './pages/ClientDetails';
 import { Premium } from './pages/Premium';
 import { BottomNav } from './components/BottomNav';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 function TelegramThemeHandler() {
-  const { theme } = useStore();
+  const { theme, joinProject } = useStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-
+    // Platform class
     const tg = (window as any).Telegram?.WebApp;
-    if (tg) {
-      if (tg.platform) {
-        document.body.classList.add(`platform-${tg.platform}`);
-      }
+    if (tg?.platform) {
+      document.body.classList.add(`platform-${tg.platform}`);
       tg.expand();
-      setTimeout(() => tg.expand(), 100);
-      tg.ready();
     }
-  }, []); // Run once on mount
 
-  const { joinProject } = useStore();
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    const startParam = tg?.initDataUnsafe?.start_param;
-    if (startParam && startParam.startsWith('invite_')) {
-      joinProject(startParam);
-    }
-  }, [joinProject]);
-
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
+    // Header Color
     if (tg) {
-      // Ensure header matches app background
       const color = theme === 'dark' ? '#000000' : '#F5F5F7';
-
       if (tg.setHeaderColor) tg.setHeaderColor(color);
       if (tg.setBackgroundColor) tg.setBackgroundColor(color);
-      if (tg.setBottomBarColor) tg.setBottomBarColor(color); // For newer versions
-
-      if (tg.expand) tg.expand();
+      if (tg.setBottomBarColor) tg.setBottomBarColor(color);
     }
-  }, [theme]);
+
+    // Start Param Handling
+    const startParam = tg?.initDataUnsafe?.start_param;
+    if (startParam) {
+      if (startParam.startsWith('invite_')) {
+        joinProject(startParam);
+      } else if (startParam === 'premium') {
+        navigate('/premium');
+      }
+    }
+
+  }, [theme, joinProject, navigate]);
 
   return null;
 }
@@ -87,14 +82,12 @@ function Layout() {
   );
 }
 
-import { ErrorBoundary } from './components/ErrorBoundary';
-
 function App() {
   return (
     <ErrorBoundary>
       <StoreProvider>
-        <TelegramThemeHandler />
         <Router>
+          <TelegramThemeHandler />
           <Layout />
         </Router>
       </StoreProvider>
