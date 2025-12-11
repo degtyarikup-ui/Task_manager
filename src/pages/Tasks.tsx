@@ -341,7 +341,7 @@ export const Tasks: React.FC = () => {
                             }}
                             style={{
                                 position: 'absolute',
-                                right: 0,
+                                right: 16,
                                 background: 'transparent',
                                 border: 'none',
                                 color: 'var(--color-accent)',

@@ -27,10 +27,9 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
                 onClick={() => setIsMembersModalOpen(true)}
                 style={{
                     position: 'absolute',
-                    left: 0,
+                    left: 16,
                     display: 'flex',
                     alignItems: 'center',
-                    paddingLeft: 4,
                     cursor: 'pointer'
                 }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
