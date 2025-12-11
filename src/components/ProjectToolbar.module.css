@@ -74,7 +74,7 @@
     color: var(--color-text-secondary);
     font-size: 15px;
     font-weight: 500;
-    border: none;
+    border: 1px solid var(--color-border);
     cursor: pointer;
     transition: all 0.2s;
     user-select: none;
@@ -83,6 +83,7 @@
 
 .chip.active {
     background-color: var(--bg-chip) !important;
+    border-color: transparent;
     /* Force visible bg */
     color: var(--color-text-primary);
     font-weight: 600;
