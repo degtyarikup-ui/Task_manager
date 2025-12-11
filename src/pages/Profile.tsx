@@ -138,7 +138,6 @@ export const Profile: React.FC = () => {
                 <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
                     <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
                     <div className={styles.statLabel}>{t('completedTasks')}</div>
-                    <ChevronRight size={14} style={{ position: 'absolute', top: 12, right: 12, opacity: 0.3 }} />
                 </div>
                 <div className={styles.statCard}>
                     <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
