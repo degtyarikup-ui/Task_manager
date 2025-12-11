@@ -127,7 +127,7 @@ export const Tasks: React.FC = () => {
             }
         } catch (e: any) {
             console.error(e);
-            alert('Error generating subtasks. Please try again.');
+            alert(`Error: ${e.message || 'Unknown error'}`);
             haptic.notification('error');
         } finally {
             setIsGenerating(false);
@@ -539,7 +539,7 @@ export const Tasks: React.FC = () => {
                                 }}
                             >
                                 {isGenerating ? <Loader2 size={16} className={styles.spin} /> : (!isPremium ? <Lock size={16} /> : <Sparkles size={16} />)}
-                                {isGenerating ? (t('generating') || 'AI Generating...') : (!isPremium ? (t('premium') || 'Premium') : (t('generateSubtasks') || '✨ Сгенерировать подзадачи'))}
+                                {isGenerating ? (t('generating') || 'AI Generating...') : (!isPremium ? (t('premium') || 'Premium') : (t('generateSubtasks') || 'Сгенерировать подзадачи'))}
                             </button>
                         )}
                         <DragDropContext onDragEnd={onDragEnd}>
