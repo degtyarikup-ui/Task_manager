@@ -102,6 +102,7 @@ export const translations = {
         copyAddress: 'Скопировать адрес',
         copied: 'Скопировано!',
         donateViaCryptoBot: 'Отправить через Wallet',
+        premium: 'Premium',
 
         // Modal Actions
         create: 'Создать',
@@ -240,6 +241,7 @@ export const translations = {
         copyAddress: 'Copy Address',
         copied: 'Copied!',
         donateViaCryptoBot: 'Send via Wallet',
+        premium: 'Premium',
 
         // Modal Actions
         create: 'Create',

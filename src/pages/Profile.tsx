@@ -22,7 +22,7 @@ import styles from './Profile.module.css';
 
 
 export const Profile: React.FC = () => {
-    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium, userId } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount, isPremium } = useStore();
     const { t } = useTranslation();
     const navigate = useNavigate();
 

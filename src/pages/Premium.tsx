@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { supabase } from '../lib/supabase';
-import { useTranslation } from '../i18n/useTranslation';
-import { Star, BarChart2, Check, X, ShieldCheck } from 'lucide-react';
+
+import { Star, BarChart2, X, ShieldCheck } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
 export const Premium: React.FC = () => {
     const { userId, isPremium } = useStore();
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
