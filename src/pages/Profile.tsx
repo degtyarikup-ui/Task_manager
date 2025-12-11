@@ -315,54 +315,57 @@ export const Profile: React.FC = () => {
                         padding: '12px',
                         background: 'var(--bg-input)',
                         borderRadius: '12px',
-                        fontSize: '13px',
-                        fontFamily: 'monospace',
-                        wordBreak: 'break-all',
-                        color: 'var(--color-text-primary)'
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        position: 'relative'
                     }}>
-                        {WALLET_ADDRESS}
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                        <div style={{
+                            fontSize: '13px',
+                            fontFamily: 'monospace',
+                            wordBreak: 'break-all',
+                            color: 'var(--color-text-primary)',
+                            flex: 1,
+                            textAlign: 'left'
+                        }}>
+                            {WALLET_ADDRESS}
+                        </div>
                         <button
                             onClick={handleCopy}
                             style={{
-                                flex: 1,
-                                height: '44px',
-                                borderRadius: '12px',
-                                background: isCopied ? 'var(--color-success)' : 'var(--bg-chip)',
-                                color: isCopied ? 'white' : 'var(--color-text-primary)',
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                color: isCopied ? 'var(--color-success)' : 'var(--color-text-secondary)',
+                                padding: '8px',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                fontWeight: 500,
-                                transition: 'all 0.2s'
+                                justifyContent: 'center'
                             }}
                         >
-                            {isCopied ? <Check size={18} /> : <Copy size={18} />}
-                            {isCopied ? t('copied') : t('copyAddress')}
-                        </button>
-
-                        <button
-                            onClick={handleOpenWallet}
-                            style={{
-                                flex: 1,
-                                height: '44px',
-                                borderRadius: '12px',
-                                background: 'var(--color-accent)',
-                                color: 'white',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                fontWeight: 500
-                            }}
-                        >
-                            <Wallet size={18} />
-                            Wallet
+                            {isCopied ? <Check size={20} /> : <Copy size={20} />}
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleOpenWallet}
+                        style={{
+                            width: '100%',
+                            height: '48px',
+                            borderRadius: '14px',
+                            background: '#0098EA', // Official Wallet Blue
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            fontWeight: 600,
+                            fontSize: '16px'
+                        }}
+                    >
+                        <Wallet size={20} />
+                        Wallet
+                    </button>
                 </div>
 
             </Modal >
