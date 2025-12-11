@@ -253,19 +253,27 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            {userId === 6034524743 && (
-                <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8, opacity: 0.5 }}>
-                    <button onClick={togglePremiumDebug} style={{
-                        background: 'transparent',
-                        border: '1px dashed var(--color-text-secondary)',
-                        color: 'var(--color-text-secondary)',
-                        padding: '6px 12px',
-                        borderRadius: 8,
-                        fontSize: 11,
+            {(userId === 6034524743 || userId === 906251783) && (
+                <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8, opacity: 0.8 }}>
+                    <label style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px 16px',
+                        background: 'rgba(0,0,0,0.05)',
+                        borderRadius: 12,
                         cursor: 'pointer'
                     }}>
-                        Dev: Toggle Premium
-                    </button>
+                        <input
+                            type="checkbox"
+                            checked={isPremium}
+                            onChange={togglePremiumDebug}
+                            style={{ width: 16, height: 16, cursor: 'pointer' }}
+                        />
+                        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
+                            Dev: Admin Premium
+                        </span>
+                    </label>
                 </div>
             )}
 
