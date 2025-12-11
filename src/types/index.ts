@@ -30,6 +30,7 @@ export interface Task {
     // description removed
     subtasks: Subtask[];
     projectId?: string; // Optional if task is not in a list
+    userId: number;
     status: Status;
     priority: Priority;
     deadline?: string;

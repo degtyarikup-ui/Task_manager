@@ -30,7 +30,7 @@ import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../util
 
 
 export const Tasks: React.FC = () => {
-    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading } = useStore();
+    const { tasks, addTask, updateTask, deleteTask, projects, addProject, updateProject, deleteProject, clients, addClient, availableStatuses, addCustomStatus, deleteCustomStatus, language, isLoading, getUserInfo, userId } = useStore();
     const { t } = useTranslation();
 
     const locale = language === 'ru' ? ru : enUS;
@@ -138,7 +138,8 @@ export const Tasks: React.FC = () => {
                     priority: formData.priority || 'low',
                     projectId: targetProjectId,
                     deadline: formData.deadline,
-                    client: formData.client
+                    client: formData.client,
+                    userId: userId
                 });
             }
             setIsModalOpen(false);
@@ -442,6 +443,7 @@ export const Tasks: React.FC = () => {
                         onSubtaskToggle={handleSubtaskToggle}
                         locale={locale}
                         t={t}
+                        owner={getUserInfo ? getUserInfo(task.userId) : undefined}
                     />)
                 )}
             </div>

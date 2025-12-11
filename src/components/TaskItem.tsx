@@ -16,9 +16,10 @@ interface TaskItemProps {
     isDeleting?: boolean;
     locale: any;
     t: any;
+    owner?: { name: string; avatar?: string; id: number };
 }
 
-export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, onSubtaskToggle, isDeleting, locale, t }) => {
+export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, onEdit, onSubtaskToggle, isDeleting, locale, t, owner }) => {
     const [offset, setOffset] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const startX = React.useRef(0);
@@ -119,6 +120,25 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                     )}
 
                     <div className={extraStyles.taskMeta}>
+                        {owner && (
+                            <span className={extraStyles.metaBadge} style={{ paddingLeft: 4, paddingRight: 8, borderRadius: 20, gap: 6 }}>
+                                <div style={{
+                                    width: 20, height: 20, borderRadius: '50%',
+                                    background: generateAvatarColor(owner.name, owner.id),
+                                    color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden'
+                                }}>
+                                    {owner.avatar ? (
+                                        <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        getInitials(owner.name)
+                                    )}
+                                </div>
+                                <span style={{ maxWidth: 80, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {owner.name}
+                                </span>
+                            </span>
+                        )}
                         {task.deadline && (
                             <span className={extraStyles.metaBadge} style={
                                 (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))

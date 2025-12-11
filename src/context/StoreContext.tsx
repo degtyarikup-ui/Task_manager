@@ -31,6 +31,7 @@ interface StoreContextType extends AppState {
     isLoading: boolean;
     userId: number;
     deleteAccount: () => Promise<void>;
+    getUserInfo: (userId: number) => { name: string; avatar?: string; id: number } | undefined;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -75,6 +76,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [state, setState] = useState<AppState>(initialState);
     const [isLoading, setIsLoading] = useState(true);
     const [userId, setUserId] = useState<number>(0);
+    const profilesCache = React.useRef<Map<number, any>>(new Map());
 
     // Statuses
     const defaultStatuses = ['in-progress', 'on-hold', 'completed'];
@@ -231,6 +233,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                             .select('*')
                             .in('id', userIds);
                         (profiles || []).forEach((p: any) => profilesMap.set(p.id, p));
+                        profilesCache.current = profilesMap;
                     }
                 }
                 // ----------------------------------------
@@ -325,6 +328,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                     return {
                         id: t.id,
+                        userId: t.user_id,
                         title: t.title,
                         subtasks: subtasks,
                         status: t.status as Status,
@@ -614,9 +618,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     };
 
+    const getUserInfo = (uid: number) => {
+        if (uid === userId) {
+            const mys = getTelegramUser();
+            if (mys) return { name: mys.first_name, avatar: mys.photo_url, id: uid };
+        }
+        const p = profilesCache.current.get(uid);
+        if (p) return { name: p.first_name || p.username || `User ${uid}`, avatar: p.avatar_url, id: uid };
+        return undefined;
+    };
+
     return (
         <StoreContext.Provider value={{
             ...state,
+            getUserInfo,
             addProject,
             updateProject,
             deleteProject,
