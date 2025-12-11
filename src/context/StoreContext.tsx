@@ -237,6 +237,25 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     // Filter out invalid User 0 members
                     projectMembers = (members || []).filter((m: any) => m.user_id !== 0);
 
+                    // Calculate unique user IDs to fetch profiles
+                    const userIds = [...new Set([
+                        ...projectMembers.map((m: any) => m.user_id),
+                        ...projectsData.map((p: any) => p.user_id)
+                    ])].filter(id => id); // Filter truthy
+
+                    if (userIds.length > 0) {
+                        try {
+                            const { data: profiles } = await supabase
+                                .from('profiles')
+                                .select('*')
+                                .in('id', userIds);
+
+                            (profiles || []).forEach((p: any) => profilesMap.set(p.id, p));
+                        } catch (e) {
+                            console.warn('Failed to fetch profiles:', e);
+                        }
+                    }
+
                     // Check for Premium License Task
                     // We need to fetch tasks specifically for this check
                     const { data: licenseTask } = await supabase
