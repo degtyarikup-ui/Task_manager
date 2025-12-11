@@ -33,10 +33,6 @@ export const Profile: React.FC = () => {
     // Get user data from Telegram
     const telegramUser = getTelegramUser();
 
-    // Check for buggy SVG avatar from Telegram (fixes the "dot" image issue)
-    const photoUrl = telegramUser?.photo_url;
-    const isAvatarValid = photoUrl && !photoUrl.endsWith('.svg');
-
     const user = {
         name: telegramUser?.first_name
             ? `${telegramUser.first_name}${telegramUser.last_name ? ' ' + telegramUser.last_name : ''}`
@@ -46,7 +42,7 @@ export const Profile: React.FC = () => {
             ? `${telegramUser.first_name[0]}${telegramUser.last_name?.[0] || ''}`
             : 'П',
         gradient: generateAvatarColor(telegramUser?.first_name || '', telegramUser?.id), // Use shared util
-        avatarUrl: isAvatarValid ? photoUrl : undefined
+        avatarUrl: telegramUser?.photo_url
     };
 
     const [confirmConfig, setConfirmConfig] = useState({
@@ -209,12 +205,8 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            <div
-                className={styles.version}
-                onClick={() => alert(JSON.stringify(getTelegramUser() || 'No User Data', null, 2))}
-                style={{ cursor: 'pointer' }}
-            >
-                {t('version')} 1.0.3 • Build 241
+            <div className={styles.version}>
+                {t('version')} 1.0.3 • Build 242
             </div>
 
             <ConfirmModal
