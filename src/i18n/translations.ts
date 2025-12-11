@@ -153,6 +153,9 @@ export const translations = {
         generateSubtasks: 'Сгенерировать подзадачи',
         generating: 'Генерация...',
         errorGenerating: 'Ошибка генерации',
+        errorLoadFailed: 'Ошибка соединения. Проверьте интернет.',
+        errorAIService: 'Ошибка сервиса AI. Попробуйте позже.',
+        errorGeneric: 'Ошибка',
     },
     en: {
         // Bottom Navigation
@@ -308,6 +311,9 @@ export const translations = {
         generateSubtasks: 'Generate Subtasks',
         generating: 'Generating...',
         errorGenerating: 'Error generating',
+        errorLoadFailed: 'Connection error. Check your internet.',
+        errorAIService: 'AI Service error. Please try again.',
+        errorGeneric: 'Error',
     },
 };
 

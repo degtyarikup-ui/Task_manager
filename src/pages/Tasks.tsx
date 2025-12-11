@@ -41,6 +41,7 @@ export const Tasks: React.FC = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [aiError, setAiError] = useState<string | null>(null);
 
     useEffect(() => {
         const hasSeenTooltip = localStorage.getItem('hasSeenOnboardingTooltip');
@@ -106,6 +107,7 @@ export const Tasks: React.FC = () => {
 
         if (!formData.title) return;
         setIsGenerating(true);
+        setAiError(null);
         try {
             // Direct fetch to bypass potential supabase-js client issues with custom keys
             const response = await fetch('https://qysfycmynplwylnbnskw.supabase.co/functions/v1/generate-subtasks', {
@@ -137,7 +139,14 @@ export const Tasks: React.FC = () => {
             }
         } catch (e: any) {
             console.error(e);
-            alert(`Error: ${e.message || 'Unknown error'}`);
+            let msg = e.message || 'Unknown error';
+            if (msg.includes('Load failed') || msg.includes('Failed to fetch')) {
+                setAiError(t('errorLoadFailed'));
+            } else if (msg.includes('Groq') || msg.includes('Google') || msg.includes('500') || msg.includes('502') || msg.includes('503')) {
+                setAiError(t('errorAIService')); // Simplified for user, detailed in console
+            } else {
+                setAiError(`${t('errorGeneric')}: ${msg}`);
+            }
             haptic.notification('error');
         } finally {
             setIsGenerating(false);
@@ -549,8 +558,19 @@ export const Tasks: React.FC = () => {
                                 }}
                             >
                                 {isGenerating ? <Loader2 size={16} className={styles.spin} /> : (!isPremium ? <Lock size={16} /> : <Sparkles size={16} />)}
-                                {isGenerating ? (t('generating') || 'AI Generating...') : (!isPremium ? (t('premium') || 'Premium') : (t('generateSubtasks') || 'Сгенерировать подзадачи'))}
+                                {isGenerating ? (t('generating') || 'AI Generating...') : (t('generateSubtasks') || 'Сгенерировать подзадачи')}
                             </button>
+                        )}
+                        {aiError && (
+                            <div style={{
+                                color: 'var(--color-risk-high)',
+                                fontSize: '13px',
+                                marginTop: '8px',
+                                textAlign: 'center',
+                                opacity: 0.9
+                            }}>
+                                {aiError}
+                            </div>
                         )}
                         <DragDropContext onDragEnd={onDragEnd}>
                             <Droppable droppableId="subtasks">
