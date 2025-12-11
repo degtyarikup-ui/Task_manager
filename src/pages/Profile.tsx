@@ -162,61 +162,33 @@ export const Profile: React.FC = () => {
             </div>
 
             {/* Statistics */}
-            <div className={styles.sectionTitle}>
-                {t('statistics')}
-                {isPremium && <span style={{ marginLeft: 8, fontSize: 12, color: '#FFD700' }}>★ Premium</span>}
-            </div>
+            {isPremium && (
+                <>
+                    <div className={styles.sectionTitle}>
+                        {t('statistics')}
+                        <span style={{ marginLeft: 8, fontSize: 12, color: '#FFD700' }}>★ Premium</span>
+                    </div>
 
-            <div style={{ position: 'relative' }}>
-                <div className={styles.statsGrid} style={!isPremium ? { filter: 'blur(8px)', opacity: 0.5, pointerEvents: 'none' } : {}}>
-                    <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
-                        <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
-                        <div className={styles.statLabel}>{t('completedTasks')}</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
-                        <div className={styles.statLabel}>{t('activeTasks')}</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldTasks}</div>
-                        <div className={styles.statLabel}>{t('lists')}</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{totalClients}</div>
-                        <div className={styles.statLabel}>{t('clientsStats')}</div>
-                    </div>
-                </div>
-
-                {!isPremium && (
-                    <div style={{
-                        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        zIndex: 10
-                    }}>
-                        <div style={{
-                            background: 'var(--bg-card)', padding: '20px 24px', borderRadius: 20,
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-                            textAlign: 'center',
-                            border: '1px solid var(--color-border)'
-                        }}>
-                            <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4, maxWidth: 200 }}>
-                                {t('unlockStats') || 'Detailed statistics available in Premium'}
-                            </div>
-                            <button onClick={() => navigate('/premium')} style={{
-                                background: 'linear-gradient(135deg, #007AFF 0%, #00C6FF 100%)',
-                                color: 'white', border: 'none',
-                                padding: '12px 24px', borderRadius: 12, fontWeight: 600,
-                                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                                marginTop: 8,
-                                boxShadow: '0 4px 12px rgba(0,122,255,0.3)'
-                            }}>
-                                {t('premium') || 'Premium'}
-                            </button>
+                    <div className={styles.statsGrid}>
+                        <div className={styles.statCard} onClick={() => setIsCompletedModalOpen(true)} style={{ cursor: 'pointer' }}>
+                            <div className={styles.statValue} style={{ color: 'var(--color-success)' }}>{completedTasks}</div>
+                            <div className={styles.statLabel}>{t('completedTasks')}</div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statValue} style={{ color: 'var(--color-accent)' }}>{activeTasks}</div>
+                            <div className={styles.statLabel}>{t('activeTasks')}</div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{onHoldTasks}</div>
+                            <div className={styles.statLabel}>{t('lists')}</div>
+                        </div>
+                        <div className={styles.statCard}>
+                            <div className={styles.statValue} style={{ color: 'var(--color-text-primary)' }}>{totalClients}</div>
+                            <div className={styles.statLabel}>{t('clientsStats')}</div>
                         </div>
                     </div>
-                )}
-            </div>
+                </>
+            )}
 
             {/* Settings Menu */}
             <div className={styles.section}>
