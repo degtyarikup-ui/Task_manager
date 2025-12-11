@@ -220,7 +220,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                         .from('project_members')
                         .select('project_id, user_id, role')
                         .in('project_id', allProjectIds);
-                    projectMembers = members || [];
+                    // Filter out invalid User 0 members
+                    projectMembers = (members || []).filter((m: any) => m.user_id !== 0);
 
                     const userIds = [...new Set([
                         ...projectMembers.map(m => m.user_id),
