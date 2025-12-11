@@ -150,6 +150,9 @@ export const translations = {
         member: 'Участник',
         taskDeleted: 'Задача удалена',
         undo: 'Отменить',
+        generateSubtasks: '✨ Сгенерировать подзадачи',
+        generating: 'Генерация...',
+        errorGenerating: 'Ошибка генерации',
     },
     en: {
         // Bottom Navigation
@@ -302,6 +305,9 @@ export const translations = {
         member: 'Member',
         taskDeleted: 'Task deleted',
         undo: 'Undo',
+        generateSubtasks: '✨ Generate Subtasks',
+        generating: 'Generating...',
+        errorGenerating: 'Error generating',
     },
 };
 
