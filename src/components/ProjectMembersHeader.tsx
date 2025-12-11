@@ -3,7 +3,7 @@ import { useStore } from '../context/StoreContext';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { Modal } from './Modal';
 import { Trash2 } from 'lucide-react';
-import { Project } from '../types';
+import type { Project } from '../types';
 
 interface ProjectMembersHeaderProps {
     project: Project;
