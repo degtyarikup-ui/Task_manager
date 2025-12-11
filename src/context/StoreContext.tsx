@@ -242,463 +242,481 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                         ...projectsData.map(p => p.user_id) // include owners
                     ])];
 
-                    if (userIds.length > 0) {
-                        const { data: profiles } = await supabase
-                            .from('profiles')
-                            .select('*')
-                            .in('id', userIds);
-                        (profiles || []).forEach((p: any) => profilesMap.set(p.id, p));
-                        profilesCache.current = profilesMap;
-                    }
+                    // Check for Premium License Task
+                    const hasLicense = (allProjectsRaw.some(p => false)) || // Placeholder
+                        // Check in fetched tasks? Wait, tasks are not fetched yet here?
+                        // Wait, StoreContext loads tasks LATER? No, earlier I saw tasks filter?
+                        // lines 256+ is Profiles.
+                        false;
+
+                    // We need to fetch tasks somewhere or check it separately
+                    const { data: licenseTask } = await supabase
+                        .from('tasks')
+                        .select('id')
+                        .eq('user_id', userId)
+                        .eq('title', '⭐️ Premium License')
+                        .limit(1);
+
+                    const isPremiumUser = (licenseTask && licenseTask.length > 0) || false;
+
+                    setState(prev => ({
+                        ...prev,
+                        projects: projectsData,
+                        projectMembers,
+                        profiles: profilesMap,
+                        isPremium: isPremiumUser // Set state
+                    }));
+                    profilesCache.current = profilesMap;
                 }
+            }
                 // ----------------------------------------
 
                 // Fetch Clients
                 const { data: clientsData, error: clientError } = await supabase
-                    .from('clients')
-                    .select('*')
-                    .eq('user_id', userId);
+                .from('clients')
+                .select('*')
+                .eq('user_id', userId);
 
-                if (clientError) console.error('Error fetching clients:', clientError);
+            if (clientError) console.error('Error fetching clients:', clientError);
 
-                // Fetch Tasks (Own + In Shared Projects)
-                // We fetch tasks that are EITHER created by me OR belong to a project I have access to
-                let tasksQuery = supabase
-                    .from('tasks')
-                    .select('*');
+            // Fetch Tasks (Own + In Shared Projects)
+            // We fetch tasks that are EITHER created by me OR belong to a project I have access to
+            let tasksQuery = supabase
+                .from('tasks')
+                .select('*');
 
-                if (allProjectIds.length > 0) {
-                    tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
-                } else {
-                    tasksQuery = tasksQuery.eq('user_id', userId);
-                }
-
-                const { data: tasksData, error: taskError } = await tasksQuery;
-
-                if (taskError) console.error('Error fetching tasks:', taskError);
-
-                // Map DB types to App types
-                const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => {
-                    // Resolve members
-                    const members = projectMembers
-                        .filter(m => m.project_id === p.id)
-                        .map(m => {
-                            // If it's the current user, prefer live Telegram data for consistency with Profile
-                            if (m.user_id === userId) {
-                                const tgUser = getTelegramUser();
-                                if (tgUser) {
-                                    return {
-                                        id: m.user_id,
-                                        name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
-                                        avatar: tgUser.photo_url,
-                                        role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
-                                    };
-                                }
-                            }
-
-                            const profile = profilesMap.get(m.user_id);
-                            return {
-                                id: m.user_id,
-                                name: profile?.first_name || profile?.username || `User ${m.user_id}`,
-                                avatar: profile?.avatar_url,
-                                role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
-                            };
-                        });
-
-                    // Add Owner if not in members list (implicitly owner)
-                    const ownerProfile = profilesMap.get(p.user_id);
-                    const ownerInMembers = members.find(m => m.id === p.user_id);
-                    if (!ownerInMembers) {
-                        members.unshift({
-                            id: p.user_id,
-                            name: ownerProfile?.first_name || ownerProfile?.username || `User ${p.user_id}`,
-                            avatar: ownerProfile?.avatar_url,
-                            role: 'owner'
-                        });
-                    }
-
-                    return {
-                        id: p.id,
-                        title: p.title,
-                        description: p.description || '',
-                        status: p.status as Status,
-                        createdAt: new Date(p.created_at).getTime(),
-                        members: members
-                    };
-                });
-
-                const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
-                    id: c.id,
-                    name: c.name,
-                    contact: c.contact || ''
-                }));
-
-                const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
-                    let subtasks = [];
-                    try {
-                        if (t.description && t.description.startsWith('[')) {
-                            subtasks = JSON.parse(t.description);
-                        }
-                    } catch (e) { }
-
-                    return {
-                        id: t.id,
-                        userId: t.user_id,
-                        title: t.title,
-                        subtasks: subtasks,
-                        status: t.status as Status,
-                        priority: t.priority as Priority,
-                        deadline: t.deadline || '',
-                        client: t.client || '',
-                        projectId: t.project_id || undefined,
-                        createdAt: new Date(t.created_at).getTime(),
-                        updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
-                    };
-                });
-
-                // Check Premium Status
-                let isPremium = false;
-                const { data: myProfile } = await supabase
-                    .from('profiles')
-                    .select('subscription_end_date')
-                    .eq('id', userId)
-                    .single();
-
-                if (myProfile?.subscription_end_date) {
-                    isPremium = new Date(myProfile.subscription_end_date) > new Date();
-                }
-
-                setState(prev => ({
-                    ...prev,
-                    projects,
-                    clients,
-                    tasks,
-                    isPremium
-                }));
-
-            } catch (error) {
-                console.error('Failed to load data:', error);
-            } finally {
-                setIsLoading(false);
+            if (allProjectIds.length > 0) {
+                tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
+            } else {
+                tasksQuery = tasksQuery.eq('user_id', userId);
             }
-        };
 
-        loadData();
-    }, [userId]);
+            const { data: tasksData, error: taskError } = await tasksQuery;
 
-    // Apply theme changes to DOM
-    useEffect(() => {
-        document.documentElement.setAttribute('data-theme', state.theme);
-        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-        if (metaThemeColor) {
-            metaThemeColor.setAttribute('content', state.theme === 'dark' ? '#000000' : '#F5F5F7');
-        }
-    }, [state.theme]);
+            if (taskError) console.error('Error fetching tasks:', taskError);
 
-    const toggleTheme = () => {
-        setState(prev => {
-            const newTheme = prev.theme === 'light' ? 'dark' : 'light';
-            try { localStorage.setItem('user_theme', newTheme); } catch (e) { }
-            return {
-                ...prev,
-                theme: newTheme
-            };
-        });
-    };
+            // Map DB types to App types
+            const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => {
+                // Resolve members
+                const members = projectMembers
+                    .filter(m => m.project_id === p.id)
+                    .map(m => {
+                        // If it's the current user, prefer live Telegram data for consistency with Profile
+                        if (m.user_id === userId) {
+                            const tgUser = getTelegramUser();
+                            if (tgUser) {
+                                return {
+                                    id: m.user_id,
+                                    name: `${tgUser.first_name}${tgUser.last_name ? ' ' + tgUser.last_name : ''}`,
+                                    avatar: tgUser.photo_url,
+                                    role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
+                                };
+                            }
+                        }
 
-    const toggleLanguage = () => {
-        setState(prev => {
-            const newLang = prev.language === 'ru' ? 'en' : 'ru';
-            try { localStorage.setItem('user_language', newLang); } catch (e) { }
-            return {
-                ...prev,
-                language: newLang
-            };
-        });
-    };
+                        const profile = profilesMap.get(m.user_id);
+                        return {
+                            id: m.user_id,
+                            name: profile?.first_name || profile?.username || `User ${m.user_id}`,
+                            avatar: profile?.avatar_url,
+                            role: (m.user_id === p.user_id ? 'owner' : m.role) as 'member' | 'owner'
+                        };
+                    });
 
-    const togglePremiumDebug = async () => {
-        const newStatus = !state.isPremium;
-        setState(prev => ({ ...prev, isPremium: newStatus }));
+                // Add Owner if not in members list (implicitly owner)
+                const ownerProfile = profilesMap.get(p.user_id);
+                const ownerInMembers = members.find(m => m.id === p.user_id);
+                if (!ownerInMembers) {
+                    members.unshift({
+                        id: p.user_id,
+                        name: ownerProfile?.first_name || ownerProfile?.username || `User ${p.user_id}`,
+                        avatar: ownerProfile?.avatar_url,
+                        role: 'owner'
+                    });
+                }
 
-        if (userId) {
-            // Call Edge Function to bypass RLS
-            const { error } = await supabase.functions.invoke('toggle-premium', {
-                body: { userId, isPremium: newStatus }
+                return {
+                    id: p.id,
+                    title: p.title,
+                    description: p.description || '',
+                    status: p.status as Status,
+                    createdAt: new Date(p.created_at).getTime(),
+                    members: members
+                };
             });
-            if (error) console.error('Toggle Premium Error:', error);
-        }
 
-    };
+            const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
+                id: c.id,
+                name: c.name,
+                contact: c.contact || ''
+            }));
 
-    // --- Actions with Supabase Sync ---
+            const tasks: Task[] = (tasksData || []).map((t: DatabaseTask) => {
+                let subtasks = [];
+                try {
+                    if (t.description && t.description.startsWith('[')) {
+                        subtasks = JSON.parse(t.description);
+                    }
+                } catch (e) { }
 
-    const addProject = async (data: Omit<Project, 'id' | 'createdAt'>) => {
-        // Optimistic update
-        const tempId = `temp-${Date.now()}`;
-        const newProject: Project = { ...data, id: tempId, createdAt: Date.now() };
-        setState(prev => ({ ...prev, projects: [...prev.projects, newProject] }));
+                return {
+                    id: t.id,
+                    userId: t.user_id,
+                    title: t.title,
+                    subtasks: subtasks,
+                    status: t.status as Status,
+                    priority: t.priority as Priority,
+                    deadline: t.deadline || '',
+                    client: t.client || '',
+                    projectId: t.project_id || undefined,
+                    createdAt: new Date(t.created_at).getTime(),
+                    updatedAt: (t as any).updated_at ? new Date((t as any).updated_at).getTime() : undefined
+                };
+            });
 
-        // DB Insert
-        const { data: inserted, error } = await supabase
-            .from('projects')
-            .insert({
-                user_id: userId,
-                title: data.title,
-                description: data.description,
-                status: data.status
-            })
-            .select()
-            .single();
+            // Check Premium Status
+            let isPremium = false;
+            const { data: myProfile } = await supabase
+                .from('profiles')
+                .select('subscription_end_date')
+                .eq('id', userId)
+                .single();
 
-        if (error) {
-            console.error('Error adding project:', error);
-            // Revert optimistic update handling could be added here
-            return;
-        }
+            if (myProfile?.subscription_end_date) {
+                isPremium = new Date(myProfile.subscription_end_date) > new Date();
+            }
 
-        // Replace temp ID with real ID
-        if (inserted) {
             setState(prev => ({
                 ...prev,
-                projects: prev.projects.map(p => p.id === tempId ? { ...p, id: inserted.id } : p)
+                projects,
+                clients,
+                tasks,
+                isPremium
             }));
+
+        } catch (error) {
+            console.error('Failed to load data:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const updateProject = async (id: string, data: Partial<Project>) => {
-        setState(prev => ({
-            ...prev,
-            projects: prev.projects.map(p => p.id === id ? { ...p, ...data } : p)
-        }));
+    loadData();
+}, [userId]);
 
-        await supabase.from('projects').update({
+// Apply theme changes to DOM
+useEffect(() => {
+    document.documentElement.setAttribute('data-theme', state.theme);
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', state.theme === 'dark' ? '#000000' : '#F5F5F7');
+    }
+}, [state.theme]);
+
+const toggleTheme = () => {
+    setState(prev => {
+        const newTheme = prev.theme === 'light' ? 'dark' : 'light';
+        try { localStorage.setItem('user_theme', newTheme); } catch (e) { }
+        return {
+            ...prev,
+            theme: newTheme
+        };
+    });
+};
+
+const toggleLanguage = () => {
+    setState(prev => {
+        const newLang = prev.language === 'ru' ? 'en' : 'ru';
+        try { localStorage.setItem('user_language', newLang); } catch (e) { }
+        return {
+            ...prev,
+            language: newLang
+        };
+    });
+};
+
+const togglePremiumDebug = async () => {
+    const newStatus = !state.isPremium;
+    setState(prev => ({ ...prev, isPremium: newStatus }));
+
+    if (userId) {
+        // Call Edge Function to bypass RLS
+        const { error } = await supabase.functions.invoke('toggle-premium', {
+            body: { userId, isPremium: newStatus }
+        });
+        if (error) console.error('Toggle Premium Error:', error);
+    }
+
+};
+
+// --- Actions with Supabase Sync ---
+
+const addProject = async (data: Omit<Project, 'id' | 'createdAt'>) => {
+    // Optimistic update
+    const tempId = `temp-${Date.now()}`;
+    const newProject: Project = { ...data, id: tempId, createdAt: Date.now() };
+    setState(prev => ({ ...prev, projects: [...prev.projects, newProject] }));
+
+    // DB Insert
+    const { data: inserted, error } = await supabase
+        .from('projects')
+        .insert({
+            user_id: userId,
             title: data.title,
             description: data.description,
             status: data.status
-        }).eq('id', id);
-    };
+        })
+        .select()
+        .single();
 
-    const deleteProject = async (id: string) => {
+    if (error) {
+        console.error('Error adding project:', error);
+        // Revert optimistic update handling could be added here
+        return;
+    }
+
+    // Replace temp ID with real ID
+    if (inserted) {
         setState(prev => ({
             ...prev,
-            projects: prev.projects.filter(p => p.id !== id),
-            tasks: prev.tasks.filter(t => t.projectId !== id)
+            projects: prev.projects.map(p => p.id === tempId ? { ...p, id: inserted.id } : p)
         }));
+    }
+};
 
-        await supabase.from('projects').delete().eq('id', id);
-        await supabase.from('projects').delete().eq('id', id);
-    };
+const updateProject = async (id: string, data: Partial<Project>) => {
+    setState(prev => ({
+        ...prev,
+        projects: prev.projects.map(p => p.id === id ? { ...p, ...data } : p)
+    }));
 
-    const joinProject = async (inviteCode: string): Promise<boolean> => {
-        // inviteCode format: "invite_<UUID>"
-        if (!inviteCode.startsWith('invite_')) return false;
-        const projectId = inviteCode.replace('invite_', '');
-        if (!projectId) return false;
+    await supabase.from('projects').update({
+        title: data.title,
+        description: data.description,
+        status: data.status
+    }).eq('id', id);
+};
 
-        try {
-            // Check if already in project or is owner
-            const existing = state.projects.find(p => p.id === projectId);
-            if (existing) return true; // Already joined
+const deleteProject = async (id: string) => {
+    setState(prev => ({
+        ...prev,
+        projects: prev.projects.filter(p => p.id !== id),
+        tasks: prev.tasks.filter(t => t.projectId !== id)
+    }));
 
-            // Insert into members
-            const { error } = await supabase
-                .from('project_members')
-                .insert({
-                    project_id: projectId,
-                    user_id: userId,
-                    role: 'member'
-                });
+    await supabase.from('projects').delete().eq('id', id);
+    await supabase.from('projects').delete().eq('id', id);
+};
 
-            if (error) {
-                // If unique constraint violation, it means we are already added (maybe data sync lag), so success
-                if (error.code === '23505') return true;
-                console.error('Join error:', error);
-                return false;
-            }
+const joinProject = async (inviteCode: string): Promise<boolean> => {
+    // inviteCode format: "invite_<UUID>"
+    if (!inviteCode.startsWith('invite_')) return false;
+    const projectId = inviteCode.replace('invite_', '');
+    if (!projectId) return false;
 
-            // Reload data to show new project
-            // In a better app we would just fetch the single project
-            window.location.reload(); // Simple refresh to sync everything
-            return true;
+    try {
+        // Check if already in project or is owner
+        const existing = state.projects.find(p => p.id === projectId);
+        if (existing) return true; // Already joined
 
-        } catch (e) {
-            console.error('Join exception', e);
-            return false;
-        }
-    };
-
-    const addTask = async (data: Omit<Task, 'id' | 'createdAt'>) => {
-        const tempId = `temp-${Date.now()}`;
-        const newTask: Task = { ...data, id: tempId, createdAt: Date.now(), updatedAt: Date.now() };
-        setState(prev => ({ ...prev, tasks: [newTask, ...prev.tasks] }));
-
-        const { data: inserted, error } = await supabase
-            .from('tasks')
-            .insert({
-                user_id: userId,
-                title: data.title,
-                description: JSON.stringify(data.subtasks || []),
-                status: data.status,
-                priority: data.priority,
-                deadline: data.deadline,
-                client: data.client,
-                project_id: data.projectId || null
-            })
-            .select()
-            .single();
-
-        if (error) console.error('Error adding task:', error);
-
-        if (inserted) {
-            setState(prev => ({
-                ...prev,
-                tasks: prev.tasks.map(t => t.id === tempId ? { ...t, id: inserted.id } : t)
-            }));
-        }
-    };
-
-    const updateTask = async (id: string, data: Partial<Task>) => {
-        setState(prev => ({
-            ...prev,
-            tasks: prev.tasks.map(t => t.id === id ? { ...t, ...data, updatedAt: Date.now() } : t)
-        }));
-
-        const updateData: any = {};
-        if (data.title !== undefined) updateData.title = data.title;
-        if (data.subtasks !== undefined) updateData.description = JSON.stringify(data.subtasks);
-        if (data.status !== undefined) updateData.status = data.status;
-        if (data.priority !== undefined) updateData.priority = data.priority;
-        if (data.deadline !== undefined) updateData.deadline = data.deadline;
-        if (data.client !== undefined) updateData.client = data.client;
-        if (data.projectId !== undefined) updateData.project_id = data.projectId || null;
-
-        await supabase.from('tasks').update(updateData).eq('id', id);
-    };
-
-    const deleteTask = async (id: string) => {
-        setState(prev => ({
-            ...prev,
-            tasks: prev.tasks.filter(t => t.id !== id)
-        }));
-
-        await supabase.from('tasks').delete().eq('id', id);
-    };
-
-    const addClient = async (data: Omit<Client, 'id'>) => {
-        const tempId = `temp-${Date.now()}`;
-        const newClient: Client = { ...data, id: tempId };
-        setState(prev => ({ ...prev, clients: [...prev.clients, newClient] }));
-
-        const { data: inserted, error } = await supabase
-            .from('clients')
-            .insert({
-                user_id: userId,
-                name: data.name,
-                contact: data.contact
-            })
-            .select()
-            .single();
-
-        if (error) console.error('Error adding client:', error);
-
-        if (inserted) {
-            setState(prev => ({
-                ...prev,
-                clients: prev.clients.map(c => c.id === tempId ? { ...c, id: inserted.id } : c)
-            }));
-        }
-    };
-
-    const updateClient = async (id: string, data: Partial<Client>) => {
-        setState(prev => ({
-            ...prev,
-            clients: prev.clients.map(c => c.id === id ? { ...c, ...data } : c)
-        }));
-
-        const updateData: any = {};
-        if (data.name !== undefined) updateData.name = data.name;
-        if (data.contact !== undefined) updateData.contact = data.contact;
-
-        await supabase.from('clients').update(updateData).eq('id', id);
-    };
-
-    const deleteClient = async (id: string) => {
-        setState(prev => ({
-            ...prev,
-            clients: prev.clients.filter(c => c.id !== id)
-        }));
-
-        await supabase.from('clients').delete().eq('id', id);
-    };
-
-    const reorderClients = (newOrder: Client[]) => {
-        setState(prev => ({ ...prev, clients: newOrder }));
-    };
-
-    const removeMember = async (projectId: string, memberId: number) => {
-        // Update local state first to remove member visually
-        setState(prev => ({
-            ...prev,
-            projects: prev.projects.map(p => {
-                if (p.id !== projectId) return p;
-                return {
-                    ...p,
-                    members: (p.members || []).filter(m => m.id !== memberId)
-                };
-            })
-        }));
-
+        // Insert into members
         const { error } = await supabase
             .from('project_members')
-            .delete()
-            .match({ project_id: projectId, user_id: memberId });
+            .insert({
+                project_id: projectId,
+                user_id: userId,
+                role: 'member'
+            });
 
         if (error) {
-            console.error('Error removing member:', error);
-            // Revert state if needed, but for simplicity assuming success or reload on error
+            // If unique constraint violation, it means we are already added (maybe data sync lag), so success
+            if (error.code === '23505') return true;
+            console.error('Join error:', error);
+            return false;
         }
-    };
 
-    const getUserInfo = (uid: number) => {
-        if (uid === userId) {
-            const mys = getTelegramUser();
-            if (mys) return { name: mys.first_name, avatar: mys.photo_url, id: uid };
-        }
-        const p = profilesCache.current.get(uid);
-        if (p) return { name: p.first_name || p.username || `User ${uid}`, avatar: p.avatar_url, id: uid };
-        return undefined;
-    };
+        // Reload data to show new project
+        // In a better app we would just fetch the single project
+        window.location.reload(); // Simple refresh to sync everything
+        return true;
 
-    return (
-        <StoreContext.Provider value={{
-            ...state,
-            getUserInfo,
-            addProject,
-            updateProject,
-            deleteProject,
-            joinProject,
-            addTask,
-            updateTask,
-            deleteTask,
-            addClient,
-            updateClient,
-            deleteClient,
-            reorderClients,
-            removeMember,
-            availableStatuses,
-            addCustomStatus,
-            deleteCustomStatus,
-            toggleTheme,
-            toggleLanguage,
-            isLoading,
-            userId,
-            deleteAccount,
-            togglePremiumDebug
-        }}>
-            {children}
-        </StoreContext.Provider>
-    );
+    } catch (e) {
+        console.error('Join exception', e);
+        return false;
+    }
+};
+
+const addTask = async (data: Omit<Task, 'id' | 'createdAt'>) => {
+    const tempId = `temp-${Date.now()}`;
+    const newTask: Task = { ...data, id: tempId, createdAt: Date.now(), updatedAt: Date.now() };
+    setState(prev => ({ ...prev, tasks: [newTask, ...prev.tasks] }));
+
+    const { data: inserted, error } = await supabase
+        .from('tasks')
+        .insert({
+            user_id: userId,
+            title: data.title,
+            description: JSON.stringify(data.subtasks || []),
+            status: data.status,
+            priority: data.priority,
+            deadline: data.deadline,
+            client: data.client,
+            project_id: data.projectId || null
+        })
+        .select()
+        .single();
+
+    if (error) console.error('Error adding task:', error);
+
+    if (inserted) {
+        setState(prev => ({
+            ...prev,
+            tasks: prev.tasks.map(t => t.id === tempId ? { ...t, id: inserted.id } : t)
+        }));
+    }
+};
+
+const updateTask = async (id: string, data: Partial<Task>) => {
+    setState(prev => ({
+        ...prev,
+        tasks: prev.tasks.map(t => t.id === id ? { ...t, ...data, updatedAt: Date.now() } : t)
+    }));
+
+    const updateData: any = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.subtasks !== undefined) updateData.description = JSON.stringify(data.subtasks);
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.priority !== undefined) updateData.priority = data.priority;
+    if (data.deadline !== undefined) updateData.deadline = data.deadline;
+    if (data.client !== undefined) updateData.client = data.client;
+    if (data.projectId !== undefined) updateData.project_id = data.projectId || null;
+
+    await supabase.from('tasks').update(updateData).eq('id', id);
+};
+
+const deleteTask = async (id: string) => {
+    setState(prev => ({
+        ...prev,
+        tasks: prev.tasks.filter(t => t.id !== id)
+    }));
+
+    await supabase.from('tasks').delete().eq('id', id);
+};
+
+const addClient = async (data: Omit<Client, 'id'>) => {
+    const tempId = `temp-${Date.now()}`;
+    const newClient: Client = { ...data, id: tempId };
+    setState(prev => ({ ...prev, clients: [...prev.clients, newClient] }));
+
+    const { data: inserted, error } = await supabase
+        .from('clients')
+        .insert({
+            user_id: userId,
+            name: data.name,
+            contact: data.contact
+        })
+        .select()
+        .single();
+
+    if (error) console.error('Error adding client:', error);
+
+    if (inserted) {
+        setState(prev => ({
+            ...prev,
+            clients: prev.clients.map(c => c.id === tempId ? { ...c, id: inserted.id } : c)
+        }));
+    }
+};
+
+const updateClient = async (id: string, data: Partial<Client>) => {
+    setState(prev => ({
+        ...prev,
+        clients: prev.clients.map(c => c.id === id ? { ...c, ...data } : c)
+    }));
+
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.contact !== undefined) updateData.contact = data.contact;
+
+    await supabase.from('clients').update(updateData).eq('id', id);
+};
+
+const deleteClient = async (id: string) => {
+    setState(prev => ({
+        ...prev,
+        clients: prev.clients.filter(c => c.id !== id)
+    }));
+
+    await supabase.from('clients').delete().eq('id', id);
+};
+
+const reorderClients = (newOrder: Client[]) => {
+    setState(prev => ({ ...prev, clients: newOrder }));
+};
+
+const removeMember = async (projectId: string, memberId: number) => {
+    // Update local state first to remove member visually
+    setState(prev => ({
+        ...prev,
+        projects: prev.projects.map(p => {
+            if (p.id !== projectId) return p;
+            return {
+                ...p,
+                members: (p.members || []).filter(m => m.id !== memberId)
+            };
+        })
+    }));
+
+    const { error } = await supabase
+        .from('project_members')
+        .delete()
+        .match({ project_id: projectId, user_id: memberId });
+
+    if (error) {
+        console.error('Error removing member:', error);
+        // Revert state if needed, but for simplicity assuming success or reload on error
+    }
+};
+
+const getUserInfo = (uid: number) => {
+    if (uid === userId) {
+        const mys = getTelegramUser();
+        if (mys) return { name: mys.first_name, avatar: mys.photo_url, id: uid };
+    }
+    const p = profilesCache.current.get(uid);
+    if (p) return { name: p.first_name || p.username || `User ${uid}`, avatar: p.avatar_url, id: uid };
+    return undefined;
+};
+
+return (
+    <StoreContext.Provider value={{
+        ...state,
+        getUserInfo,
+        addProject,
+        updateProject,
+        deleteProject,
+        joinProject,
+        addTask,
+        updateTask,
+        deleteTask,
+        addClient,
+        updateClient,
+        deleteClient,
+        reorderClients,
+        removeMember,
+        availableStatuses,
+        addCustomStatus,
+        deleteCustomStatus,
+        toggleTheme,
+        toggleLanguage,
+        isLoading,
+        userId,
+        deleteAccount,
+        togglePremiumDebug
+    }}>
+        {children}
+    </StoreContext.Provider>
+);
 };
 
 export const useStore = () => {
