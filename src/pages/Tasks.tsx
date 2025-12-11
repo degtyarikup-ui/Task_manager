@@ -6,8 +6,9 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List } from 'lucide-react';
+import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Sparkles, Loader2 } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
+import { supabase } from '../lib/supabase';
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
 import formStyles from '../components/ui/Form.module.css';
@@ -24,7 +25,6 @@ import { UndoToast } from '../components/UndoToast';
 import { ProjectToolbar } from '../components/ProjectToolbar';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 
-// ... logic ...
 
 
 
@@ -38,6 +38,7 @@ export const Tasks: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
         const hasSeenTooltip = localStorage.getItem('hasSeenOnboardingTooltip');
@@ -93,6 +94,37 @@ export const Tasks: React.FC = () => {
         const newSub = { id: Date.now().toString(), title: newSubtaskTitle.trim(), completed: false };
         setFormData(prev => ({ ...prev, subtasks: [...(prev.subtasks || []), newSub] }));
         setNewSubtaskTitle('');
+    };
+
+    const handleGenerateSubtasks = async () => {
+        if (!formData.title) return;
+        setIsGenerating(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('generate-subtasks', {
+                body: { title: formData.title, language: language }
+            });
+
+            if (error) throw error;
+
+            if (data?.subtasks && Array.isArray(data.subtasks)) {
+                const newSubs = data.subtasks.map((t: string) => ({
+                    id: Date.now().toString() + Math.random().toString().slice(2),
+                    title: t,
+                    completed: false
+                }));
+                setFormData(prev => ({
+                    ...prev,
+                    subtasks: [...(prev.subtasks || []), ...newSubs]
+                }));
+                haptic.notification('success');
+            }
+        } catch (e: any) {
+            console.error(e);
+            alert('Error generating subtasks. Please try again.');
+            haptic.notification('error');
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     const toggleSubtaskValid = (id: string) => { // Rename to avoid conflict if any
@@ -474,6 +506,35 @@ export const Tasks: React.FC = () => {
                                 <Plus size={20} />
                             </button>
                         </div>
+
+                        {formData.title && (
+                            <button
+                                type="button"
+                                onClick={handleGenerateSubtasks}
+                                disabled={isGenerating}
+                                style={{
+                                    width: '100%',
+                                    marginBottom: 12,
+                                    padding: '8px 12px',
+                                    background: 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: 12,
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: 8,
+                                    opacity: isGenerating ? 0.7 : 1,
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
+                                }}
+                            >
+                                {isGenerating ? <Loader2 size={16} className={styles.spin} /> : <Sparkles size={16} />}
+                                {isGenerating ? (t('generating') || 'AI Generating...') : (t('generateSubtasks') || '✨ Сгенерировать подзадачи')}
+                            </button>
+                        )}
                         <DragDropContext onDragEnd={onDragEnd}>
                             <Droppable droppableId="subtasks">
                                 {(provided) => (
