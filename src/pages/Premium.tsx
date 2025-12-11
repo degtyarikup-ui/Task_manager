@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
+import { useTranslation } from '../i18n/useTranslation';
 
 import { Star, BarChart2, ShieldCheck } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
 export const Premium: React.FC = () => {
-    const { userId, isPremium } = useStore();
+    const { userId, isPremium, language } = useStore();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -33,7 +35,11 @@ export const Premium: React.FC = () => {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer sb_publishable_ZikJgvMJx7lj9c7OmICtNg_ctMzFDDu'
                 },
-                body: JSON.stringify({ action: 'create_invoice', userId: userId })
+                body: JSON.stringify({
+                    action: 'create_invoice',
+                    userId: userId,
+                    language: language
+                })
             });
 
             if (!response.ok) {
@@ -48,7 +54,7 @@ export const Premium: React.FC = () => {
                 if (tg && tg.openInvoice) {
                     tg.openInvoice(data.invoiceLink, (status: string) => {
                         if (status === 'paid' || status === 'paid_med') {
-                            if (tg.showAlert) tg.showAlert('Payment Successful!');
+                            if (tg.showAlert) tg.showAlert(t('paymentSuccess'));
                             setTimeout(() => {
                                 navigate('/profile');
                                 window.location.reload();
@@ -77,9 +83,9 @@ export const Premium: React.FC = () => {
                 <div className={styles.iconWrapper}>
                     <Star size={44} color="white" fill="white" />
                 </div>
-                <div className={styles.title}>Trackit Premium</div>
+                <div className={styles.title}>{t('premiumTitle')}</div>
                 <div className={styles.subtitle}>
-                    Раскройте полный потенциал вашей продуктивности
+                    {t('premiumSubtitle')}
                 </div>
             </div>
 
@@ -89,8 +95,8 @@ export const Premium: React.FC = () => {
                         <BarChart2 size={24} />
                     </div>
                     <div className={styles.featureText}>
-                        <h3>Расширенная статистика</h3>
-                        <p>Анализируйте свою продуктивность с графиками и цифрами</p>
+                        <h3>{t('advancedStats')}</h3>
+                        <p>{t('advancedStatsDesc')}</p>
                     </div>
                 </div>
 
@@ -99,8 +105,8 @@ export const Premium: React.FC = () => {
                         <ShieldCheck size={24} />
                     </div>
                     <div className={styles.featureText}>
-                        <h3>Поддержка развития</h3>
-                        <p>Ваш вклад помогает нам делать приложение лучше</p>
+                        <h3>{t('supportDev')}</h3>
+                        <p>{t('supportDevDesc')}</p>
                     </div>
                 </div>
 
@@ -110,8 +116,8 @@ export const Premium: React.FC = () => {
                         <Star size={24} />
                     </div>
                     <div className={styles.featureText}>
-                        <h3>Скоро больше</h3>
-                        <p>Новые функции уже в разработке</p>
+                        <h3>{t('soonMore')}</h3>
+                        <p>{t('soonMoreDesc')}</p>
                     </div>
                 </div>
             </div>
@@ -120,10 +126,10 @@ export const Premium: React.FC = () => {
                 {!isPremium ? (
                     <>
                         <button className={styles.buyButton} onClick={handleBuyPremium} disabled={isLoading}>
-                            {isLoading ? 'Загрузка...' : 'Подключить за 5 ⭐ / неделя'}
+                            {isLoading ? t('loading') : t('buyButton')}
                         </button>
                         <div className={styles.price}>
-                            Отменить можно в любой момет
+                            {t('cancelAnytime')}
                         </div>
                     </>
                 ) : (
@@ -131,7 +137,7 @@ export const Premium: React.FC = () => {
                         padding: 16, background: 'var(--color-success)', color: 'white',
                         borderRadius: 16, fontWeight: 600
                     }}>
-                        У вас уже есть Premium! 🎉
+                        {t('alreadyPremium')}
                     </div>
                 )}
             </div>
