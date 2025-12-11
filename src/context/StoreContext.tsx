@@ -30,6 +30,7 @@ interface StoreContextType extends AppState {
     toggleLanguage: () => void;
     isLoading: boolean;
     userId: number;
+    deleteAccount: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -139,7 +140,35 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         } else if (isTelegramWebApp()) {
             setState(prev => ({ ...prev, theme: getTelegramTheme() }));
         }
+        if (savedTheme) {
+            setState(prev => ({ ...prev, theme: savedTheme }));
+        } else if (isTelegramWebApp()) {
+            setState(prev => ({ ...prev, theme: getTelegramTheme() }));
+        }
     }, []);
+
+    const deleteAccount = async () => {
+        if (!userId && userId !== 0) return;
+
+        try {
+            // Delete all user data from Supabase
+            await supabase.from('tasks').delete().eq('user_id', userId);
+            await supabase.from('clients').delete().eq('user_id', userId);
+            await supabase.from('project_members').delete().eq('user_id', userId);
+            await supabase.from('projects').delete().eq('user_id', userId);
+            // Optionally delete profile
+            await supabase.from('profiles').delete().eq('id', userId);
+        } catch (error) {
+            console.error('Error clearing data:', error);
+        }
+
+        // Clear local storage
+        localStorage.clear();
+
+        // Reset State
+        setState(initialState);
+        window.location.reload();
+    };
 
     // 2. Load Data from Supabase
     useEffect(() => {
@@ -606,7 +635,8 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             toggleTheme,
             toggleLanguage,
             isLoading,
-            userId
+            userId,
+            deleteAccount
         }}>
             {children}
         </StoreContext.Provider>

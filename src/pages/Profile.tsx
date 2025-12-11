@@ -21,7 +21,7 @@ import styles from './Profile.module.css';
 
 
 export const Profile: React.FC = () => {
-    const { tasks, clients, theme, toggleTheme, language, toggleLanguage } = useStore();
+    const { tasks, clients, theme, toggleTheme, language, toggleLanguage, deleteAccount } = useStore();
     const { t } = useTranslation();
 
     // Calculated Statistics
@@ -93,8 +93,7 @@ export const Profile: React.FC = () => {
             title: t('clearDataTitle'),
             message: t('clearDataMessage'),
             onConfirm: () => {
-                localStorage.clear();
-                window.location.reload();
+                deleteAccount();
             },
             isDestructive: true,
             isAlert: false
