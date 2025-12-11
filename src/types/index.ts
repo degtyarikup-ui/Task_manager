@@ -43,6 +43,9 @@ export interface Client {
     id: string;
     name: string;
     contact: string;
+    avatar_url?: string;
+    telegram_id?: number;
+    notes?: string;
 }
 
 import type { Language } from '../i18n/translations';

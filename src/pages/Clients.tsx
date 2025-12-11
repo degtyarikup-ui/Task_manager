@@ -182,9 +182,18 @@ export const Clients: React.FC = () => {
                                                 zIndex: snapshot.isDragging ? 1000 : 1,
                                             }}
                                         >
-                                            <div className={styles.avatar} style={{ background: generateAvatarColor(client.name) }}>
-                                                {getInitials(client.name)}
-                                            </div>
+                                            {client.avatar_url ? (
+                                                <img
+                                                    src={client.avatar_url}
+                                                    alt={client.name}
+                                                    className={styles.avatar}
+                                                    style={{ objectFit: 'cover', background: 'none' }}
+                                                />
+                                            ) : (
+                                                <div className={styles.avatar} style={{ background: generateAvatarColor(client.name) }}>
+                                                    {getInitials(client.name)}
+                                                </div>
+                                            )}
                                             <div className={styles.name}>{client.name}</div>
                                             {client.contact && <div className={styles.contact}>{client.contact}</div>}
                                         </div>
