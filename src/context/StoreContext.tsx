@@ -422,12 +422,13 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setState(prev => ({ ...prev, isPremium: newStatus }));
 
         if (userId) {
-            // Use upsert to create profile if it doesn't exist
-            await supabase.from('profiles').upsert({
-                id: userId,
-                is_premium: newStatus
+            // Call Edge Function to bypass RLS
+            const { error } = await supabase.functions.invoke('toggle-premium', {
+                body: { userId, isPremium: newStatus }
             });
+            if (error) console.error('Toggle Premium Error:', error);
         }
+
     };
 
     // --- Actions with Supabase Sync ---

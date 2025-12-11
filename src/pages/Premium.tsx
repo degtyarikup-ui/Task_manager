@@ -16,7 +16,7 @@ export const Premium: React.FC = () => {
         const tg = (window as any).Telegram?.WebApp;
         if (tg) {
             tg.BackButton.show();
-            const handleBack = () => navigate(-1);
+            const handleBack = () => navigate('/');
             tg.BackButton.onClick(handleBack);
             return () => {
                 tg.BackButton.offClick(handleBack);
