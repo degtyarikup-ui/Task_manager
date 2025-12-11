@@ -20,6 +20,8 @@ interface StoreContextType extends AppState {
     deleteClient: (id: string) => void;
     reorderClients: (clients: Client[]) => void;
 
+    removeMember: (projectId: string, userId: number) => Promise<void>;
+
     availableStatuses: string[];
     addCustomStatus: (status: string) => void;
     deleteCustomStatus: (status: string) => void;
@@ -27,6 +29,7 @@ interface StoreContextType extends AppState {
     toggleTheme: () => void;
     toggleLanguage: () => void;
     isLoading: boolean;
+    userId: number;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -111,6 +114,20 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const uid = tgUser?.id || 1;
         setUserId(uid);
 
+        // Sync Profile
+        if (tgUser && uid !== 1) {
+            const updates = {
+                id: uid,
+                username: tgUser.username,
+                first_name: tgUser.first_name,
+                avatar_url: tgUser.photo_url,
+                updated_at: new Date()
+            };
+            supabase.from('profiles').upsert(updates).then(({ error }) => {
+                if (error) console.error('Error syncing profile:', error);
+            });
+        }
+
         // Load Theme
         let savedTheme: 'light' | 'dark' | null = null;
         try {
@@ -158,11 +175,36 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                 // Combine projects
                 const allProjectsRaw = [...(ownProjects || []), ...sharedProjects];
-                // Remove duplicates just in case
                 const uniqueProjectsMap = new Map();
                 allProjectsRaw.forEach(p => uniqueProjectsMap.set(p.id, p));
                 const projectsData = Array.from(uniqueProjectsMap.values());
                 const allProjectIds = projectsData.map(p => p.id);
+
+                // --- NEW: Fetch Members and Profiles ---
+                let projectMembers: any[] = [];
+                let profilesMap = new Map();
+
+                if (allProjectIds.length > 0) {
+                    const { data: members } = await supabase
+                        .from('project_members')
+                        .select('project_id, user_id, role')
+                        .in('project_id', allProjectIds);
+                    projectMembers = members || [];
+
+                    const userIds = [...new Set([
+                        ...projectMembers.map(m => m.user_id),
+                        ...projectsData.map(p => p.user_id) // include owners
+                    ])];
+
+                    if (userIds.length > 0) {
+                        const { data: profiles } = await supabase
+                            .from('profiles')
+                            .select('*')
+                            .in('id', userIds);
+                        (profiles || []).forEach((p: any) => profilesMap.set(p.id, p));
+                    }
+                }
+                // ----------------------------------------
 
                 // Fetch Clients
                 const { data: clientsData, error: clientError } = await supabase
@@ -179,11 +221,6 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     .select('*');
 
                 if (allProjectIds.length > 0) {
-                    // Logic: (user_id = me) OR (project_id IN allProjectIds)
-                    // Supabase syntax for OR is complex, simpler to fetch two sets or use .or()
-                    // .or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`)
-                    // But for safety and simpler code, we can fetch all tasks for projects AND all orphan tasks for user
-                    // For now, let's fetch ALL tasks for user + tasks for shared projects
                     tasksQuery = tasksQuery.or(`user_id.eq.${userId},project_id.in.(${allProjectIds.join(',')})`);
                 } else {
                     tasksQuery = tasksQuery.eq('user_id', userId);
@@ -194,13 +231,41 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 if (taskError) console.error('Error fetching tasks:', taskError);
 
                 // Map DB types to App types
-                const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => ({
-                    id: p.id,
-                    title: p.title,
-                    description: p.description || '',
-                    status: p.status as Status,
-                    createdAt: new Date(p.created_at).getTime()
-                }));
+                const projects: Project[] = (projectsData || []).map((p: DatabaseProject) => {
+                    // Resolve members
+                    const members = projectMembers
+                        .filter(m => m.project_id === p.id)
+                        .map(m => {
+                            const profile = profilesMap.get(m.user_id);
+                            return {
+                                id: m.user_id,
+                                name: profile?.first_name || profile?.username || `User ${m.user_id}`,
+                                avatar: profile?.avatar_url,
+                                role: m.role as 'member' | 'owner'
+                            };
+                        });
+
+                    // Add Owner if not in members list (implicitly owner)
+                    const ownerProfile = profilesMap.get(p.user_id);
+                    const ownerInMembers = members.find(m => m.id === p.user_id);
+                    if (!ownerInMembers) {
+                        members.unshift({
+                            id: p.user_id,
+                            name: ownerProfile?.first_name || ownerProfile?.username || `User ${p.user_id}`,
+                            avatar: ownerProfile?.avatar_url,
+                            role: 'owner'
+                        });
+                    }
+
+                    return {
+                        id: p.id,
+                        title: p.title,
+                        description: p.description || '',
+                        status: p.status as Status,
+                        createdAt: new Date(p.created_at).getTime(),
+                        members: members
+                    };
+                });
 
                 const clients: Client[] = (clientsData || []).map((c: DatabaseClient) => ({
                     id: c.id,
@@ -483,6 +548,30 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setState(prev => ({ ...prev, clients: newOrder }));
     };
 
+    const removeMember = async (projectId: string, memberId: number) => {
+        // Update local state first to remove member visually
+        setState(prev => ({
+            ...prev,
+            projects: prev.projects.map(p => {
+                if (p.id !== projectId) return p;
+                return {
+                    ...p,
+                    members: (p.members || []).filter(m => m.id !== memberId)
+                };
+            })
+        }));
+
+        const { error } = await supabase
+            .from('project_members')
+            .delete()
+            .match({ project_id: projectId, user_id: memberId });
+
+        if (error) {
+            console.error('Error removing member:', error);
+            // Revert state if needed, but for simplicity assuming success or reload on error
+        }
+    };
+
     return (
         <StoreContext.Provider value={{
             ...state,
@@ -497,12 +586,14 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             updateClient,
             deleteClient,
             reorderClients,
+            removeMember,
             availableStatuses,
             addCustomStatus,
             deleteCustomStatus,
             toggleTheme,
             toggleLanguage,
-            isLoading
+            isLoading,
+            userId
         }}>
             {children}
         </StoreContext.Provider>

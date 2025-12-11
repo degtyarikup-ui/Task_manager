@@ -127,6 +127,11 @@ export const translations = {
         fri: 'Пт',
         sat: 'Сб',
         sun: 'Вс',
+        shareMessage: 'Присоединяйся к моему списку "{listName}" в Task Manager!',
+        members: 'Участники',
+        removeMember: 'Удалить участника',
+        removeMemberConfirm: 'Вы уверены, что хотите удалить участника',
+        you: 'Вы',
     },
     en: {
         // Bottom Navigation
@@ -256,6 +261,11 @@ export const translations = {
         fri: 'Fri',
         sat: 'Sat',
         sun: 'Sun',
+        shareMessage: 'Join my list "{listName}" in Task Manager!',
+        members: 'Members',
+        removeMember: 'Remove Member',
+        removeMemberConfirm: 'Are you sure you want to remove member',
+        you: 'You',
     },
 };
 

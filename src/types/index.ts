@@ -10,6 +10,12 @@ export interface Project {
     cost?: number;
     clientId?: string;
     createdAt: number;
+    members?: {
+        id: number;
+        name: string;
+        avatar?: string;
+        role: 'owner' | 'member';
+    }[];
 }
 
 export interface Subtask {
