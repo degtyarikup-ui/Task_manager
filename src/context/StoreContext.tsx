@@ -131,17 +131,29 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             });
         }
 
+        // Load Language
+        let savedLang: Language | null = null;
+        try { savedLang = localStorage.getItem('user_language') as Language | null; } catch (e) { }
+
+        if (!savedLang && tgUser?.language_code) {
+            const code = tgUser.language_code.toLowerCase();
+            if (code === 'ru' || code === 'uk' || code === 'be') {
+                savedLang = 'ru';
+            } else {
+                savedLang = 'en';
+            }
+        }
+
+        if (savedLang) {
+            setState(prev => ({ ...prev, language: savedLang }));
+        }
+
         // Load Theme
         let savedTheme: 'light' | 'dark' | null = null;
         try {
             savedTheme = localStorage.getItem('user_theme') as 'light' | 'dark' | null;
         } catch (e) { }
 
-        if (savedTheme) {
-            setState(prev => ({ ...prev, theme: savedTheme }));
-        } else if (isTelegramWebApp()) {
-            setState(prev => ({ ...prev, theme: getTelegramTheme() }));
-        }
         if (savedTheme) {
             setState(prev => ({ ...prev, theme: savedTheme }));
         } else if (isTelegramWebApp()) {
