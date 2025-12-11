@@ -9,7 +9,7 @@ import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
 import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Sparkles, Loader2, Lock } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
-import { supabase } from '../lib/supabase';
+
 import styles from './Tasks.module.css';
 import extraStyles from './TasksExtra.module.css';
 import formStyles from '../components/ui/Form.module.css';
