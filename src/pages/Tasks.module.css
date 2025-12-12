@@ -25,7 +25,7 @@
 }
 
 .header {
-    margin-bottom: 48px;
+    margin-bottom: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -41,13 +41,11 @@
 
 :global(.platform-ios) .header {
     margin-top: -12px;
-    margin-bottom: 36px;
     padding-top: 20px;
 }
 
 :global(.platform-android) .header {
     margin-top: -60px;
-    margin-bottom: 84px;
     padding-top: 68px;
 }
 
@@ -62,7 +60,7 @@
     display: flex;
     justify-content: flex-start;
     /* Align content left */
-    box-shadow: 0 -80px 0 80px var(--bg-app);
+    /* Align content left */
     /* Ensure padding is handled by child or here? Child has padding. */
 }
 
