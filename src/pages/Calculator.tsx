@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/useTranslation';
-import { useStore } from '../context/StoreContext'; // Import store for language
+import { useStore } from '../context/StoreContext';
 import { haptic } from '../utils/haptics';
 import { Calculator as CalcIcon, Sparkles, Clock, TrendingUp } from 'lucide-react';
 import styles from './Calculator.module.css';
@@ -19,11 +19,11 @@ interface AIResult {
 export const Calculator: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { language } = useStore(); // Get language
+    const { language } = useStore();
 
     const [projectType, setProjectType] = useState<string>('development');
     const [description, setDescription] = useState<string>('');
-    const [rate, setRate] = useState<number | ''>(50);
+    const [rate, setRate] = useState<number>(30); // Default middle value
     const [experience, setExperience] = useState<string>('beginner');
     const [result, setResult] = useState<AIResult | null>(null);
     const [isCalculating, setIsCalculating] = useState(false);
@@ -65,7 +65,7 @@ export const Calculator: React.FC = () => {
                 body: JSON.stringify({
                     projectType,
                     description,
-                    hourlyRate: rate || 0,
+                    hourlyRate: rate,
                     experience,
                     language
                 })
@@ -91,18 +91,11 @@ export const Calculator: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-                    <div style={{
-                        width: 64, height: 64, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 8px 16px rgba(255, 165, 0, 0.3)'
-                    }}>
-                        <CalcIcon size={32} color="white" />
-                    </div>
+                <div className={styles.iconWrapper}>
+                    <CalcIcon size={40} color="white" />
                 </div>
-                <h1 className={styles.title}>{t('aiCalculator')}</h1>
-                <p className={styles.subtitle}>{t('aiCalculatorDesc')}</p>
+                <div className={styles.title}>{t('aiCalculator')}</div>
+                <div className={styles.subtitle}>{t('aiCalculatorDesc')}</div>
             </header>
 
             <div className={styles.formGroup}>
@@ -130,7 +123,7 @@ export const Calculator: React.FC = () => {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={String(t('projectDescriptionPlaceholder') || '')}
                     rows={4}
-                    style={{ resize: 'none' }}
+                    style={{ resize: 'none', minHeight: 100 }}
                 />
             </div>
 
@@ -149,13 +142,18 @@ export const Calculator: React.FC = () => {
 
             <div className={styles.formGroup}>
                 <label className={styles.label}>{t('hourlyRate')}</label>
-                <input
-                    type="number"
-                    className={styles.input}
-                    value={rate}
-                    onChange={(e) => setRate(e.target.value ? Number(e.target.value) : '')}
-                    placeholder="50"
-                />
+                <div className={styles.rangeContainer}>
+                    <input
+                        type="range"
+                        className={styles.rangeInput}
+                        min="2"
+                        max="50"
+                        step="1"
+                        value={rate}
+                        onChange={(e) => setRate(Number(e.target.value))}
+                    />
+                    <div className={styles.rangeValue}>${rate}</div>
+                </div>
             </div>
 
             {error && (
@@ -173,7 +171,7 @@ export const Calculator: React.FC = () => {
                     <>{t('loading') || 'Processing...'}</>
                 ) : (
                     <>
-                        <Sparkles size={20} />
+                        <Sparkles size={24} />
                         {t('calculate')}
                     </>
                 )}
@@ -187,25 +185,29 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
-                        <div style={{ background: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 12 }}>
+                        <div style={{ background: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 16 }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, opacity: 0.8, marginBottom: 4 }}>
-                                <Clock size={14} /> {t('hoursEstimate')}
+                                <Clock size={16} /> {t('hoursEstimate')}
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: 16 }}>
+                            <div style={{ fontWeight: 700, fontSize: 16 }}>
                                 {result.minHours}-{result.maxHours} {t('hours')}
                             </div>
                         </div>
-                        <div style={{ background: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 12 }}>
+                        <div style={{ background: 'rgba(255,255,255,0.1)', padding: 12, borderRadius: 16 }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13, opacity: 0.8, marginBottom: 4 }}>
-                                <TrendingUp size={14} /> {t('complexity')}
+                                <TrendingUp size={16} /> {t('complexity')}
                             </div>
-                            <div style={{ fontWeight: 600, fontSize: 16 }}>
+                            <div style={{ fontWeight: 700, fontSize: 16 }}>
                                 {result.complexity}
                             </div>
                         </div>
                     </div>
 
-                    <div className={styles.disclaimer} style={{ fontSize: 14, marginTop: 16, lineHeight: 1.5, textAlign: 'left', background: 'rgba(0,0,0,0.1)', padding: 12, borderRadius: 12 }}>
+                    <div className={styles.disclaimer} style={{
+                        fontSize: 15, marginTop: 20,
+                        lineHeight: 1.5, textAlign: 'left',
+                        background: 'rgba(255,255,255,0.1)', padding: 16, borderRadius: 16
+                    }}>
                         {result.explanation}
                     </div>
 
