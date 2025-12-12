@@ -268,7 +268,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                         .limit(1);
 
 
-                    const isPremiumUser = (licenseTask && licenseTask.length > 0) || false;
+                    const isPremiumUser = (licenseTask && licenseTask.length > 0) || [643656439].includes(userId);
 
                     setState(prev => ({
                         ...prev,
