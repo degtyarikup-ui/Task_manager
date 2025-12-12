@@ -9,11 +9,11 @@
 }
 
 :global(.platform-ios) .container {
-    padding-top: 170px;
+    padding-top: 160px;
 }
 
 :global(.platform-android) .container {
-    padding-top: 180px;
+    padding-top: 186px;
 }
 
 .detailsHeaderPadding {
@@ -38,11 +38,11 @@
 }
 
 :global(.platform-ios) .fixedTop {
-    padding-top: 56px;
+    padding-top: 58px;
 }
 
 :global(.platform-android) .fixedTop {
-    padding-top: 50px;
+    padding-top: 64px;
 }
 
 .fixedTop::after {
@@ -57,7 +57,7 @@
 }
 
 .header {
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -66,10 +66,10 @@
 
 .stickyHeader {
     position: relative;
-    width: 100%;
+    width: calc(100% + 32px);
+    margin: 0 -16px 8px -16px;
     z-index: 100;
     background-color: var(--bg-app);
-    margin-bottom: 8px;
 }
 
 .title {
