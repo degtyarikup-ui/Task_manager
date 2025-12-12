@@ -9,11 +9,11 @@
 }
 
 :global(.platform-ios) .container {
-    padding-top: 160px;
+    padding-top: 170px;
 }
 
 :global(.platform-android) .container {
-    padding-top: 210px;
+    padding-top: 180px;
 }
 
 .detailsHeaderPadding {
@@ -38,11 +38,11 @@
 }
 
 :global(.platform-ios) .fixedTop {
-    padding-top: 48px;
+    padding-top: 56px;
 }
 
 :global(.platform-android) .fixedTop {
-    padding-top: 80px;
+    padding-top: 50px;
 }
 
 .fixedTop::after {
