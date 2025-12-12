@@ -33,7 +33,7 @@
 
 .stickyHeader {
     position: sticky;
-    top: 48px;
+    top: 90px;
     z-index: 100;
     background-color: var(--bg-app);
     margin: 0 -16px 8px -16px;
@@ -42,6 +42,7 @@
     display: flex;
     justify-content: flex-start;
     /* Align content left */
+    box-shadow: 0 -80px 0 80px var(--bg-app);
     /* Ensure padding is handled by child or here? Child has padding. */
 }
 
