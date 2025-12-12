@@ -9,6 +9,7 @@ import { Profile } from './pages/Profile';
 import { ClientDetails } from './pages/ClientDetails';
 import { Premium } from './pages/Premium';
 import { TaskForm } from './pages/TaskForm';
+import { Calculator } from './pages/Calculator';
 import { BottomNav } from './components/BottomNav';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -76,6 +77,7 @@ function Layout() {
           <Route path="/clients/:clientId" element={<ClientDetails />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/premium" element={<Premium />} />
+          <Route path="/calculator" element={<Calculator />} />
           <Route path="*" element={<Navigate to="/tasks" replace />} />
         </Routes>
       </main>

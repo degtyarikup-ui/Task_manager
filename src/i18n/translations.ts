@@ -162,6 +162,17 @@ export const translations = {
         errorLoadFailed: 'Ошибка соединения. Проверьте интернет.',
         errorAIService: 'Ошибка сервиса AI. Попробуйте позже.',
         errorGeneric: 'Ошибка',
+
+        // AI Calculator
+        aiCalculator: 'AI Калькулятор',
+        aiCalculatorDesc: 'Оценка стоимости проекта на базе ИИ',
+        projectType: 'Тип проекта',
+        hourlyRate: 'Почасовая ставка ($)',
+        estimatedHours: 'Примерные часы',
+        complexity: 'Сложность',
+        calculate: 'Рассчитать стоимость',
+        estimatedCost: 'Примерная стоимость',
+        aiDisclaimer: '* Расчет приблизительный и основан на рыночных данных.'
     },
     en: {
         // Bottom Navigation
@@ -326,6 +337,17 @@ export const translations = {
         errorLoadFailed: 'Connection error. Check your internet.',
         errorAIService: 'AI Service error. Please try again.',
         errorGeneric: 'Error',
+
+        // AI Calculator
+        aiCalculator: 'AI Calculator',
+        aiCalculatorDesc: 'Estimate project cost using AI',
+        projectType: 'Project Type',
+        hourlyRate: 'Hourly Rate ($)',
+        estimatedHours: 'Estimated Hours',
+        complexity: 'Complexity',
+        calculate: 'Calculate Cost',
+        estimatedCost: 'Estimated Cost',
+        aiDisclaimer: '* This is an AI estimation based on average market rates. Actual cost may vary.'
     },
 };
 
