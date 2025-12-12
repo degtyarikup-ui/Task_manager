@@ -4,7 +4,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--bg-card);
-    padding: 6px;
+    padding: 3px;
     border-radius: 32px;
     display: flex;
     align-items: center;
