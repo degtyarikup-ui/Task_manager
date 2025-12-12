@@ -131,6 +131,9 @@ export const Tasks: React.FC = () => {
             if (now - lastUpdate > ONE_DAY_MS) return false;
         }
 
+        // 3. Hide Premium License System Task
+        if (t.title === '⭐️ Premium License') return false;
+
         return true;
     }).sort((a, b) => {
         // 1. Completed to bottom
