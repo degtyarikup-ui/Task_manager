@@ -34,8 +34,19 @@
     z-index: 102;
     background-color: var(--bg-app);
     width: 100%;
-    padding-top: 8px;
+    padding-top: 32px;
     padding-bottom: 8px;
+    margin-top: -24px;
+}
+
+:global(.platform-ios) .header {
+    margin-top: -12px;
+    padding-top: 20px;
+}
+
+:global(.platform-android) .header {
+    margin-top: -60px;
+    padding-top: 68px;
 }
 
 .stickyHeader {
