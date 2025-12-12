@@ -21,7 +21,7 @@ export const Calculator: React.FC = () => {
     const { t } = useTranslation();
     const { language } = useStore();
 
-    const [projectType, setProjectType] = useState<string>('development');
+    const [projectType, setProjectType] = useState<string>('design');
     const [description, setDescription] = useState<string>('');
     const [rate, setRate] = useState<number>(30);
     const [experience, setExperience] = useState<string>('beginner');
@@ -74,14 +74,15 @@ export const Calculator: React.FC = () => {
             const data = await response.json();
 
             if (!response.ok) {
+                console.error('AI Error Data:', data);
                 throw new Error(data.error || 'Failed to calculate');
             }
 
             setResult(data);
             haptic.notification('success');
-        } catch (e) {
-            console.error(e);
-            setError(t('errorAIService') || 'AI Service Error');
+        } catch (e: any) {
+            console.error('Calculation Error:', e);
+            setError(e.message || t('errorAIService') || 'AI Service Error');
             haptic.notification('error');
         } finally {
             setIsCalculating(false);
@@ -89,11 +90,13 @@ export const Calculator: React.FC = () => {
     };
 
     const categories = [
-        { id: 'development', label: t('development') },
         { id: 'design', label: t('design') },
-        { id: 'copywriting', label: t('copywriting') },
+        { id: 'art', label: t('art') },
+        { id: 'text', label: t('text') },
         { id: 'marketing', label: t('marketing') },
-        { id: 'videoAudio', label: t('videoAudio') },
+        { id: 'smm', label: t('smm') },
+        { id: 'video', label: t('video') },
+        { id: 'audio', label: t('audio') },
         { id: 'ai', label: t('ai') },
         { id: 'other', label: t('other') }
     ];

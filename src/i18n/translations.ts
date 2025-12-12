@@ -185,12 +185,14 @@ export const translations = {
 
         // Categories
         category: 'Сфера деятельности',
-        development: 'Программирование / IT',
-        design: 'Дизайн / Арт',
-        copywriting: 'Тексты / Переводы',
-        marketing: 'Маркетинг / SMM',
-        videoAudio: 'Аудио / Видео',
-        ai: 'Искусственный интеллект / AI',
+        design: 'Дизайн',
+        art: 'Арт',
+        text: 'Тексты',
+        marketing: 'Маркетинг',
+        smm: 'SMM',
+        video: 'Видео',
+        audio: 'Аудио',
+        ai: 'Искусственный интеллект',
         other: 'Другое'
     },
     en: {
@@ -379,12 +381,14 @@ export const translations = {
 
         // Categories
         category: 'Field / Category',
-        development: 'Programming / IT',
-        design: 'Design / Creative',
-        copywriting: 'Copywriting / Translation',
-        marketing: 'Marketing / SMM',
-        videoAudio: 'Audio / Video',
-        ai: 'Artificial Intelligence / AI',
+        design: 'Design',
+        art: 'Art',
+        text: 'Texts',
+        marketing: 'Marketing',
+        smm: 'SMM',
+        video: 'Video',
+        audio: 'Audio',
+        ai: 'Artificial Intelligence',
         other: 'Other'
     },
 };
