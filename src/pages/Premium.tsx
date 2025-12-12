@@ -91,7 +91,7 @@ export const Premium: React.FC = () => {
 
             <div className={styles.features}>
                 <div className={styles.featureCard}>
-                    <div className={styles.featureIcon} style={{ background: 'rgba(155, 81, 224, 0.1)', color: '#9B51E0' }}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(217, 70, 239, 0.1)', color: '#D946EF' }}>
                         <Sparkles size={24} />
                     </div>
                     <div className={styles.featureText}>
@@ -101,7 +101,7 @@ export const Premium: React.FC = () => {
                 </div>
 
                 <div className={styles.featureCard}>
-                    <div className={styles.featureIcon} style={{ background: 'rgba(0,122,255,0.1)', color: '#007AFF' }}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6' }}>
                         <BarChart2 size={24} />
                     </div>
                     <div className={styles.featureText}>
@@ -111,7 +111,7 @@ export const Premium: React.FC = () => {
                 </div>
 
                 <div className={styles.featureCard}>
-                    <div className={styles.featureIcon} style={{ background: 'rgba(52,199,89,0.1)', color: '#34C759' }}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}>
                         <ShieldCheck size={24} />
                     </div>
                     <div className={styles.featureText}>
@@ -121,23 +121,12 @@ export const Premium: React.FC = () => {
                 </div>
 
                 <div className={styles.featureCard}>
-                    <div className={styles.featureIcon} style={{ background: 'rgba(42, 171, 238, 0.1)', color: '#2AABEE' }}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(6, 182, 212, 0.1)', color: '#06B6D4' }}>
                         <Mic size={24} />
                     </div>
                     <div className={styles.featureText}>
                         <h3>{t('featureBot')}</h3>
                         <p>{t('featureBotDesc')}</p>
-                    </div>
-                </div>
-
-                {/* Placeholder for future features */}
-                <div className={styles.featureCard} style={{ opacity: 0.6 }}>
-                    <div className={styles.featureIcon}>
-                        <Star size={24} />
-                    </div>
-                    <div className={styles.featureText}>
-                        <h3>{t('soonMore')}</h3>
-                        <p>{t('soonMoreDesc')}</p>
                     </div>
                 </div>
             </div>
