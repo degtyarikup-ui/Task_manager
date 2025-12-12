@@ -405,7 +405,7 @@ export const Profile: React.FC = () => {
                     ))}
                     {tasks.filter(t => t.status === 'completed').length === 0 && (
                         <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: '32px 0' }}>
-                            Нет завершенных задач
+                            {t('noCompletedTasks')}
                         </div>
                     )}
                 </div>

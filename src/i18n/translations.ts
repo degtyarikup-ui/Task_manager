@@ -75,6 +75,7 @@ export const translations = {
 
         // Profile Page
         statistics: 'Статистика',
+        noCompletedTasks: 'Нет завершенных задач',
         completedTasks: 'Завершено',
         activeTasks: 'В работе',
         lists: 'На паузе',
@@ -238,6 +239,7 @@ export const translations = {
 
         // Profile Page
         statistics: 'Statistics',
+        noCompletedTasks: 'No completed tasks',
         completedTasks: 'Completed',
         activeTasks: 'In Progress',
         lists: 'On Hold',
