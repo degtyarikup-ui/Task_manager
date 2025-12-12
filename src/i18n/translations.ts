@@ -184,7 +184,8 @@ export const translations = {
         hours: 'ч',
 
         // Categories
-        category: 'Сфера деятельности',
+        category: 'Сфера',
+        development: 'Программирование',
         design: 'Дизайн',
         art: 'Арт',
         text: 'Тексты',
@@ -381,6 +382,7 @@ export const translations = {
 
         // Categories
         category: 'Field / Category',
+        development: 'Programming',
         design: 'Design',
         art: 'Art',
         text: 'Texts',

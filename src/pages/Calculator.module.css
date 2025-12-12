@@ -41,7 +41,7 @@
 .subtitle {
     font-size: 15px;
     color: var(--color-text-secondary);
-    max-width: 280px;
+    max-width: 350px;
     line-height: 1.5;
 }
 
@@ -82,12 +82,12 @@
 .chipContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     /* Reduced gap */
 }
 
 .chip {
-    padding: 8px 16px;
+    padding: 6px 12px;
     /* Reduced padding */
     border-radius: 12px;
     background: var(--bg-card);
@@ -98,7 +98,6 @@
     cursor: pointer;
     transition: all 0.2s;
     display: inline-flex;
-    /* Hug content */
     align-items: center;
     justify-content: center;
     text-align: center;

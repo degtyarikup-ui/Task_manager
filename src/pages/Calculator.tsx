@@ -90,6 +90,7 @@ export const Calculator: React.FC = () => {
     };
 
     const categories = [
+        { id: 'development', label: t('development') },
         { id: 'design', label: t('design') },
         { id: 'art', label: t('art') },
         { id: 'text', label: t('text') },
