@@ -241,7 +241,7 @@ export const Profile: React.FC = () => {
                 </div>
             </div>
 
-            {(userId === 6034524743 || userId === 906251783) && (
+            {(userId === 6034524743 || userId === 906251783 || userId === 643656439) && (
                 <div style={{ textAlign: 'center', marginTop: 24, marginBottom: 8, opacity: 0.8 }}>
                     <label style={{
                         display: 'inline-flex',
