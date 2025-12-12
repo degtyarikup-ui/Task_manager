@@ -543,12 +543,12 @@ export const Tasks: React.FC = () => {
                                 style={{
                                     width: '100%',
                                     marginBottom: 12,
-                                    padding: '8px 12px',
+                                    padding: '12px',
                                     background: !isPremium ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' : 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: 12,
-                                    fontSize: 13,
+                                    fontSize: 14,
                                     fontWeight: 600,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -556,10 +556,10 @@ export const Tasks: React.FC = () => {
                                     gap: 8,
                                     opacity: isGenerating ? 0.7 : 1,
                                     cursor: 'pointer',
-                                    boxShadow: !isPremium ? '0 4px 12px rgba(255, 165, 0, 0.3)' : '0 4px 12px rgba(168, 85, 247, 0.3)'
+                                    boxShadow: 'none'
                                 }}
                             >
-                                {isGenerating ? <Loader2 size={16} className={styles.spin} /> : (!isPremium ? <Lock size={16} /> : <Sparkles size={16} />)}
+                                {isGenerating ? <Loader2 size={18} className={styles.spin} /> : (!isPremium ? <Lock size={18} /> : <Sparkles size={18} />)}
                                 {isGenerating ? (t('generating') || 'AI Generating...') : (t('generateSubtasks') || 'Сгенерировать подзадачи')}
                             </button>
                         )}
