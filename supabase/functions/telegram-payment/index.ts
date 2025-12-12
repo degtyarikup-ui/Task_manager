@@ -41,13 +41,15 @@ serve(async (req) => {
         if (body.action === 'create_invoice') {
             const { userId } = body;
 
+            // Updated Price: 80 Stars
             const payload = {
                 title: "Premium Subscription",
-                description: "Unlock full statistics for 1 week",
+                description: "1 Month Premium Access",
                 payload: `premium_${userId}_${Date.now()}`,
                 provider_token: "", // Empty for Stars
                 currency: "XTR",
-                prices: [{ label: "1 Week", amount: 5 }]
+                prices: [{ label: "1 Month", amount: 80 }],
+                subscription_period: 2592000 // 30 days in seconds (Auto-renewal)
             };
 
             const res = await fetch(`https://api.telegram.org/bot${botToken}/createInvoiceLink`, {
@@ -69,7 +71,55 @@ serve(async (req) => {
             )
         }
 
-        // Webhook fallback
+        // Webhook Handling
+
+        // 1. Handle Pre-Checkout Query (required for payment to proceed)
+        if (body.pre_checkout_query) {
+            const queryId = body.pre_checkout_query.id;
+            await fetch(`https://api.telegram.org/bot${botToken}/answerPreCheckoutQuery`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pre_checkout_query_id: queryId, ok: true })
+            });
+            return new Response("OK");
+        }
+
+        // 2. Handle Successful Payment
+        if (body.message?.successful_payment) {
+            const invoicePayload = body.message.successful_payment.invoice_payload; // "premium_USERID_TIME"
+
+            console.log("Processing payment:", invoicePayload);
+
+            if (invoicePayload?.startsWith('premium_')) {
+                const parts = invoicePayload.split('_');
+                const userId = parts[1];
+
+                if (userId) {
+                    // Calculate new end date (Now + 30 days)
+                    // Ideally we should check if user is already premium and extend, but for MVP we set from now or extend if logic allows.
+                    // Let's keep it simple: Expand 30 days from NOW or from CURRENT END if valid.
+
+                    const { data: profile } = await supabase.from('profiles').select('subscription_end_date').eq('id', userId).single();
+
+                    let endDate = new Date();
+                    if (profile?.subscription_end_date && new Date(profile.subscription_end_date) > endDate) {
+                        endDate = new Date(profile.subscription_end_date);
+                    }
+
+                    endDate.setDate(endDate.getDate() + 30); // Add 30 days
+
+                    const { error } = await supabase.from('profiles').update({
+                        is_premium: true, // Keep legacy flag true
+                        subscription_end_date: endDate.toISOString()
+                    }).eq('id', userId);
+
+                    if (error) console.error("Database update failed:", error);
+                    else console.log(`User ${userId} extended to ${endDate.toISOString()}`);
+                }
+            }
+            return new Response("OK");
+        }
+
         return new Response("OK", { headers: corsHeaders });
 
     } catch (error) {

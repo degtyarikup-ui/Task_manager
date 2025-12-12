@@ -7,7 +7,7 @@ import { useTranslation } from '../i18n/useTranslation';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { haptic } from '../utils/haptics';
 import { Modal } from '../components/Modal';
-import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Sparkles, Loader2, Lock } from 'lucide-react';
+import { Trash2, Calendar, GripVertical, Plus, Check, X, User, AlertTriangle, List, Loader2, Wand2 } from 'lucide-react';
 import type { Task, Status, Priority, Project } from '../types';
 
 import styles from './Tasks.module.css';
@@ -544,7 +544,7 @@ export const Tasks: React.FC = () => {
                                     width: '100%',
                                     marginBottom: 12,
                                     padding: '12px',
-                                    background: !isPremium ? 'var(--color-premium)' : 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
+                                    background: 'var(--color-premium)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: 12,
@@ -559,7 +559,7 @@ export const Tasks: React.FC = () => {
                                     boxShadow: 'none'
                                 }}
                             >
-                                {isGenerating ? <Loader2 size={18} className={styles.spin} /> : (!isPremium ? <Lock size={18} /> : <Sparkles size={18} />)}
+                                {isGenerating ? <Loader2 size={18} className={styles.spin} /> : <Wand2 size={18} />}
                                 {isGenerating ? (t('generating') || 'AI Generating...') : (t('generateSubtasks') || 'Сгенерировать подзадачи')}
                             </button>
                         )}
