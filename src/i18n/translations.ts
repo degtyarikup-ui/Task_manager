@@ -172,7 +172,16 @@ export const translations = {
         complexity: 'Сложность',
         calculate: 'Рассчитать стоимость',
         estimatedCost: 'Примерная стоимость',
-        aiDisclaimer: '* Расчет приблизительный и основан на рыночных данных.'
+        aiDisclaimer: '* Расчет приблизительный и основан на рыночных данных.',
+        projectDescription: 'Описание проекта',
+        projectDescriptionPlaceholder: 'Опишите задачу подробнее (например: "Лендинг для кофейни с анимацией")',
+        experienceLevel: 'Ваш уровень',
+        beginner: 'Новичок',
+        intermediate: 'Средний',
+        expert: 'Эксперт',
+        priceRange: 'Диапазон цен',
+        hoursEstimate: 'Оценка времени',
+        hours: 'ч'
     },
     en: {
         // Bottom Navigation
@@ -347,7 +356,16 @@ export const translations = {
         complexity: 'Complexity',
         calculate: 'Calculate Cost',
         estimatedCost: 'Estimated Cost',
-        aiDisclaimer: '* This is an AI estimation based on average market rates. Actual cost may vary.'
+        aiDisclaimer: '* This is an AI estimation based on average market rates. Actual cost may vary.',
+        projectDescription: 'Project Description',
+        projectDescriptionPlaceholder: 'Describe the task in detail (e.g. "Landing page for coffee shop with animation")',
+        experienceLevel: 'Your Level',
+        beginner: 'Beginner',
+        intermediate: 'Intermediate',
+        expert: 'Expert',
+        priceRange: 'Price Range',
+        hoursEstimate: 'Time Estimate',
+        hours: 'h'
     },
 };
 
