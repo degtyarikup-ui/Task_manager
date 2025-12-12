@@ -33,7 +33,7 @@
 
 .stickyHeader {
     position: sticky;
-    top: 16px;
+    top: 48px;
     z-index: 100;
     background-color: var(--bg-app);
     margin: 0 -16px 8px -16px;

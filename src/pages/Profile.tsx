@@ -208,13 +208,6 @@ export const Profile: React.FC = () => {
                         <div className={styles.menuLabel}>{t('support')}</div>
                         <ChevronRight size={16} className={styles.menuValue} />
                     </button>
-                    <button className={styles.menuItem} onClick={() => setIsDonateOpen(true)}>
-                        <div className={styles.menuIcon} style={{ color: '#FF2D55' }}>
-                            <Heart size={20} />
-                        </div>
-                        <div className={styles.menuLabel}>{t('donate')}</div>
-                        <ChevronRight size={16} className={styles.menuValue} />
-                    </button>
 
                     <button className={styles.menuItem} onClick={toggleTheme}>
                         <div className={styles.menuIcon}>
