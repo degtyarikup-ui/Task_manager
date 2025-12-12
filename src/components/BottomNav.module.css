@@ -5,7 +5,7 @@
     transform: translateX(-50%);
     background: var(--bg-card);
     padding: 3px;
-    border-radius: 32px;
+    border-radius: 9999px;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -22,7 +22,7 @@
     justify-content: center;
     gap: 4px;
     padding: 8px 24px;
-    border-radius: 24px;
+    border-radius: 9999px;
     min-width: 60px;
     color: var(--color-text-secondary);
     font-size: 11px;
