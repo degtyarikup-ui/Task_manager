@@ -21,7 +21,7 @@ export const Calculator: React.FC = () => {
     const { t } = useTranslation();
     const { language } = useStore(); // Get language
 
-    const [projectType, setProjectType] = useState<string>('landing');
+    const [projectType, setProjectType] = useState<string>('development');
     const [description, setDescription] = useState<string>('');
     const [rate, setRate] = useState<number | ''>(50);
     const [experience, setExperience] = useState<string>('beginner');
@@ -106,19 +106,18 @@ export const Calculator: React.FC = () => {
             </header>
 
             <div className={styles.formGroup}>
-                <label className={styles.label}>{t('projectType')}</label>
+                <label className={styles.label}>{t('category') || 'Category'}</label>
                 <select
                     className={styles.input}
                     value={projectType}
                     onChange={(e) => setProjectType(e.target.value)}
                 >
-                    <option value="landing">Landing Page</option>
-                    <option value="ecommerce">E-commerce</option>
-                    <option value="webapp">Web Application</option>
-                    <option value="bot">Telegram Bot</option>
-                    <option value="mobile">Mobile App</option>
-                    <option value="script">Script / Utility</option>
-                    <option value="design">UI/UX Design</option>
+                    <option value="development">{t('development')}</option>
+                    <option value="design">{t('design')}</option>
+                    <option value="copywriting">{t('copywriting')}</option>
+                    <option value="marketing">{t('marketing')}</option>
+                    <option value="videoAudio">{t('videoAudio')}</option>
+                    <option value="other">{t('other')}</option>
                 </select>
             </div>
 

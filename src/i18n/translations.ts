@@ -181,7 +181,16 @@ export const translations = {
         expert: 'Эксперт',
         priceRange: 'Диапазон цен',
         hoursEstimate: 'Оценка времени',
-        hours: 'ч'
+        hours: 'ч',
+
+        // Categories
+        category: 'Сфера деятельности',
+        development: 'Программирование / IT',
+        design: 'Дизайн / Арт',
+        copywriting: 'Тексты / Переводы',
+        marketing: 'Маркетинг / SMM',
+        videoAudio: 'Аудио / Видео',
+        other: 'Другое'
     },
     en: {
         // Bottom Navigation
@@ -365,7 +374,16 @@ export const translations = {
         expert: 'Expert',
         priceRange: 'Price Range',
         hoursEstimate: 'Time Estimate',
-        hours: 'h'
+        hours: 'h',
+
+        // Categories
+        category: 'Field / Category',
+        development: 'Programming / IT',
+        design: 'Design / Creative',
+        copywriting: 'Copywriting / Translation',
+        marketing: 'Marketing / SMM',
+        videoAudio: 'Audio / Video',
+        other: 'Other'
     },
 };
 
