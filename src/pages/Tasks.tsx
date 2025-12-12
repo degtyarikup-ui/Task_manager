@@ -384,21 +384,23 @@ export const Tasks: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                    <h1 className={styles.title}>{t('tasks')}</h1>
-                </div>
-            </header>
+            <div className={styles.fixedTop}>
+                <header className={styles.header}>
+                    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                        <h1 className={styles.title}>{t('tasks')}</h1>
+                    </div>
+                </header>
 
-            <div className={styles.stickyHeader}>
-                <ProjectToolbar
-                    projects={projects}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                    onAddList={handleAddList}
-                    onEditList={handleEditList}
-                    t={t}
-                />
+                <div className={styles.stickyHeader}>
+                    <ProjectToolbar
+                        projects={projects}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                        onAddList={handleAddList}
+                        onEditList={handleEditList}
+                        t={t}
+                    />
+                </div>
             </div>
 
             {activeTab !== 'all' && (() => {
