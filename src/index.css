@@ -55,7 +55,7 @@
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #656F7B;
   /* Check contrast, if bad, revert to #98989D */
-  --color-border: #1C2229;
+  --color-border: rgba(255, 255, 255, 0.15);
   --color-accent: #0074F1;
   --color-premium: #F1BD00;
 }
