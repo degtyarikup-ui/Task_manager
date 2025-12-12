@@ -8,6 +8,7 @@ import { Clients } from './pages/Clients';
 import { Profile } from './pages/Profile';
 import { ClientDetails } from './pages/ClientDetails';
 import { Premium } from './pages/Premium';
+import { TaskForm } from './pages/TaskForm';
 import { BottomNav } from './components/BottomNav';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -69,6 +70,8 @@ function Layout() {
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/tasks/new" element={<TaskForm />} />
+          <Route path="/tasks/:id" element={<TaskForm />} />
           <Route path="/clients" element={<Clients />} />
           <Route path="/clients/:clientId" element={<ClientDetails />} />
           <Route path="/profile" element={<Profile />} />
