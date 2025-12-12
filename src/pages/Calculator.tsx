@@ -117,6 +117,7 @@ export const Calculator: React.FC = () => {
                     <option value="copywriting">{t('copywriting')}</option>
                     <option value="marketing">{t('marketing')}</option>
                     <option value="videoAudio">{t('videoAudio')}</option>
+                    <option value="ai">{t('ai')}</option>
                     <option value="other">{t('other')}</option>
                 </select>
             </div>

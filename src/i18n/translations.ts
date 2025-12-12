@@ -190,6 +190,7 @@ export const translations = {
         copywriting: 'Тексты / Переводы',
         marketing: 'Маркетинг / SMM',
         videoAudio: 'Аудио / Видео',
+        ai: 'Искусственный интеллект / AI',
         other: 'Другое'
     },
     en: {
@@ -383,6 +384,7 @@ export const translations = {
         copywriting: 'Copywriting / Translation',
         marketing: 'Marketing / SMM',
         videoAudio: 'Audio / Video',
+        ai: 'Artificial Intelligence / AI',
         other: 'Other'
     },
 };
