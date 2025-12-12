@@ -104,16 +104,15 @@
 
 /* Add Client Card Styles */
 .addCard {
-    border: 2px dashed var(--color-border);
+    border: 2px dashed var(--color-accent);
     background: transparent;
-    opacity: 0.7;
+    opacity: 0.8;
     transition: all 0.2s;
 }
 
 .addCard:hover {
     opacity: 1;
-    border-color: var(--color-accent);
-    background: var(--bg-card);
+    background: rgba(0, 116, 241, 0.05);
 }
 
 .addCard:active {
@@ -121,8 +120,8 @@
 }
 
 .addAvatar {
-    background: var(--color-border) !important;
-    color: var(--color-text-secondary) !important;
+    background: rgba(0, 116, 241, 0.1) !important;
+    color: var(--color-accent) !important;
 }
 
 .fab {
