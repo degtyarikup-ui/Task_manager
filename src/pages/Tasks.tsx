@@ -544,7 +544,7 @@ export const Tasks: React.FC = () => {
                                     width: '100%',
                                     marginBottom: 12,
                                     padding: '12px',
-                                    background: !isPremium ? 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)' : 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
+                                    background: !isPremium ? 'var(--color-premium)' : 'linear-gradient(135deg, #A855F7 0%, #D946EF 100%)',
                                     color: 'white',
                                     border: 'none',
                                     borderRadius: 12,

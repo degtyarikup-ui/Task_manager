@@ -166,7 +166,7 @@ export const Profile: React.FC = () => {
                 <>
                     <div className={styles.sectionTitle}>
                         {t('statistics')}
-                        <span style={{ marginLeft: 8, fontSize: 12, color: '#FFD700' }}>★ Premium</span>
+                        <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--color-premium)' }}>★ Premium</span>
                     </div>
 
                     <div className={styles.statsGrid}>
@@ -195,7 +195,7 @@ export const Profile: React.FC = () => {
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
                     <button className={styles.menuItem} onClick={() => navigate('/premium')}>
-                        <div className={styles.menuIcon} style={{ color: '#FFD700' }}>
+                        <div className={styles.menuIcon} style={{ color: 'var(--color-premium)' }}>
                             <Star size={20} />
                         </div>
                         <div className={styles.menuLabel}>Premium</div>

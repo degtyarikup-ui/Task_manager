@@ -2,29 +2,23 @@
 
 :root {
   /* Colors - Light Theme Default */
-  --bg-app: #F5F5F7;
+  --bg-app: #F0F4F7;
   --bg-card: #FFFFFF;
   --bg-sidebar: #FFFFFF;
-  --bg-input: #E5E5EA;
-  /* Standard gray input */
-  --bg-chip: #E5E5EA;
-  /* Standard gray chip */
-  --bg-nav-item-active: #EFF0F5;
-  /* Light gray to maintain visibility but softer than E5E5EA */
+  --bg-input: #F0F4F7;
+  --bg-chip: #F0F4F7;
+  --bg-nav-item-active: #D7DEE5;
 
   /* iOS secondary system fill */
-  --bg-chip-active: #1C1C1E;
-  /* Consistent dark gray/black */
-  --color-chip-text: #8E8E93;
+  --bg-chip-active: #080D12;
+  --color-chip-text: #656F7B;
   --color-chip-text-active: #FFFFFF;
 
-  --color-text-primary: #1C1C1E;
-  /* iOS System Gray 6 equivalent for text */
-  --color-text-secondary: #8E8E93;
-  --color-accent: #00C2EC;
-  /* Telegram Blue */
-  --color-border: #E5E5EA;
-  /* Lighter border */
+  --color-text-primary: #080D12;
+  --color-text-secondary: #656F7B;
+  --color-accent: #0074F1;
+  --color-border: #D7DEE5;
+  --color-premium: #F1BD00;
 
   --color-success: #34C759;
   --color-warning: #FF9F0A;
@@ -48,19 +42,22 @@
 }
 
 [data-theme='dark'] {
-  --bg-app: #000000;
-  --bg-card: #1C1C1E;
-  --bg-sidebar: #1C1C1E;
-  --bg-input: #2C2C2E;
-  --bg-chip: #2C2C2E;
-  --bg-chip-active: #48484A;
-  /* Приглушенный серый вместо белого */
-  --color-chip-text: #98989D;
-  --color-chip-text-active: #FFFFFF;
+  --bg-app: #080D12;
+  --bg-card: #151A21;
+  --bg-sidebar: #151A21;
+  --bg-input: #1C2229;
+  --bg-chip: #1C2229;
+  --bg-chip-active: #F0F4F7;
+
+  --color-chip-text: #656F7B;
+  --color-chip-text-active: #080D12;
 
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #8E8E93;
-  --color-border: #38383A;
+  --color-text-secondary: #656F7B;
+  /* Check contrast, if bad, revert to #98989D */
+  --color-border: #1C2229;
+  --color-accent: #0074F1;
+  --color-premium: #F1BD00;
 }
 
 * {
