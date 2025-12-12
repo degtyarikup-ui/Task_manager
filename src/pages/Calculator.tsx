@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/useTranslation';
 import { useStore } from '../context/StoreContext';
 import { haptic } from '../utils/haptics';
-import { Calculator as CalcIcon, Sparkles, Clock, TrendingUp } from 'lucide-react';
+import { Calculator as CalcIcon, Sparkles, Clock, TrendingUp, Lock } from 'lucide-react';
 import styles from './Calculator.module.css';
 
 interface AIResult {
@@ -19,9 +19,9 @@ interface AIResult {
 export const Calculator: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { language } = useStore();
+    const { language, isPremium } = useStore();
 
-    const [projectType, setProjectType] = useState<string>('design');
+    const [projectType, setProjectType] = useState<string>('development');
     const [description, setDescription] = useState<string>('');
     const [rate, setRate] = useState<number>(30);
     const [experience, setExperience] = useState<string>('beginner');
@@ -87,6 +87,15 @@ export const Calculator: React.FC = () => {
         } finally {
             setIsCalculating(false);
         }
+    };
+
+    const handleButtonClick = () => {
+        if (!isPremium) {
+            haptic.impact('medium');
+            navigate('/premium');
+            return;
+        }
+        handleCalculate();
     };
 
     const categories = [
@@ -188,21 +197,6 @@ export const Calculator: React.FC = () => {
                 </div>
             )}
 
-            <button
-                className={styles.calculateBtn}
-                onClick={handleCalculate}
-                disabled={isCalculating}
-            >
-                {isCalculating ? (
-                    <>{t('loading') || 'Processing...'}</>
-                ) : (
-                    <>
-                        <Sparkles size={24} />
-                        {t('calculate')}
-                    </>
-                )}
-            </button>
-
             {result && (
                 <div className={styles.resultCard}>
                     <div className={styles.resultLabel}>{t('priceRange')}</div>
@@ -242,6 +236,24 @@ export const Calculator: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <div className={styles.footer}>
+                <button
+                    className={styles.calculateBtn}
+                    onClick={handleButtonClick}
+                    disabled={isCalculating}
+                >
+                    {isCalculating ? (
+                        <>{t('loading') || 'Processing...'}</>
+                    ) : (
+                        <>
+                            {!isPremium && <Lock size={20} />}
+                            {isPremium ? <Sparkles size={24} /> : null}
+                            {t('calculate')}
+                        </>
+                    )}
+                </button>
+            </div>
         </div>
     );
 };
