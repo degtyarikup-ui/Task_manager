@@ -51,7 +51,7 @@
 
 .stickyHeader {
     position: sticky;
-    top: 104px;
+    top: 64px;
     z-index: 100;
     background-color: var(--bg-app);
     margin: 0 -16px 8px -16px;
@@ -62,6 +62,14 @@
     /* Align content left */
     box-shadow: 0 -80px 0 80px var(--bg-app);
     /* Ensure padding is handled by child or here? Child has padding. */
+}
+
+:global(.platform-ios) .stickyHeader {
+    top: 56px;
+}
+
+:global(.platform-android) .stickyHeader {
+    top: 100px;
 }
 
 .stickyHeader::after {
