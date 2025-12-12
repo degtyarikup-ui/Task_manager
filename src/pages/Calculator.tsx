@@ -23,7 +23,7 @@ export const Calculator: React.FC = () => {
 
     const [projectType, setProjectType] = useState<string>('development');
     const [description, setDescription] = useState<string>('');
-    const [rate, setRate] = useState<number>(30); // Default middle value
+    const [rate, setRate] = useState<number>(30);
     const [experience, setExperience] = useState<string>('beginner');
     const [result, setResult] = useState<AIResult | null>(null);
     const [isCalculating, setIsCalculating] = useState(false);
@@ -88,6 +88,22 @@ export const Calculator: React.FC = () => {
         }
     };
 
+    const categories = [
+        { id: 'development', label: t('development') },
+        { id: 'design', label: t('design') },
+        { id: 'copywriting', label: t('copywriting') },
+        { id: 'marketing', label: t('marketing') },
+        { id: 'videoAudio', label: t('videoAudio') },
+        { id: 'ai', label: t('ai') },
+        { id: 'other', label: t('other') }
+    ];
+
+    const levels = [
+        { id: 'beginner', label: t('beginner') },
+        { id: 'intermediate', label: t('intermediate') },
+        { id: 'expert', label: t('expert') }
+    ];
+
     return (
         <div className={styles.container}>
             <header className={styles.header}>
@@ -98,24 +114,43 @@ export const Calculator: React.FC = () => {
                 <div className={styles.subtitle}>{t('aiCalculatorDesc')}</div>
             </header>
 
-            <div className={styles.formGroup}>
+            <div className={styles.formGroup} style={{ animationDelay: '0.1s' }}>
                 <label className={styles.label}>{t('category') || 'Category'}</label>
-                <select
-                    className={styles.input}
-                    value={projectType}
-                    onChange={(e) => setProjectType(e.target.value)}
-                >
-                    <option value="development">{t('development')}</option>
-                    <option value="design">{t('design')}</option>
-                    <option value="copywriting">{t('copywriting')}</option>
-                    <option value="marketing">{t('marketing')}</option>
-                    <option value="videoAudio">{t('videoAudio')}</option>
-                    <option value="ai">{t('ai')}</option>
-                    <option value="other">{t('other')}</option>
-                </select>
+                <div className={styles.chipContainer}>
+                    {categories.map((cat) => (
+                        <div
+                            key={cat.id}
+                            className={`${styles.chip} ${projectType === cat.id ? styles.active : ''}`}
+                            onClick={() => {
+                                setProjectType(cat.id);
+                                haptic.impact('light');
+                            }}
+                        >
+                            {cat.label}
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            <div className={styles.formGroup}>
+            <div className={styles.formGroup} style={{ animationDelay: '0.2s' }}>
+                <label className={styles.label}>{t('experienceLevel')}</label>
+                <div className={styles.chipContainer}>
+                    {levels.map((lvl) => (
+                        <div
+                            key={lvl.id}
+                            className={`${styles.chip} ${experience === lvl.id ? styles.active : ''}`}
+                            onClick={() => {
+                                setExperience(lvl.id);
+                                haptic.impact('light');
+                            }}
+                        >
+                            {lvl.label}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className={styles.formGroup} style={{ animationDelay: '0.3s' }}>
                 <label className={styles.label}>{t('projectDescription')}</label>
                 <textarea
                     className={styles.input}
@@ -127,20 +162,7 @@ export const Calculator: React.FC = () => {
                 />
             </div>
 
-            <div className={styles.formGroup}>
-                <label className={styles.label}>{t('experienceLevel')}</label>
-                <select
-                    className={styles.input}
-                    value={experience}
-                    onChange={(e) => setExperience(e.target.value)}
-                >
-                    <option value="beginner">{t('beginner')}</option>
-                    <option value="intermediate">{t('intermediate')}</option>
-                    <option value="expert">{t('expert')}</option>
-                </select>
-            </div>
-
-            <div className={styles.formGroup}>
+            <div className={styles.formGroup} style={{ animationDelay: '0.4s' }}>
                 <label className={styles.label}>{t('hourlyRate')}</label>
                 <div className={styles.rangeContainer}>
                     <input

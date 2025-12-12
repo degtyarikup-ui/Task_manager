@@ -10,20 +10,21 @@
 }
 
 .header {
-    margin-top: 20px;
+    margin-top: 40px;
+    /* Matched to Premium */
     margin-bottom: 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
     text-align: center;
+    animation: slideDown 0.5s ease;
 }
 
 .iconWrapper {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    /* Gradient matching Premium yellow/gold theme */
     background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     display: flex;
     align-items: center;
@@ -46,10 +47,10 @@
     line-height: 1.5;
 }
 
-/* Open layout for form elements */
 .formGroup {
     margin-bottom: 24px;
     text-align: left;
+    animation: fadeIn 0.5s ease backwards;
 }
 
 .label {
@@ -57,20 +58,17 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     margin-left: 4px;
-    /* subtle alignment */
 }
 
-/* Inputs styling matching open feel */
+/* Inputs */
 .input {
     width: 100%;
     padding: 16px;
     border-radius: 16px;
     border: 1px solid var(--color-border);
-    /* subtle border */
     background: var(--bg-card);
-    /* Keep input background but maybe lighter/transparent */
     color: var(--color-text-primary);
     font-size: 16px;
     outline: none;
@@ -82,6 +80,44 @@
 .input:focus {
     border-color: var(--color-accent);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Chip / Tab Styles */
+.chipContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chip {
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    /* Grow to fill */
+    text-align: center;
+    min-width: 100px;
+}
+
+.chip.active {
+    background: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(0, 116, 241, 0.3);
+    font-weight: 600;
+}
+
+.chip:active {
+    transform: scale(0.98);
 }
 
 /* Range Slider */
@@ -125,8 +161,6 @@
 .calculateBtn {
     width: 100%;
     padding: 18px;
-    background: var(--color-text-primary);
-    /* Dark button like Premium? Or Accent? Premium uses Accent. */
     background: var(--color-accent);
     color: white;
     border: none;
@@ -140,7 +174,6 @@
     gap: 10px;
     margin-top: 12px;
     box-shadow: 0 10px 25px rgba(0, 116, 241, 0.3);
-    /* Assuming accent blue shadow */
     transition: transform 0.1s;
 }
 
@@ -151,7 +184,6 @@
 /* Result Card */
 .resultCard {
     background: linear-gradient(135deg, var(--color-accent) 0%, #0055FF 100%);
-    /* Blue gradient like premium blocks? */
     border-radius: 24px;
     padding: 24px;
     color: white;
@@ -181,6 +213,30 @@
     font-size: 13px;
     opacity: 0.8;
     margin-top: 16px;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideUp {
