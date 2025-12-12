@@ -167,6 +167,13 @@ export const Tasks: React.FC = () => {
         }));
     };
 
+    const updateSubtaskTitle = (id: string, newTitle: string) => {
+        setFormData(prev => ({
+            ...prev,
+            subtasks: (prev.subtasks || []).map(s => s.id === id ? { ...s, title: newTitle } : s)
+        }));
+    };
+
     const [activeTool, setActiveTool] = useState<string | null>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -624,14 +631,22 @@ export const Tasks: React.FC = () => {
                                                         >
                                                             {sub.completed && <Check size={14} color="white" />}
                                                         </button>
-                                                        <span style={{
-                                                            flex: 1,
-                                                            textDecoration: sub.completed ? 'line-through' : 'none',
-                                                            color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)',
-                                                            fontSize: 15
-                                                        }}>
-                                                            {sub.title}
-                                                        </span>
+                                                        <input
+                                                            value={sub.title}
+                                                            onChange={(e) => updateSubtaskTitle(sub.id, e.target.value)}
+                                                            style={{
+                                                                flex: 1,
+                                                                textDecoration: sub.completed ? 'line-through' : 'none',
+                                                                color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)',
+                                                                fontSize: 15,
+                                                                border: 'none',
+                                                                background: 'transparent',
+                                                                outline: 'none',
+                                                                padding: 0,
+                                                                margin: 0,
+                                                                fontFamily: 'inherit'
+                                                            }}
+                                                        />
                                                         <button
                                                             type="button"
                                                             onClick={() => removeSubtask(sub.id)}
