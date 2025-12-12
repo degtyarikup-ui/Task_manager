@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -268,6 +268,7 @@ export const TaskForm: React.FC = () => {
                         <Calendar size={20} color="var(--color-accent)" />
                         <span>{formData.deadline ? formatDate(formData.deadline, locale) : t('deadline')}</span>
                     </div>
+                    <ChevronDown size={16} className={styles.menuRightIcon} />
                 </button>
 
                 <button className={styles.menuItem} onClick={togglePriority}>
@@ -278,54 +279,55 @@ export const TaskForm: React.FC = () => {
                 </button>
 
                 <div className={styles.menuItem}>
-                    <div className={styles.menuIcon}>
-                        <List size={20} color="#FF9500" />
-                        <select
-                            value={formData.projectId || ''}
-                            onChange={e => setFormData({ ...formData, projectId: e.target.value })}
-                            style={{ border: 'none', background: 'transparent', fontSize: 16, color: 'var(--color-text-primary)', outline: 'none', width: '100%' }}
-                        >
-                            <option value="">{formData.projectId ? projects.find(p => p.id === formData.projectId)?.title : t('list')}</option>
-                            {projects.map(p => (
-                                <option key={p.id} value={p.id}>{p.title}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <List size={20} color="#FF9500" className={styles.menuLeftIcon} />
+                    <select
+                        className={styles.rowSelect}
+                        value={formData.projectId || ''}
+                        onChange={e => setFormData({ ...formData, projectId: e.target.value })}
+                    >
+                        <option value="">{formData.projectId ? projects.find(p => p.id === formData.projectId)?.title : t('list')}</option>
+                        {projects.map(p => (
+                            <option key={p.id} value={p.id}>{p.title}</option>
+                        ))}
+                    </select>
+                    <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
 
                 <div className={styles.menuItem}>
-                    <div className={styles.menuIcon}>
+                    <div className={styles.menuLeftIcon}>
                         {formData.client ? (
-                            <div style={{ width: 20, height: 20, borderRadius: '50%', background: generateAvatarColor(formData.client), color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>
+                            <div className={styles.avatarIcon} style={{ background: generateAvatarColor(formData.client), color: 'white' }}>
                                 {getInitials(formData.client)}
                             </div>
                         ) : <User size={20} color="#007AFF" />}
-                        <select
-                            value={formData.client || ''}
-                            onChange={e => setFormData({ ...formData, client: e.target.value })}
-                            style={{ border: 'none', background: 'transparent', fontSize: 16, color: 'var(--color-text-primary)', outline: 'none', width: '100%' }}
-                        >
-                            <option value="">{formData.client || t('client')}</option>
-                            {clients.map(c => (
-                                <option key={c.id} value={c.name}>{c.name}</option>
-                            ))}
-                        </select>
                     </div>
+                    <select
+                        className={styles.rowSelect}
+                        value={formData.client || ''}
+                        onChange={e => setFormData({ ...formData, client: e.target.value })}
+                    >
+                        <option value="">{formData.client || t('client')}</option>
+                        {clients.map(c => (
+                            <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                    </select>
+                    <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
 
                 <div className={styles.menuItem}>
-                    <div className={styles.menuIcon}>
+                    <div className={styles.menuLeftIcon}>
                         {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
-                        <select
-                            value={formData.status || ''}
-                            onChange={e => setFormData({ ...formData, status: e.target.value as Status })}
-                            style={{ border: 'none', background: 'transparent', fontSize: 16, color: 'var(--color-text-primary)', outline: 'none', width: '100%' }}
-                        >
-                            {availableStatuses.map(s => (
-                                <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
-                            ))}
-                        </select>
                     </div>
+                    <select
+                        className={styles.rowSelect}
+                        value={formData.status || ''}
+                        onChange={e => setFormData({ ...formData, status: e.target.value as Status })}
+                    >
+                        {availableStatuses.map(s => (
+                            <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
+                        ))}
+                    </select>
+                    <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
             </div>
 
