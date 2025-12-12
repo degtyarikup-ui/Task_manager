@@ -7,7 +7,7 @@
   --bg-sidebar: #FFFFFF;
   --bg-input: #F0F4F7;
   --bg-chip: #F0F4F7;
-  --bg-nav-item-active: #D7DEE5;
+  --bg-nav-item-active: #F0F4F7;
 
   /* iOS secondary system fill */
   --bg-chip-active: #080D12;
@@ -48,6 +48,7 @@
   --bg-input: #1C2229;
   --bg-chip: #1C2229;
   --bg-chip-active: #F0F4F7;
+  --bg-nav-item-active: #1C2229;
 
   --color-chip-text: #656F7B;
   --color-chip-text-active: #080D12;
