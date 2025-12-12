@@ -81,10 +81,10 @@
 }
 
 .chip.active {
-    background-color: var(--bg-chip) !important;
+    background-color: var(--bg-chip-active) !important;
     border-color: transparent;
     /* Force visible bg */
-    color: var(--color-text-primary);
+    color: var(--color-chip-text-active);
     font-weight: 600;
 }
 
