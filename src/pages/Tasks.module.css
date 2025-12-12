@@ -51,7 +51,7 @@
 
 .stickyHeader {
     position: sticky;
-    top: 88px;
+    top: 64px;
     z-index: 100;
     background-color: var(--bg-app);
     margin: 0 -16px 8px -16px;
@@ -65,11 +65,11 @@
 }
 
 :global(.platform-ios) .stickyHeader {
-    top: 80px;
+    top: 56px;
 }
 
 :global(.platform-android) .stickyHeader {
-    top: 124px;
+    top: 100px;
 }
 
 .stickyHeader::after {
