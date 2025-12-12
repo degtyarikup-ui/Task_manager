@@ -631,9 +631,20 @@ export const Tasks: React.FC = () => {
                                                         >
                                                             {sub.completed && <Check size={14} color="white" />}
                                                         </button>
-                                                        <input
+                                                        <textarea
                                                             value={sub.title}
-                                                            onChange={(e) => updateSubtaskTitle(sub.id, e.target.value)}
+                                                            onChange={(e) => {
+                                                                updateSubtaskTitle(sub.id, e.target.value);
+                                                                e.target.style.height = 'auto';
+                                                                e.target.style.height = `${e.target.scrollHeight}px`;
+                                                            }}
+                                                            ref={(el) => {
+                                                                if (el) {
+                                                                    el.style.height = 'auto';
+                                                                    el.style.height = `${el.scrollHeight}px`;
+                                                                }
+                                                            }}
+                                                            rows={1}
                                                             style={{
                                                                 flex: 1,
                                                                 textDecoration: sub.completed ? 'line-through' : 'none',
@@ -642,9 +653,13 @@ export const Tasks: React.FC = () => {
                                                                 border: 'none',
                                                                 background: 'transparent',
                                                                 outline: 'none',
-                                                                padding: 0,
+                                                                padding: '2px 0',
                                                                 margin: 0,
-                                                                fontFamily: 'inherit'
+                                                                fontFamily: 'inherit',
+                                                                resize: 'none',
+                                                                overflow: 'hidden',
+                                                                minHeight: '24px',
+                                                                lineHeight: '1.4'
                                                             }}
                                                         />
                                                         <button
