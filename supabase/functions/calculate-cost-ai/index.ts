@@ -24,33 +24,34 @@ serve(async (req) => {
         // Simple heuristic for currency symbol/name if needed, but AI can handle it.
 
         const systemPrompt = `You are an expert freelance business mentor.
-        Your goal is to help a beginner freelancer estimate the cost of a project.
+        Your goal is to help a user estimate the cost of a project based on their experience level.
         
         Input Data:
         - Project Type: ${projectType}
         - Description: ${description}
-        - Freelancer Hourly Rate: ${hourlyRate || 'Unknown'} (if unknown, use market average for beginners)
+        - Freelancer Hourly Rate: ${hourlyRate || 'Unknown'}
         - Experience Level: ${experience || 'Beginner'}
         - Target Audience Currency: USD
 
         Task:
-        1. Analyze the project requirements and complexity.
+        1. Analyze the project requirements.
         2. Estimate the number of hours required (Min/Max).
         3. Calculate a recommended price range (Min/Max) in USD.
         4. Provide a "Complexity Rating" (Low, Medium, High).
-        5. Write a brief "Explanation" (max 3 sentences) explaining the main cost drivers.
+        5. Write a brief "Explanation".
 
-        IMPORTANT PRICING LOGIC:
-        - Ensure the Total Price roughly follows: Beginner < Intermediate < Expert.
-        - If the user provides a fixed Hourly Rate, you MUST adjust your Estimated Hours to satisfy this trend. 
-        - Assume a "Beginner" working at $X/hour is less efficient but might scope tasks smaller or bill fewer effective hours than a Pro.
-        - Do not let a Beginner quote be higher than an Intermediate quote for the same task description.
-
+        CRITICAL PRICING RULES (Experience Level Impact):
+        - You MUST differentiate results based on Experience Level:
+          * Beginner: Focus on core functionality only. Standard hours.
+          * Intermediate: Add 20% to hours/price for better code quality and basic testing.
+          * Expert: Add 50-80% to hours/price for premium architecture, exhaustive testing, security, and scalability.
+        - Even with a fixed Hourly Rate, an Expert provides MORE VALUE (and does MORE work/checks), so the Total Price/Hours MUST be higher than a Beginner.
+        - Do NOT return the same estimate for different levels.
+        
         Output Requirements:
         - Language: ${langName}
         - Return ONLY a valid JSON object.
         - JSON Structure: { "minPrice": number, "maxPrice": number, "currency": "USD", "minHours": number, "maxHours": number, "complexity": "string", "explanation": "string" }
-        - Do not include markdown formatting.
         `;
 
         const userPrompt = `Estimate this project: ${projectType}. Details: ${description}`;

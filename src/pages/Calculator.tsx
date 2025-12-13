@@ -69,6 +69,9 @@ export const Calculator: React.FC = () => {
                 return;
             }
             descToUse = selectedTask.title;
+            if (selectedTask.subtasks && selectedTask.subtasks.length > 0) {
+                descToUse += `\n\nSubtasks:\n${selectedTask.subtasks.map(s => `- ${s.title}`).join('\n')}`;
+            }
         } else {
             if (!descToUse.trim()) {
                 haptic.notification('error');
