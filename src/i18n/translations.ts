@@ -132,6 +132,7 @@ export const translations = {
         add: 'Добавить',
         cancel: 'Отмена',
         delete: 'Удалить',
+        removeDate: 'Убрать дату',
         ok: 'OK',
 
         // Task Priority in selector
@@ -341,6 +342,7 @@ export const translations = {
         add: 'Add',
         cancel: 'Cancel',
         delete: 'Delete',
+        removeDate: 'Remove Date',
         ok: 'OK',
 
         // Task Priority in selector

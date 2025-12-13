@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical, Circle } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -369,7 +369,7 @@ export const TaskForm: React.FC = () => {
                 {/* Status */}
                 <div className={styles.menuItem}>
                     <div className={styles.menuLeftIcon}>
-                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
+                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <Circle size={20} color="var(--color-text-secondary)" />}
                     </div>
                     <span style={{ flex: 1, paddingRight: 8 }}>
                         {formData.status ? getStatusLabel(formData.status as Status, t) : (t('noStatus') || 'Нет статуса')}
@@ -437,6 +437,7 @@ export const TaskForm: React.FC = () => {
                     onClose={() => setIsCalendarOpen(false)}
                     locale={locale}
                     todayLabel={t('today') || 'Today'}
+                    removeDateLabel={t('removeDate') || 'Убрать дату'}
                 />
             )}
         </div>

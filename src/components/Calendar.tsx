@@ -10,9 +10,10 @@ interface CalendarProps {
     onClose: () => void;
     locale: Locale;
     todayLabel: string;
+    removeDateLabel?: string;
 }
 
-export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, locale, todayLabel }) => {
+export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, locale, todayLabel, removeDateLabel }) => {
     const [currentMonth, setCurrentMonth] = useState(selectedDate ? new Date(selectedDate) : new Date());
 
     const onNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -40,8 +41,6 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
         onClose();
     };
 
-
-
     const handleToday = () => {
         const today = new Date();
         const year = today.getFullYear();
@@ -49,7 +48,12 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
         const d = String(today.getDate()).padStart(2, '0');
         onChange(`${year}-${month}-${d}`);
         onClose();
-    }
+    };
+
+    const handleRemoveDate = () => {
+        onChange('');
+        onClose();
+    };
 
     return createPortal(
         <div className={styles.backdrop} onClick={onClose}>
@@ -91,8 +95,13 @@ export const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onCl
                     })}
                 </div>
 
-                <div className={styles.footer} style={{ justifyContent: 'flex-end' }}>
-                    <button type="button" className={styles.linkBtn} onClick={handleToday}>
+                <div className={styles.footer} style={{ justifyContent: 'space-between' }}>
+                    {selectedDate && removeDateLabel && (
+                        <button type="button" className={styles.linkBtn} style={{ color: 'var(--color-danger)' }} onClick={handleRemoveDate}>
+                            {removeDateLabel}
+                        </button>
+                    )}
+                    <button type="button" className={styles.linkBtn} onClick={handleToday} style={{ marginLeft: 'auto' }}>
                         {todayLabel}
                     </button>
                 </div>
