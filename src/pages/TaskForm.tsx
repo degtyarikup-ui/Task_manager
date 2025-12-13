@@ -444,7 +444,7 @@ export const TaskForm: React.FC = () => {
             <Modal
                 isOpen={isStatusModalOpen}
                 onClose={() => setIsStatusModalOpen(false)}
-                title={t('enterStatus') || 'Enter status'}
+                title={t('status') || 'Status'}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <input
