@@ -346,7 +346,7 @@ export const TaskForm: React.FC = () => {
 
                 {/* Project / List */}
                 <div className={styles.menuItem}>
-                    <List size={20} color="#FF9500" className={styles.menuLeftIcon} />
+                    <List size={20} color="var(--color-accent)" className={styles.menuLeftIcon} />
                     <span style={{ flex: 1, paddingRight: 8 }}>
                         {formData.projectId
                             ? (projects.find(p => p.id === formData.projectId)?.title || t('list'))
@@ -369,7 +369,7 @@ export const TaskForm: React.FC = () => {
                 {/* Status */}
                 <div className={styles.menuItem}>
                     <div className={styles.menuLeftIcon}>
-                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <Circle size={20} color="var(--color-text-secondary)" />}
+                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <Circle size={20} color="var(--color-accent)" />}
                     </div>
                     <span style={{ flex: 1, paddingRight: 8 }}>
                         {formData.status ? getStatusLabel(formData.status as Status, t) : (t('noStatus') || 'Нет статуса')}
