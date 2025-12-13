@@ -6,7 +6,7 @@
     min-height: 100vh;
     background: var(--bg-app);
     box-sizing: border-box;
-    padding-bottom: 160px;
+    padding-bottom: 200px;
 }
 
 .header {
@@ -141,7 +141,7 @@
 /* Fixed Footer for Button */
 .footer {
     position: fixed;
-    bottom: calc(56px + env(safe-area-inset-bottom));
+    bottom: calc(100px + env(safe-area-inset-bottom));
     /* Above BottomNav */
     left: 0;
     right: 0;
