@@ -309,7 +309,7 @@ export const Calculator: React.FC = () => {
                 </div>
             )}
 
-            {history.length > 0 && !result && (
+            {history.length > 0 && (
                 <div style={{ marginTop: 24, paddingBottom: 20 }}>
                     <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, paddingLeft: 8 }}>
                         {t('history') || 'History'}
