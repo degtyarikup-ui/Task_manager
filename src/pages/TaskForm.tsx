@@ -10,6 +10,8 @@ import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../util
 import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar';
 import { Modal } from '../components/Modal';
+import { BottomSheet } from '../components/BottomSheet';
+import sheetStyles from '../components/BottomSheet.module.css';
 import type { Status, Priority, Task } from '../types';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
@@ -35,6 +37,7 @@ export const TaskForm: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [isStatusSheetOpen, setIsStatusSheetOpen] = useState(false);
     const [customStatusText, setCustomStatusText] = useState('');
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
@@ -370,32 +373,13 @@ export const TaskForm: React.FC = () => {
                 </div>
 
                 {/* Status */}
-                <div className={styles.menuItem}>
+                <div className={styles.menuItem} onClick={() => setIsStatusSheetOpen(true)}>
                     <div className={styles.menuLeftIcon}>
                         {formData.status ? getStatusIcon(formData.status as Status, 20) : <Circle size={20} color="var(--color-accent)" />}
                     </div>
                     <span style={{ flex: 1, paddingRight: 8 }}>
                         {formData.status ? getStatusLabel(formData.status as Status, t) : (t('noStatus') || 'Нет статуса')}
                     </span>
-                    <select
-                        className={styles.rowSelect}
-                        value={formData.status || ''}
-                        onChange={e => {
-                            if (e.target.value === '__add_new__') {
-                                setCustomStatusText('');
-                                setIsStatusModalOpen(true);
-                            } else {
-                                setFormData({ ...formData, status: e.target.value as Status })
-                            }
-                        }}
-                        style={{ opacity: 0 }}
-                    >
-                        <option value="">{t('noStatus') || 'Нет статуса'}</option>
-                        {availableStatuses.map(s => (
-                            <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
-                        ))}
-                        <option value="__add_new__">+ {t('add') || 'Добавить статус'}</option>
-                    </select>
                     <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
             </div>
@@ -478,6 +462,36 @@ export const TaskForm: React.FC = () => {
                     </button>
                 </div>
             </Modal>
+
+            <BottomSheet
+                isOpen={isStatusSheetOpen}
+                onClose={() => setIsStatusSheetOpen(false)}
+                title={t('taskStatus') || 'Task Status'}
+            >
+                {/* No Status */}
+                <button className={sheetStyles.option} onClick={() => { setFormData({ ...formData, status: '' }); setIsStatusSheetOpen(false); }}>
+                    <Circle size={20} color="var(--color-text-secondary)" />
+                    {t('noStatus') || 'No Status'}
+                    {!formData.status && <Check size={16} style={{ marginLeft: 'auto', color: 'var(--color-accent)' }} />}
+                </button>
+
+                {/* Available Statuses */}
+                {availableStatuses.map(s => (
+                    <button key={s} className={sheetStyles.option} onClick={() => { setFormData({ ...formData, status: s as Status }); setIsStatusSheetOpen(false); }}>
+                        {getStatusIcon(s as Status, 20)}
+                        {getStatusLabel(s as Status, t)}
+                        {formData.status === s && <Check size={16} style={{ marginLeft: 'auto', color: 'var(--color-accent)' }} />}
+                    </button>
+                ))}
+
+                <div className={sheetStyles.separator} />
+
+                {/* Add New */}
+                <button className={sheetStyles.option} onClick={() => { setIsStatusSheetOpen(false); setTimeout(() => { setCustomStatusText(''); setIsStatusModalOpen(true); }, 200); }}>
+                    <Plus size={20} color="var(--color-accent)" />
+                    {t('add') || 'Add'}
+                </button>
+            </BottomSheet>
         </div>
     );
 };

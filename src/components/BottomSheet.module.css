@@ -1,0 +1,102 @@
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sheet {
+    background: var(--bg-card);
+    width: 100%;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sheetOpen {
+    transform: translateY(0);
+}
+
+.sheetClose {
+    transform: translateY(100%);
+}
+
+.handleBar {
+    width: 100%;
+    padding: 12px 0 8px;
+    display: flex;
+    justify-content: center;
+    cursor: grab;
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    background: var(--color-border);
+    /* Or a specific gray */
+    border-radius: 2px;
+    opacity: 0.5;
+}
+
+.title {
+    padding: 0 16px 16px;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-text-primary);
+}
+
+.content {
+    overflow-y: auto;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* Option Styles inside Sheet */
+.option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.option:active {
+    background: var(--bg-input);
+}
+
+.optionSelected {
+    background: var(--bg-input);
+    font-weight: 500;
+}
+
+.separator {
+    height: 1px;
+    background: var(--color-border);
+    margin: 8px 0;
+    opacity: 0.5;
+}
