@@ -52,6 +52,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
 
     const priorityColor = task.priority === 'high' ? '#FF3B30' : task.priority === 'medium' ? '#FF9500' : 'var(--color-border)';
 
+    const hasSubtasks = task.subtasks && task.subtasks.filter(s => !s.completed).length > 0;
+    const hasMeta = !!(task.deadline || task.client || task.status || owner);
+
     return (
         <div style={{ position: 'relative', borderRadius: 16, marginBottom: 6, overflow: 'hidden' }}>
             <div style={{
@@ -88,15 +91,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                     {task.status === 'completed' && <Check size={14} color="white" />}
                 </button>
                 <div className={styles.taskContent}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: (hasSubtasks || hasMeta) ? '4px' : '0' }}>
                         <span className={`${styles.taskTitle} ${task.status === 'completed' ? styles.completedText : ''} `} style={{ marginBottom: 0 }}>
                             {task.title}
                         </span>
                     </div>
                     {/* Subtasks List */}
-                    {(task.subtasks && task.subtasks.filter(s => !s.completed).length > 0) && (
-                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                            {task.subtasks.filter(s => !s.completed).map(sub => (
+                    {hasSubtasks && (
+                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {task.subtasks!.filter(s => !s.completed).map(sub => (
                                 <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <button
                                         onClick={(e) => {
