@@ -141,6 +141,10 @@ export const translations = {
         editList: 'Редактировать список',
         taskTitle: 'Название задачи',
         newStatus: 'Новый статус',
+        noStatus: 'Нет статуса',
+        custom: 'Свой статус...',
+        enterStatus: 'Введите статус...',
+        none: 'Нет',
         deleteStatusConfirm: 'Удалить статус',
 
         // Days of week
@@ -345,6 +349,10 @@ export const translations = {
         editList: 'Edit List',
         taskTitle: 'Task Name',
         newStatus: 'New Status',
+        noStatus: 'No Status',
+        custom: 'Custom Status...',
+        enterStatus: 'Enter status...',
+        none: 'None',
         deleteStatusConfirm: 'Delete status',
 
         // Days of week
