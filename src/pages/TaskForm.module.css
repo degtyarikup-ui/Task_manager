@@ -283,14 +283,15 @@
     font-size: 20px;
     font-weight: 600;
     color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Removed drop shadow */
     background-size: cover;
     background-position: center;
     border: none;
 }
 
 .selectedClient .clientAvatarLarge {
-    box-shadow: 0 0 0 3px var(--color-accent), 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 0 3px var(--color-accent);
+    /* Keep only selection ring */
 }
 
 .clientName {
