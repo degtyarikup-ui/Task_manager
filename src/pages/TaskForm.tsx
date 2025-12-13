@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -244,14 +244,14 @@ export const TaskForm: React.FC = () => {
             {/* Subtasks */}
             <div className={styles.section}>
                 <div className={styles.addSubtaskInput}>
-                    <Plus size={20} color="var(--color-text-secondary)" />
+                    {/* Removed Plus Icon here as per request */}
                     <input
-                        className={styles.input}
+                        className={styles.subtaskInput}
+                        style={{ padding: '8px 0', fontSize: 16 }}
                         value={newSubtaskTitle}
                         onChange={e => setNewSubtaskTitle(e.target.value)}
                         placeholder={t('addSubtask')}
                         onKeyDown={e => e.key === 'Enter' && addSubtask()}
-                        style={{ padding: 0 }}
                     />
                     {newSubtaskTitle && (
                         <button onClick={addSubtask} style={{ border: 'none', background: 'var(--color-accent)', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
@@ -379,8 +379,6 @@ export const TaskForm: React.FC = () => {
                         value={formData.status || ''}
                         onChange={e => {
                             if (e.target.value === '__add_new__') {
-                                // Prompt for new status
-                                // Using simple prompt for now as per "Add button" request in select context
                                 const s = window.prompt(t('enterStatus') || 'Введите название статуса:');
                                 if (s && s.trim()) {
                                     addCustomStatus(s.trim());
@@ -406,22 +404,13 @@ export const TaskForm: React.FC = () => {
             <div className={styles.clientSection}>
                 <div className={styles.sectionTitle}>{t('client') || 'Клиент'}</div>
                 <div className={styles.clientScrollList}>
-                    {/* Allow Deselect Option */}
-                    <div
-                        className={`${styles.clientCard} ${!formData.client ? styles.selectedClient : ''}`}
-                        onClick={() => setFormData({ ...formData, client: '' })}
-                    >
-                        <div className={styles.clientAvatarLarge} style={{ background: 'var(--bg-input)', color: 'var(--color-text-secondary)' }}>
-                            <User size={24} />
-                        </div>
-                        <span className={styles.clientName}>{t('none') || 'Нет'}</span>
-                    </div>
+                    {/* Removed None option */}
 
                     {clients.map(c => (
                         <div
                             key={c.id}
                             className={`${styles.clientCard} ${formData.client === c.name ? styles.selectedClient : ''}`}
-                            onClick={() => setFormData({ ...formData, client: c.name })}
+                            onClick={() => setFormData(prev => ({ ...prev, client: prev.client === c.name ? '' : c.name }))}
                         >
                             {c.avatar_url ? (
                                 <div className={styles.clientAvatarLarge} style={{ backgroundImage: `url(${c.avatar_url})` }} />
