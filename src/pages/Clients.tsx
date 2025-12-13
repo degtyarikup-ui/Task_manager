@@ -161,8 +161,8 @@ export const Clients: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <h1 className={styles.title}>{t('clients')}</h1>
-                <p className={styles.subtitle}>{clients.length} {getClientCountLabel(clients.length)}</p>
+                <h1 className={styles.title} style={{ textAlign: 'left', width: '100%' }}>{t('clients')}</h1>
+                <p className={styles.subtitle} style={{ textAlign: 'left', width: '100%' }}>{clients.length} {getClientCountLabel(clients.length)}</p>
             </header>
 
             <DragDropContext onDragEnd={onDragEnd}>

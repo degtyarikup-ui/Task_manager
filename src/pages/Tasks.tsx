@@ -227,8 +227,12 @@ export const Tasks: React.FC = () => {
         <div className={styles.container}>
             <div className={styles.fixedTop}>
                 <header className={styles.header}>
-                    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-                        <h1 className={styles.title}>{t('tasks')}</h1>
+                    <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <h1 className={styles.title} style={{ marginBottom: 0, textAlign: 'left', flex: 1 }}>{t('tasks')}</h1>
+                        {activeTab !== 'all' && (() => {
+                            const project = projects.find(p => p.id === activeTab);
+                            if (project) return <ProjectMembersHeader project={project} t={t as any} />;
+                        })()}
                     </div>
                 </header>
 
@@ -244,11 +248,6 @@ export const Tasks: React.FC = () => {
                 </div>
             </div>
 
-            {activeTab !== 'all' && (() => {
-                const project = projects.find(p => p.id === activeTab);
-                if (!project) return null;
-                return <ProjectMembersHeader project={project} t={t as any} />;
-            })()}
 
             <div className={styles.taskList}>
                 {isLoading ? (

@@ -40,77 +40,64 @@ export const ProjectMembersHeader: React.FC<ProjectMembersHeaderProps> = ({ proj
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                gap: 16,
-                paddingBottom: 16,
-                marginTop: 12 // Push down away from tabs
+                gap: 12,
             }}>
-                {/* Members Pill */}
-                <div
-                    onClick={() => setIsMembersModalOpen(true)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        background: 'var(--bg-card)',
-                        padding: '6px 12px',
-                        borderRadius: 20,
-                        cursor: 'pointer',
-                        boxShadow: 'var(--shadow-sm)'
-                    }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginRight: 8 }}>
-                        {members.slice(0, 3).map((m, i) => (
-                            <div
-                                key={m.id}
-                                style={{
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: '50%',
-                                    border: '2px solid var(--bg-card)',
-                                    marginLeft: i > 0 ? -8 : 0,
-                                    overflow: 'hidden',
-                                    backgroundColor: generateAvatarColor(m.name, m.id),
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: '#fff',
-                                    fontSize: 9,
-                                    fontWeight: 'bold',
-                                    zIndex: members.length - i
-                                }}
-                            >
-                                {m.avatar ? (
-                                    <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                ) : (
-                                    getInitials(m.name)
-                                )}
-                            </div>
-                        ))}
+                {/* Members Avatars - Only show if more than 1 member */}
+                {members.length > 1 && (
+                    <div
+                        onClick={() => setIsMembersModalOpen(true)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            cursor: 'pointer'
+                        }}>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {members.slice(0, 3).map((m, i) => (
+                                <div
+                                    key={m.id}
+                                    style={{
+                                        width: 28,
+                                        height: 28,
+                                        borderRadius: '50%',
+                                        border: '2px solid var(--bg-app)', // Match background for overlap cut-out
+                                        marginLeft: i > 0 ? -10 : 0,
+                                        overflow: 'hidden',
+                                        backgroundColor: generateAvatarColor(m.name, m.id),
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        color: '#fff',
+                                        fontSize: 10,
+                                        fontWeight: 'bold',
+                                        zIndex: members.length - i
+                                    }}
+                                >
+                                    {m.avatar ? (
+                                        <img src={m.avatar} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        getInitials(m.name)
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-secondary)' }}>
-                        {members.length > 3 ? `+${members.length - 3}` : t('members')}
-                    </span>
-                </div>
+                )}
 
-                {/* Share Button Pill */}
+                {/* Share Button - Icon Only */}
                 <button
                     onClick={handleShare}
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 8,
-                        background: 'var(--bg-card)',
-                        padding: '6px 16px',
-                        borderRadius: 20,
+                        justifyContent: 'center',
+                        background: 'transparent',
+                        padding: 4,
                         border: 'none',
-                        color: 'var(--color-text-primary)', // Neutral color
-                        cursor: 'pointer',
-                        fontSize: 13,
-                        fontWeight: 600,
-                        boxShadow: 'var(--shadow-sm)'
+                        color: 'var(--color-primary)', // Use primary or text color
+                        cursor: 'pointer'
                     }}
                 >
-                    <Share2 size={16} />
-                    {t('share')}
+                    <Share2 size={24} color="var(--color-text-primary)" />
                 </button>
             </div>
 
