@@ -53,7 +53,9 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
     const priorityColor = task.priority === 'high' ? '#FF3B30' : task.priority === 'medium' ? '#FF9500' : 'var(--color-border)';
 
     const hasSubtasks = task.subtasks && task.subtasks.filter(s => !s.completed).length > 0;
-    const hasMeta = !!(task.deadline || task.client || task.status || owner);
+    const hasMetaBadges = !!(task.deadline || task.client || task.status);
+    const showOwnerInMeta = owner && hasMetaBadges;
+    const showOwnerAbsolute = owner && !hasMetaBadges;
 
     return (
         <div style={{ position: 'relative', borderRadius: 16, marginBottom: 6, overflow: 'hidden' }}>
@@ -77,7 +79,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                     marginBottom: 0,
                     background: 'var(--bg-card)',
                     position: 'relative',
-                    zIndex: 2
+                    zIndex: 2,
+                    minHeight: 54 // Ensure enough height for absolute avatar if text is short
                 }}
             >
                 <button
@@ -91,14 +94,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                     {task.status === 'completed' && <Check size={14} color="white" />}
                 </button>
                 <div className={styles.taskContent}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: (hasSubtasks || hasMeta) ? '4px' : '0' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', marginBottom: (hasSubtasks || hasMetaBadges) ? '4px' : '0' }}>
                         <span className={`${styles.taskTitle} ${task.status === 'completed' ? styles.completedText : ''} `} style={{ marginBottom: 0 }}>
                             {task.title}
                         </span>
                     </div>
                     {/* Subtasks List */}
                     {hasSubtasks && (
-                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
                             {task.subtasks!.filter(s => !s.completed).map(sub => (
                                 <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <button
@@ -123,64 +126,84 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, onToggle, onDelete, on
                         </div>
                     )}
 
-                    <div className={extraStyles.taskMeta}>
+                    {(hasMetaBadges || showOwnerInMeta) && (
+                        <div className={extraStyles.taskMeta}>
+                            {task.deadline && (
+                                <span className={extraStyles.metaBadge} style={
+                                    (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
+                                        ? { color: '#FF3B30', backgroundColor: 'rgba(255, 59, 48, 0.1)' }
+                                        : {}
+                                }>
+                                    {(task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
+                                        ? <AlertTriangle size={10} />
+                                        : <Calendar size={10} />
+                                    }
+                                    {formatDate(task.deadline, locale)}
+                                </span>
+                            )}
 
-                        {task.deadline && (
-                            <span className={extraStyles.metaBadge} style={
-                                (task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
-                                    ? { color: '#FF3B30', backgroundColor: 'rgba(255, 59, 48, 0.1)' }
-                                    : {}
-                            }>
-                                {(task.status !== 'completed' && new Date(task.deadline) < new Date(new Date().setHours(0, 0, 0, 0)))
-                                    ? <AlertTriangle size={10} />
-                                    : <Calendar size={10} />
-                                }
-                                {formatDate(task.deadline, locale)}
-                            </span>
-                        )}
+                            {task.client && (
+                                <span className={extraStyles.metaBadge} style={{ paddingLeft: 4, paddingRight: 10, borderRadius: 20, gap: 6 }}>
+                                    <div style={{
+                                        width: 20, height: 20, borderRadius: '50%',
+                                        background: generateAvatarColor(task.client),
+                                        color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        flexShrink: 0, fontWeight: 'bold', overflow: 'hidden'
+                                    }}>
+                                        {clientAvatar ? (
+                                            <img src={clientAvatar} alt={task.client} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            getInitials(task.client)
+                                        )}
+                                    </div>
+                                    {task.client}
+                                </span>
+                            )}
+                            {task.status && (
+                                <span className={extraStyles.metaBadge}>
+                                    {getStatusIcon(task.status, 10)}
+                                    {getStatusLabel(task.status, t)}
+                                </span>
+                            )}
+                            {showOwnerInMeta && owner && (
+                                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+                                    <div style={{
+                                        width: 22, height: 22, borderRadius: '50%',
+                                        background: generateAvatarColor(owner.name, owner.id),
+                                        color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        flexShrink: 0, fontWeight: 'bold', overflow: 'hidden',
+                                        boxShadow: '0 0 0 1px var(--bg-card)'
+                                    }}>
+                                        {owner.avatar ? (
+                                            <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            getInitials(owner.name)
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
 
-                        {task.client && (
-                            <span className={extraStyles.metaBadge} style={{ paddingLeft: 4, paddingRight: 10, borderRadius: 20, gap: 6 }}>
-                                <div style={{
-                                    width: 20, height: 20, borderRadius: '50%',
-                                    background: generateAvatarColor(task.client),
-                                    color: 'white', fontSize: 9, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden'
-                                }}>
-                                    {clientAvatar ? (
-                                        <img src={clientAvatar} alt={task.client} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        getInitials(task.client)
-                                    )}
-                                </div>
-                                {task.client}
-                            </span>
-                        )}
-                        {task.status && (
-                            <span className={extraStyles.metaBadge}>
-                                {getStatusIcon(task.status, 10)}
-                                {getStatusLabel(task.status, t)}
-                            </span>
-                        )}
-                        {owner && (
-                            <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-                                <div style={{
-                                    width: 22, height: 22, borderRadius: '50%',
-                                    background: generateAvatarColor(owner.name, owner.id),
-                                    color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0, fontWeight: 'bold', overflow: 'hidden',
-                                    boxShadow: '0 0 0 1px var(--bg-card)'
-                                }}>
-                                    {owner.avatar ? (
-                                        <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        getInitials(owner.name)
-                                    )}
-                                </div>
-                            </div>
+                {showOwnerAbsolute && owner && (
+                    <div style={{
+                        position: 'absolute',
+                        bottom: 12,
+                        right: 12,
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: generateAvatarColor(owner.name, owner.id),
+                        color: 'white', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0, fontWeight: 'bold', overflow: 'hidden',
+                        boxShadow: '0 0 0 1px var(--bg-card)'
+                    }}>
+                        {owner.avatar ? (
+                            <img src={owner.avatar} alt={owner.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            getInitials(owner.name)
                         )}
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );
