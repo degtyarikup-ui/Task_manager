@@ -72,7 +72,7 @@ function Layout() {
 
   return (
     <div className={styles.appContainer}>
-      {!isTaskForm && <div className={styles.topGradient} style={{ height: isSmallGradient ? '12px' : '40px' }} />}
+      {!isTaskForm && location.pathname !== '/tasks' && <div className={styles.topGradient} style={{ height: isSmallGradient ? '12px' : '40px' }} />}
       <main className={styles.mainContent}>
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />
