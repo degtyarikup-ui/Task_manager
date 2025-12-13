@@ -305,7 +305,7 @@ export const ClientDetails: React.FC = () => {
             </div>
 
             {/* Tasks List */}
-            <h3 style={{ marginBottom: 16, color: 'var(--color-text-primary)' }}>{t('tasks') || 'Tasks'} ({clientTasks.length})</h3>
+            <h3 style={{ marginBottom: 16, color: 'var(--color-text-primary)', padding: '0 16px' }}>{t('tasks') || 'Tasks'} ({clientTasks.length})</h3>
             <div className={styles.taskList}>
                 {clientTasks.length === 0 ? (
                     <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center', marginTop: 32 }}>
