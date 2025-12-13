@@ -18,6 +18,10 @@
     outline: none;
     margin-bottom: 24px;
     padding: 0;
+    resize: none;
+    overflow: hidden;
+    min-height: 40px;
+    font-family: inherit;
 }
 
 .titleInput::placeholder {

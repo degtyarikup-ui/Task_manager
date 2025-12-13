@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar';
 import type { Status, Priority, Task } from '../types';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
 export const TaskForm: React.FC = () => {
     const { id } = useParams();
@@ -32,6 +33,16 @@ export const TaskForm: React.FC = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
+
+    const titleRef = useRef<HTMLTextAreaElement>(null);
+
+    // Auto-resize title
+    useEffect(() => {
+        if (titleRef.current) {
+            titleRef.current.style.height = 'auto';
+            titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
+        }
+    }, [formData.title]);
 
     // Load Task Data if Editing
     useEffect(() => {
@@ -128,6 +139,20 @@ export const TaskForm: React.FC = () => {
         }));
     };
 
+    const onDragEnd = (result: DropResult) => {
+        if (!result.destination) return;
+        const sourceIndex = result.source.index;
+        const destIndex = result.destination.index;
+        if (sourceIndex === destIndex) return;
+
+        const newSubtasks = Array.from(formData.subtasks || []);
+        const [moved] = newSubtasks.splice(sourceIndex, 1);
+        newSubtasks.splice(destIndex, 0, moved);
+
+        setFormData(prev => ({ ...prev, subtasks: newSubtasks }));
+        haptic.selection();
+    };
+
     const handleGenerateSubtasks = async () => {
         if (!isPremium) {
             navigate('/premium');
@@ -183,13 +208,27 @@ export const TaskForm: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            {/* Title Input */}
-            <input
+            {/* Title Input (Textarea) */}
+            <textarea
+                ref={titleRef}
                 className={styles.titleInput}
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
                 placeholder={t('taskTitle')}
+                rows={1}
                 autoFocus={!id}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Optional: defocus or add new line? 
+                        // User requested "Multiline writing", so we should ALLOW newline?
+                        // "Написание задачи в несколько строк" -> Yes, allow Enter = Newline.
+                        // So remove preventDefault.
+                        // But usually Enter submits? The User said "Multiline".
+                        // So Enter should insert \n.
+                        setFormData({ ...formData, title: formData.title + '\n' });
+                    }
+                }}
             />
 
             {/* AI Generation */}
@@ -226,39 +265,73 @@ export const TaskForm: React.FC = () => {
                     )}
                 </div>
 
-                <div className={styles.subtaskList}>
-                    {(formData.subtasks || []).map((sub) => (
-                        <div key={sub.id} className={styles.subtaskItem}>
-                            <button onClick={() => toggleSubtask(sub.id)} style={{ padding: 0, background: 'none', border: 'none', display: 'flex', alignItems: 'center' }}>
-                                <div style={{
-                                    width: 20, height: 20, borderRadius: '50%', border: '2px solid var(--color-border)',
-                                    background: sub.completed ? 'var(--color-accent)' : 'transparent',
-                                    borderColor: sub.completed ? 'var(--color-accent)' : 'var(--color-border)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                }}>
-                                    {sub.completed && <Check size={12} color="white" />}
-                                </div>
-                            </button>
-                            <textarea
-                                value={sub.title}
-                                onChange={(e) => {
-                                    updateSubtaskTitle(sub.id, e.target.value);
-                                    e.target.style.height = 'auto';
-                                    e.target.style.height = `${e.target.scrollHeight}px`;
-                                }}
-                                className={styles.subtaskInput}
-                                style={{
-                                    textDecoration: sub.completed ? 'line-through' : 'none',
-                                    color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)'
-                                }}
-                                rows={1}
-                            />
-                            <button onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', padding: 4 }}>
-                                <X size={18} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
+                <DragDropContext onDragEnd={onDragEnd}>
+                    <Droppable droppableId="subtasks-list">
+                        {(provided) => (
+                            <div
+                                className={styles.subtaskList}
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                {(formData.subtasks || []).map((sub, index) => (
+                                    <Draggable key={sub.id} draggableId={sub.id} index={index}>
+                                        {(provided) => (
+                                            <div
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                className={styles.subtaskItem}
+                                                style={provided.draggableProps.style}
+                                            >
+                                                {/* Drag Handle */}
+                                                <div {...provided.dragHandleProps} style={{ padding: '0 8px 0 0', cursor: 'grab', color: 'var(--color-text-secondary)', opacity: 0.5 }}>
+                                                    <GripVertical size={20} />
+                                                </div>
+
+                                                <button onClick={() => toggleSubtask(sub.id)} style={{ padding: 0, background: 'none', border: 'none', display: 'flex', alignItems: 'center', marginRight: 8 }}>
+                                                    <div style={{
+                                                        width: 20, height: 20, borderRadius: '50%', border: '2px solid var(--color-border)',
+                                                        background: sub.completed ? 'var(--color-accent)' : 'transparent',
+                                                        borderColor: sub.completed ? 'var(--color-accent)' : 'var(--color-border)',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                    }}>
+                                                        {sub.completed && <Check size={12} color="white" />}
+                                                    </div>
+                                                </button>
+                                                <textarea
+                                                    value={sub.title}
+                                                    onChange={(e) => {
+                                                        updateSubtaskTitle(sub.id, e.target.value);
+                                                        e.target.style.height = 'auto';
+                                                        e.target.style.height = `${e.target.scrollHeight}px`;
+                                                    }}
+                                                    className={styles.subtaskInput}
+                                                    style={{
+                                                        textDecoration: sub.completed ? 'line-through' : 'none',
+                                                        color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)'
+                                                    }}
+                                                    rows={1}
+                                                    // Auto-resize on mount/update is handled by the onChange event (imperfect for existing ones)
+                                                    // We can add a ref callback logic if strictly needed, but React often re-renders.
+                                                    // Simple fix: ref={el => el && (el.style.height = el.scrollHeight + 'px')}
+                                                    ref={el => {
+                                                        if (el) {
+                                                            el.style.height = 'auto';
+                                                            el.style.height = el.scrollHeight + 'px';
+                                                        }
+                                                    }}
+                                                />
+                                                <button onClick={() => removeSubtask(sub.id)} style={{ background: 'none', border: 'none', color: 'var(--color-text-secondary)', padding: 4 }}>
+                                                    <X size={18} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </Draggable>
+                                ))}
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
             </div>
 
             {/* Properties */}
