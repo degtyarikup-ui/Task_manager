@@ -1,5 +1,5 @@
 .container {
-    padding: 110px 16px 120px;
+    padding: 130px 16px 120px;
     /* More padding for bottom nav */
     max-width: 600px;
     margin: 0 auto;
@@ -32,7 +32,7 @@
     width: 100%;
     max-width: 600px;
     background-color: var(--bg-app);
-    z-index: 200;
+    z-index: 950;
     padding: 16px 16px 0;
     box-sizing: border-box;
 }

@@ -16,6 +16,12 @@ interface AIResult {
     explanation: string;
 }
 
+interface HistoryItem extends AIResult {
+    timestamp: number;
+    projectType: string;
+    description: string;
+}
+
 export const Calculator: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -28,8 +34,27 @@ export const Calculator: React.FC = () => {
     const [rate, setRate] = useState<number>(30);
     const [experience, setExperience] = useState<string>('beginner');
     const [result, setResult] = useState<AIResult | null>(null);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
     const [isCalculating, setIsCalculating] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('calc_history');
+            if (saved) {
+                setHistory(JSON.parse(saved));
+            }
+        } catch (e) {
+            console.error('Failed to load history', e);
+        }
+    }, []);
+
+    const saveToHistory = (res: AIResult, params: { projectType: string, description: string }) => {
+        const newItem: HistoryItem = { ...res, ...params, timestamp: Date.now() };
+        const newHistory = [newItem, ...history].slice(0, 3);
+        setHistory(newHistory);
+        localStorage.setItem('calc_history', JSON.stringify(newHistory));
+    };
 
     // Handle Telegram Back Button
 
@@ -81,6 +106,7 @@ export const Calculator: React.FC = () => {
             }
 
             setResult(data);
+            saveToHistory(data, { projectType, description: descToUse });
             haptic.notification('success');
         } catch (e: any) {
             console.error('Calculation Error:', e);
@@ -122,9 +148,6 @@ export const Calculator: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.iconWrapper}>
-                    <CalcIcon size={40} color="white" />
-                </div>
                 <div className={styles.title}>{t('aiCalculator')}</div>
                 <div className={styles.subtitle}>{t('aiCalculatorDesc')}</div>
             </header>
@@ -270,6 +293,38 @@ export const Calculator: React.FC = () => {
                 </div>
             )}
 
+            {history.length > 0 && !result && (
+                <div style={{ marginTop: 24, paddingBottom: 20 }}>
+                    <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, paddingLeft: 8 }}>
+                        {t('history') || 'History'}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {history.map((item) => (
+                            <div key={item.timestamp} onClick={() => {
+                                setResult(item);
+                                setProjectType(item.projectType);
+                                setDescription(item.description);
+                                setInputMode('manual');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }} style={{
+                                background: 'var(--bg-card)', padding: 16, borderRadius: 16,
+                                cursor: 'pointer', border: '1px solid var(--color-border)'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                    <span style={{ fontWeight: 600, fontSize: 15 }}>${item.minPrice} - ${item.maxPrice}</span>
+                                    <span style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                                        {new Date(item.timestamp).toLocaleDateString()}
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
+                                    {item.description.length > 60 ? item.description.substring(0, 60) + '...' : item.description}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             <div className={styles.footer}>
                 <button
                     className={styles.calculateBtn}
@@ -281,7 +336,7 @@ export const Calculator: React.FC = () => {
                     ) : (
                         <>
                             {!isPremium && <Lock size={20} />}
-                            {isPremium ? <Sparkles size={24} /> : null}
+                            {isPremium ? <CalcIcon size={24} /> : null}
                             {t('calculate')}
                         </>
                     )}

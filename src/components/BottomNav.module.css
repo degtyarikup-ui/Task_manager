@@ -21,7 +21,7 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 8px 24px;
+    padding: 8px 12px;
     border-radius: 9999px;
     min-width: 60px;
     color: var(--color-text-secondary);
