@@ -50,15 +50,29 @@ export const Tasks: React.FC = () => {
         localStorage.setItem('hasSeenOnboardingTooltip', 'true');
     };
 
-    // Default to 'all'
-    const [activeTab, setActiveTab] = useState<string>('all');
+    // Default to 'all' or saved state
+    const [activeTab, setActiveTab] = useState<string>(() => {
+        try {
+            return localStorage.getItem('tasks_active_tab') || 'all';
+        } catch {
+            return 'all';
+        }
+    });
+
+    // Persist active tab
+    useEffect(() => {
+        try {
+            localStorage.setItem('tasks_active_tab', activeTab);
+        } catch { }
+    }, [activeTab]);
 
     // Validate activeTab exists (if it's not 'all' and project was deleted externally/unexpectedly)
+    // Only fetch if not loading to prevent resetting on initial render before projects load
     useEffect(() => {
-        if (activeTab !== 'all' && !projects.find(p => p.id === activeTab)) {
+        if (!isLoading && activeTab !== 'all' && !projects.find(p => p.id === activeTab)) {
             setActiveTab('all');
         }
-    }, [projects, activeTab]);
+    }, [projects, activeTab, isLoading]);
 
     // Confirm Modal State
     const [confirmConfig, setConfirmConfig] = useState({
