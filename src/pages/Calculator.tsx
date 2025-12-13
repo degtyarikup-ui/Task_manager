@@ -191,18 +191,18 @@ export const Calculator: React.FC = () => {
             <div className={styles.formGroup} style={{ animationDelay: '0.3s' }}>
                 <label className={styles.label}>{t('projectDescription')}</label>
 
-                <div className={styles.chipContainer} style={{ marginBottom: 12 }}>
+                <div className={styles.toggleContainer} style={{ marginBottom: 16 }}>
                     <div
-                        className={`${styles.chip} ${inputMode === 'manual' ? styles.active : ''}`}
-                        onClick={() => setInputMode('manual')}
-                    >
-                        {t('writeDescription')}
-                    </div>
-                    <div
-                        className={`${styles.chip} ${inputMode === 'select' ? styles.active : ''}`}
+                        className={`${styles.toggleItem} ${inputMode === 'select' ? styles.active : ''}`}
                         onClick={() => setInputMode('select')}
                     >
                         {t('selectTask')}
+                    </div>
+                    <div
+                        className={`${styles.toggleItem} ${inputMode === 'manual' ? styles.active : ''}`}
+                        onClick={() => setInputMode('manual')}
+                    >
+                        {t('writeDescription')}
                     </div>
                 </div>
 
@@ -243,8 +243,23 @@ export const Calculator: React.FC = () => {
                         value={rate}
                         onChange={(e) => setRate(Number(e.target.value))}
                     />
-                    <div className={styles.rangeValue}>${rate}</div>
                 </div>
+
+                <button
+                    className={styles.calculateBtn}
+                    onClick={handleButtonClick}
+                    disabled={isCalculating}
+                >
+                    {isCalculating ? (
+                        <>{t('loading') || 'Processing...'}</>
+                    ) : (
+                        <>
+                            {!isPremium && <Lock size={20} />}
+                            {isPremium ? <CalcIcon size={24} /> : null}
+                            {t('calculate')}
+                        </>
+                    )}
+                </button>
             </div>
 
             {error && (
@@ -325,23 +340,6 @@ export const Calculator: React.FC = () => {
                 </div>
             )}
 
-            <div className={styles.footer}>
-                <button
-                    className={styles.calculateBtn}
-                    onClick={handleButtonClick}
-                    disabled={isCalculating}
-                >
-                    {isCalculating ? (
-                        <>{t('loading') || 'Processing...'}</>
-                    ) : (
-                        <>
-                            {!isPremium && <Lock size={20} />}
-                            {isPremium ? <CalcIcon size={24} /> : null}
-                            {t('calculate')}
-                        </>
-                    )}
-                </button>
-            </div>
         </div>
     );
 };

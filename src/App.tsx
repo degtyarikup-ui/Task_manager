@@ -65,9 +65,12 @@ function Layout() {
   // Show Nav on main tabs and client details
   const showBottomNav = ['/tasks', '/profile', '/calculator'].includes(location.pathname) || location.pathname.startsWith('/clients') || location.pathname === '/';
 
+  // Smaller gradient for specific pages
+  const isSmallGradient = ['/clients', '/profile', '/calculator'].some(path => location.pathname.startsWith(path));
+
   return (
     <div className={styles.appContainer}>
-      <div className={styles.topGradient} />
+      <div className={styles.topGradient} style={{ height: isSmallGradient ? '12px' : '40px' }} />
       <main className={styles.mainContent}>
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />

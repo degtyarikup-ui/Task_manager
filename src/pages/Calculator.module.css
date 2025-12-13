@@ -6,11 +6,10 @@
     min-height: 100vh;
     background: var(--bg-app);
     box-sizing: border-box;
-    padding-bottom: 200px;
+    padding-bottom: 120px;
 }
 
 .header {
-    margin-top: 16px;
     margin-bottom: 32px;
     display: flex;
     flex-direction: column;
@@ -66,17 +65,17 @@
     border-color: var(--color-accent);
 }
 
-/* Chip / Tab Styles - Hug content */
+/* Chip / Tab Styles - Updated to match Tasks */
 .chipContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
 }
 
 .chip {
-    padding: 6px 12px;
-    border-radius: 12px;
-    background: var(--bg-card);
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: transparent;
     border: 1px solid var(--color-border);
     color: var(--color-text-primary);
     font-size: 14px;
@@ -91,14 +90,42 @@
 }
 
 .chip.active {
-    background: var(--color-accent);
-    color: white;
-    border-color: var(--color-accent);
+    background: var(--color-text-primary);
+    color: var(--bg-app);
+    border-color: var(--color-text-primary);
     font-weight: 600;
 }
 
 .chip:active {
     transform: scale(0.98);
+}
+
+/* Segmented Control for Input Mode */
+.toggleContainer {
+    display: flex;
+    background: var(--bg-input);
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.toggleItem {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggleItem.active {
+    background: var(--bg-card);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Range Slider */
@@ -138,39 +165,22 @@
     text-align: right;
 }
 
-/* Fixed Footer for Button */
-.footer {
-    position: fixed;
-    bottom: calc(100px + env(safe-area-inset-bottom));
-    /* Above BottomNav */
-    left: 0;
-    right: 0;
-    padding: 16px 24px;
-    /* Reduced top padding */
-    background: var(--bg-app);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--color-border);
-    animation: slideUp 0.5s ease 0.4s backwards;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+/* Calculate Button - Non Fixed */
 .calculateBtn {
     width: 100%;
-    padding: 18px;
+    padding: 16px;
     background: var(--color-accent);
     color: white;
     border: none;
     border-radius: 16px;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
+    margin-top: 32px;
     transition: transform 0.1s;
 }
 
@@ -190,9 +200,8 @@
     padding: 24px;
     color: white;
     text-align: center;
-    margin-top: 16px;
+    margin-top: 32px;
     margin-bottom: 20px;
-    /* Space for footer */
     animation: slideUp 0.5s ease backwards;
 }
 
