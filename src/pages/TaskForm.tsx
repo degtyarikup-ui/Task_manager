@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical, Edit2 } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -16,7 +16,7 @@ export const TaskForm: React.FC = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { tasks, addTask, updateTask, projects, clients, availableStatuses, language, userId, isPremium } = useStore();
+    const { tasks, addTask, updateTask, projects, clients, availableStatuses, language, userId, isPremium, addCustomStatus } = useStore();
     const locale = language === 'ru' ? ru : enUS;
 
     const [formData, setFormData] = useState<Partial<Task>>({
@@ -33,7 +33,6 @@ export const TaskForm: React.FC = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
-    const [isCustomStatusMode, setIsCustomStatusMode] = useState(false);
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
 
@@ -59,13 +58,9 @@ export const TaskForm: React.FC = () => {
                     client: task.client,
                     projectId: task.projectId
                 });
-                // Check if status is custom
-                if (task.status && !availableStatuses.includes(task.status as any)) {
-                    setIsCustomStatusMode(true);
-                }
             }
         }
-    }, [id, tasks, availableStatuses]);
+    }, [id, tasks]);
 
     // Handle Telegram Back Button
     useEffect(() => {
@@ -89,10 +84,6 @@ export const TaskForm: React.FC = () => {
 
         haptic.notification('success');
 
-        // Use 'in-progress' fallback if status is empty? Or keep ''?
-        // User said "Start without status".
-        // But types might require string. '' is string.
-        // We will save as is.
         const statusToSave = formData.status || '';
 
         if (id) {
@@ -336,29 +327,38 @@ export const TaskForm: React.FC = () => {
 
             {/* Properties */}
             <div className={styles.section} style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden' }}>
+                {/* Deadline */}
                 <button className={styles.menuItem} onClick={() => setIsCalendarOpen(true)}>
                     <div className={styles.menuIcon}>
                         <Calendar size={20} color="var(--color-accent)" />
-                        <span>{formData.deadline ? formatDate(formData.deadline, locale) : t('deadline')}</span>
+                        <span>{formData.deadline ? formatDate(formData.deadline, locale) : (t('deadline') || 'Дедлайн')}</span>
                     </div>
                     <ChevronDown size={16} className={styles.menuRightIcon} />
                 </button>
 
+                {/* Priority */}
                 <button className={styles.menuItem} onClick={togglePriority}>
                     <div className={styles.menuIcon}>
                         <AlertTriangle size={20} className={getIconClass(formData.priority || 'low')} />
-                        <span>{t('priority')}: {t(formData.priority || 'low')}</span>
+                        <span style={{ flex: 1 }}>{t('priority') || 'Приоритет'}: {t(formData.priority || 'low')}</span>
                     </div>
                 </button>
 
+                {/* Project / List */}
                 <div className={styles.menuItem}>
                     <List size={20} color="#FF9500" className={styles.menuLeftIcon} />
+                    <span style={{ flex: 1, paddingRight: 8 }}>
+                        {formData.projectId
+                            ? (projects.find(p => p.id === formData.projectId)?.title || t('list'))
+                            : (t('list') || 'Список')}
+                    </span>
                     <select
                         className={styles.rowSelect}
                         value={formData.projectId || ''}
                         onChange={e => setFormData({ ...formData, projectId: e.target.value })}
+                        style={{ opacity: 0 }}
                     >
-                        <option value="">{formData.projectId ? projects.find(p => p.id === formData.projectId)?.title : t('list')}</option>
+                        <option value="">{t('selectList') || 'Выбрать список'}</option>
                         {projects.map(p => (
                             <option key={p.id} value={p.id}>{p.title}</option>
                         ))}
@@ -366,51 +366,40 @@ export const TaskForm: React.FC = () => {
                     <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
 
-                {/* Status Logic */}
-                {!isCustomStatusMode ? (
-                    <div className={styles.menuItem}>
-                        <div className={styles.menuLeftIcon}>
-                            {/* Show empty if empty */}
-                            {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
-                        </div>
-                        <select
-                            className={styles.rowSelect}
-                            value={formData.status || ''}
-                            onChange={e => {
-                                if (e.target.value === 'custom') {
-                                    setIsCustomStatusMode(true);
-                                    setFormData({ ...formData, status: '' });
-                                } else {
-                                    setFormData({ ...formData, status: e.target.value as Status })
+                {/* Status */}
+                <div className={styles.menuItem}>
+                    <div className={styles.menuLeftIcon}>
+                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
+                    </div>
+                    <span style={{ flex: 1, paddingRight: 8 }}>
+                        {formData.status ? getStatusLabel(formData.status as Status, t) : (t('noStatus') || 'Нет статуса')}
+                    </span>
+                    <select
+                        className={styles.rowSelect}
+                        value={formData.status || ''}
+                        onChange={e => {
+                            if (e.target.value === '__add_new__') {
+                                // Prompt for new status
+                                // Using simple prompt for now as per "Add button" request in select context
+                                const s = window.prompt(t('enterStatus') || 'Введите название статуса:');
+                                if (s && s.trim()) {
+                                    addCustomStatus(s.trim());
+                                    setFormData({ ...formData, status: s.trim() });
                                 }
-                            }}
-                        >
-                            <option value="">{t('noStatus') || 'Нет статуса'}</option>
-                            {availableStatuses.map(s => (
-                                <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
-                            ))}
-                            <option value="custom">{t('custom') || 'Свой статус...'}</option>
-                        </select>
-                        <ChevronDown size={16} className={styles.menuRightIcon} />
-                    </div>
-                ) : (
-                    <div className={styles.menuItem} style={{ padding: '8px 16px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 8 }}>
-                            <Edit2 size={16} color="var(--color-accent)" />
-                            <input
-                                className={styles.input}
-                                style={{ background: 'transparent', padding: '8px 0', borderRadius: 0 }}
-                                value={formData.status || ''}
-                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                placeholder={t('enterStatus') || "Введите статус..."}
-                                autoFocus
-                            />
-                            <button onClick={() => setIsCustomStatusMode(false)} style={{ border: 'none', background: 'none' }}>
-                                <X size={16} color="var(--color-text-secondary)" />
-                            </button>
-                        </div>
-                    </div>
-                )}
+                            } else {
+                                setFormData({ ...formData, status: e.target.value as Status })
+                            }
+                        }}
+                        style={{ opacity: 0 }}
+                    >
+                        <option value="">{t('noStatus') || 'Нет статуса'}</option>
+                        {availableStatuses.map(s => (
+                            <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
+                        ))}
+                        <option value="__add_new__">+ {t('add') || 'Добавить статус'}</option>
+                    </select>
+                    <ChevronDown size={16} className={styles.menuRightIcon} />
+                </div>
             </div>
 
             {/* Client Section (Moved to Bottom) - Horizontal Scroll */}

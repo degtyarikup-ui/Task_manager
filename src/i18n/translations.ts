@@ -129,6 +129,7 @@ export const translations = {
 
         // Modal Actions
         create: 'Создать',
+        add: 'Добавить',
         cancel: 'Отмена',
         delete: 'Удалить',
         ok: 'OK',
@@ -337,6 +338,7 @@ export const translations = {
 
         // Modal Actions
         create: 'Create',
+        add: 'Add',
         cancel: 'Cancel',
         delete: 'Delete',
         ok: 'OK',
