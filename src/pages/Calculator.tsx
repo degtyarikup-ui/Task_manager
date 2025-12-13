@@ -19,9 +19,11 @@ interface AIResult {
 export const Calculator: React.FC = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { language, isPremium } = useStore();
+    const { language, isPremium, tasks } = useStore();
 
     const [projectType, setProjectType] = useState<string>('development');
+    const [inputMode, setInputMode] = useState<'manual' | 'select'>('manual');
+    const [selectedTaskId, setSelectedTaskId] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [rate, setRate] = useState<number>(30);
     const [experience, setExperience] = useState<string>('beginner');
@@ -44,10 +46,22 @@ export const Calculator: React.FC = () => {
     }, [navigate]);
 
     const handleCalculate = async () => {
-        if (!description.trim()) {
-            haptic.notification('error');
-            setError(t('errorGeneric') || 'Please add a description');
-            return;
+        let descToUse = description;
+
+        if (inputMode === 'select') {
+            const selectedTask = tasks.find(t => t.id === selectedTaskId);
+            if (!selectedTask) {
+                haptic.notification('error');
+                setError(t('selectTaskPlaceholder') || 'Please select a task');
+                return;
+            }
+            descToUse = selectedTask.title;
+        } else {
+            if (!descToUse.trim()) {
+                haptic.notification('error');
+                setError(t('errorGeneric') || 'Please add a description');
+                return;
+            }
         }
 
         setIsCalculating(true);
@@ -64,7 +78,7 @@ export const Calculator: React.FC = () => {
                 },
                 body: JSON.stringify({
                     projectType,
-                    description,
+                    description: descToUse,
                     hourlyRate: rate,
                     experience,
                     language
@@ -165,14 +179,45 @@ export const Calculator: React.FC = () => {
 
             <div className={styles.formGroup} style={{ animationDelay: '0.3s' }}>
                 <label className={styles.label}>{t('projectDescription')}</label>
-                <textarea
-                    className={styles.input}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder={String(t('projectDescriptionPlaceholder') || '')}
-                    rows={4}
-                    style={{ resize: 'none', minHeight: 100 }}
-                />
+
+                <div className={styles.chipContainer} style={{ marginBottom: 12 }}>
+                    <div
+                        className={`${styles.chip} ${inputMode === 'manual' ? styles.active : ''}`}
+                        onClick={() => setInputMode('manual')}
+                    >
+                        {t('writeDescription')}
+                    </div>
+                    <div
+                        className={`${styles.chip} ${inputMode === 'select' ? styles.active : ''}`}
+                        onClick={() => setInputMode('select')}
+                    >
+                        {t('selectTask')}
+                    </div>
+                </div>
+
+                {inputMode === 'manual' ? (
+                    <textarea
+                        className={styles.input}
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder={String(t('projectDescriptionPlaceholder') || '')}
+                        rows={4}
+                        style={{ resize: 'none', minHeight: 100 }}
+                    />
+                ) : (
+                    <select
+                        className={styles.input}
+                        value={selectedTaskId}
+                        onChange={(e) => setSelectedTaskId(e.target.value)}
+                    >
+                        <option value="">{t('selectTaskPlaceholder')}</option>
+                        {tasks.map(task => (
+                            <option key={task.id} value={task.id}>
+                                {task.title.length > 50 ? task.title.substring(0, 50) + '...' : task.title}
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
 
             <div className={styles.formGroup} style={{ animationDelay: '0.4s' }}>
@@ -201,7 +246,7 @@ export const Calculator: React.FC = () => {
                 <div className={styles.resultCard}>
                     <div className={styles.resultLabel}>{t('priceRange')}</div>
                     <div className={styles.resultValue}>
-                        {result.minPrice} - {result.maxPrice} {result.currency}
+                        ${result.minPrice} - ${result.maxPrice}
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>

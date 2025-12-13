@@ -182,6 +182,9 @@ export const translations = {
         priceRange: 'Диапазон цен',
         hoursEstimate: 'Оценка времени',
         hours: 'ч',
+        selectTask: 'Выбрать задачу',
+        writeDescription: 'Описать вручную',
+        selectTaskPlaceholder: 'Выберите задачу...',
 
         // Categories
         category: 'Сфера',
@@ -379,6 +382,9 @@ export const translations = {
         priceRange: 'Price Range',
         hoursEstimate: 'Time Estimate',
         hours: 'h',
+        selectTask: 'Select Task',
+        writeDescription: 'Write Description',
+        selectTaskPlaceholder: 'Select a task...',
 
         // Categories
         category: 'Field / Category',
