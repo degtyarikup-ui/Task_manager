@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { getTelegramUser } from '../utils/telegram';
+import { supabase } from '../lib/supabase';
 import { generateAvatarColor } from '../utils/colors'; // Import shared util
 import {
     Moon,
@@ -26,6 +27,17 @@ export const Profile: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [adminStats, setAdminStats] = useState<{ users: number, premium: number } | null>(null);
+
+    const loadAdminStats = async () => {
+        try {
+            const { count: users } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: premium } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).gt('subscription_end_date', new Date().toISOString());
+            setAdminStats({ users: users || 0, premium: premium || 0 });
+        } catch (e) {
+            console.error('Failed to load stats', e);
+        }
+    };
 
     // Calculated Statistics
     const completedTasks = tasks.filter(t => t.status === 'completed').length;
@@ -264,6 +276,29 @@ export const Profile: React.FC = () => {
                             Dev: Admin Premium
                         </span>
                     </label>
+
+                    <div style={{ marginTop: 12 }}>
+                        <button
+                            onClick={loadAdminStats}
+                            style={{
+                                padding: '6px 12px',
+                                fontSize: 13,
+                                background: 'var(--color-text-secondary)',
+                                color: 'var(--bg-app)',
+                                border: 'none',
+                                borderRadius: 8,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            {adminStats ? 'Refresh Stats' : 'Load Stats'}
+                        </button>
+                        {adminStats && (
+                            <div style={{ marginTop: 8, fontSize: 13, color: 'var(--color-text-secondary)' }}>
+                                <div>Total Users: <b>{adminStats.users}</b></div>
+                                <div>Premium: <b>{adminStats.premium}</b></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
