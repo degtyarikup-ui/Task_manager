@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/useTranslation';
 import { useStore } from '../context/StoreContext';
 import { haptic } from '../utils/haptics';
-import { Calculator as CalcIcon, Sparkles, Clock, TrendingUp, Lock } from 'lucide-react';
+import { Calculator as CalcIcon, Clock, TrendingUp, Lock } from 'lucide-react';
 import styles from './Calculator.module.css';
 
 interface AIResult {
