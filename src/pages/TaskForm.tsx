@@ -9,6 +9,7 @@ import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
 import { Calendar as CustomCalendar } from '../components/Calendar';
+import { Modal } from '../components/Modal';
 import type { Status, Priority, Task } from '../types';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 
@@ -33,6 +34,8 @@ export const TaskForm: React.FC = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [customStatusText, setCustomStatusText] = useState('');
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
 
@@ -379,11 +382,8 @@ export const TaskForm: React.FC = () => {
                         value={formData.status || ''}
                         onChange={e => {
                             if (e.target.value === '__add_new__') {
-                                const s = window.prompt(t('enterStatus') || 'Введите название статуса:');
-                                if (s && s.trim()) {
-                                    addCustomStatus(s.trim());
-                                    setFormData({ ...formData, status: s.trim() });
-                                }
+                                setCustomStatusText('');
+                                setIsStatusModalOpen(true);
                             } else {
                                 setFormData({ ...formData, status: e.target.value as Status })
                             }
@@ -440,6 +440,44 @@ export const TaskForm: React.FC = () => {
                     removeDateLabel={t('removeDate') || 'Убрать дату'}
                 />
             )}
+
+            <Modal
+                isOpen={isStatusModalOpen}
+                onClose={() => setIsStatusModalOpen(false)}
+                title={t('enterStatus') || 'Enter status'}
+            >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <input
+                        className={styles.input}
+                        value={customStatusText}
+                        onChange={(e) => setCustomStatusText(e.target.value)}
+                        placeholder={t('enterStatus') || "Введите статус..."}
+                        autoFocus
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                if (customStatusText.trim()) {
+                                    addCustomStatus(customStatusText.trim());
+                                    setFormData({ ...formData, status: customStatusText.trim() as Status });
+                                }
+                                setIsStatusModalOpen(false);
+                            }
+                        }}
+                    />
+                    <button
+                        className={styles.input}
+                        style={{ background: 'var(--color-accent)', color: 'white', fontWeight: 600, textAlign: 'center', justifyContent: 'center' }}
+                        onClick={() => {
+                            if (customStatusText.trim()) {
+                                addCustomStatus(customStatusText.trim());
+                                setFormData({ ...formData, status: customStatusText.trim() as Status });
+                            }
+                            setIsStatusModalOpen(false);
+                        }}
+                    >
+                        {t('add') || 'Add'}
+                    </button>
+                </div>
+            </Modal>
         </div>
     );
 };
