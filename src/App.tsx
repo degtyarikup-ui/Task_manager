@@ -87,7 +87,7 @@ function Layout() {
           <Route path="*" element={<Navigate to="/tasks" replace />} />
         </Routes>
       </main>
-      {location.pathname !== '/calculator' && <div className={styles.bottomGradient} />}
+      <div className={styles.bottomGradient} />
       {showBottomNav && <BottomNavWrapper />}
     </div>
   );
