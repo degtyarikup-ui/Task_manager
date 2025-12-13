@@ -1,19 +1,19 @@
 .container {
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     background: var(--bg-app);
     overflow: hidden;
-    padding-top: env(safe-area-inset-top);
+    padding-top: 24px;
     box-sizing: border-box;
 }
 
 :global(.platform-ios) .container {
-    padding-top: max(20px, env(safe-area-inset-top));
+    padding-top: 12px;
 }
 
 :global(.platform-android) .container {
-    padding-top: max(24px, env(safe-area-inset-top));
+    padding-top: 16px;
 }
 
 .detailsHeaderPadding {
