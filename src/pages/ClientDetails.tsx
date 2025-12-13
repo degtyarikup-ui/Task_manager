@@ -8,7 +8,7 @@ import styles from './Tasks.module.css'; // Reuse basic styles
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { ru, enUS } from 'date-fns/locale';
 import { Modal } from '../components/Modal';
-import { Calendar, AlertTriangle, List, Trash2, Plus, Check, Edit2 } from 'lucide-react';
+import { Calendar, AlertTriangle, List, Trash2, Plus, Check } from 'lucide-react';
 import formStyles from '../components/ui/Form.module.css';
 import extraStyles from './TasksExtra.module.css';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
@@ -225,15 +225,19 @@ export const ClientDetails: React.FC = () => {
 
 
             {/* Client Info Card */}
-            <div style={{
-                background: 'var(--bg-card)',
-                padding: 24,
-                borderRadius: 24,
-                marginBottom: 32,
-                display: 'flex', alignItems: 'center', gap: 16,
-                boxShadow: 'var(--shadow-sm)',
-                position: 'relative'
-            }}>
+            <div
+                onClick={handleEditClient}
+                style={{
+                    background: 'var(--bg-card)',
+                    padding: 24,
+                    borderRadius: 24,
+                    margin: '0 16px 32px 16px', // Added horizontal margin
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    boxShadow: 'var(--shadow-sm)',
+                    position: 'relative',
+                    cursor: 'pointer'
+                }}
+            >
                 <input
                     type="file"
                     ref={fileInputRef}
@@ -242,7 +246,10 @@ export const ClientDetails: React.FC = () => {
                     onChange={handleFileChange}
                 />
                 <button
-                    onClick={handleDeleteClient}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClient();
+                    }}
                     style={{
                         position: 'absolute',
                         top: 16,
@@ -256,23 +263,13 @@ export const ClientDetails: React.FC = () => {
                     <Trash2 size={20} />
                 </button>
 
-                <button
-                    onClick={handleEditClient}
-                    style={{
-                        position: 'absolute',
-                        top: 16,
-                        right: 56,
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--color-text-secondary)',
-                        padding: 8
-                    }}
-                >
-                    <Edit2 size={20} />
-                </button>
+                {/* Edit Button Removed */}
 
                 <div
-                    onClick={handleAvatarClick}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleAvatarClick();
+                    }}
                     style={{
                         position: 'relative',
                         cursor: 'pointer',
