@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, User, List, Wand2, Loader2, X, ChevronDown, GripVertical, Edit2 } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -22,7 +22,7 @@ export const TaskForm: React.FC = () => {
     const [formData, setFormData] = useState<Partial<Task>>({
         title: '',
         subtasks: [],
-        status: 'in-progress',
+        status: '', // Initial empty status
         priority: 'low',
         deadline: '',
         client: '',
@@ -33,6 +33,7 @@ export const TaskForm: React.FC = () => {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
+    const [isCustomStatusMode, setIsCustomStatusMode] = useState(false);
 
     const titleRef = useRef<HTMLTextAreaElement>(null);
 
@@ -58,9 +59,13 @@ export const TaskForm: React.FC = () => {
                     client: task.client,
                     projectId: task.projectId
                 });
+                // Check if status is custom
+                if (task.status && !availableStatuses.includes(task.status as any)) {
+                    setIsCustomStatusMode(true);
+                }
             }
         }
-    }, [id, tasks]);
+    }, [id, tasks, availableStatuses]);
 
     // Handle Telegram Back Button
     useEffect(() => {
@@ -84,23 +89,29 @@ export const TaskForm: React.FC = () => {
 
         haptic.notification('success');
 
+        // Use 'in-progress' fallback if status is empty? Or keep ''?
+        // User said "Start without status".
+        // But types might require string. '' is string.
+        // We will save as is.
+        const statusToSave = formData.status || '';
+
         if (id) {
             // Update
             updateTask(id, {
                 title: formData.title,
                 subtasks: formData.subtasks || [],
-                status: formData.status as Status,
+                status: statusToSave as Status,
                 priority: formData.priority,
                 deadline: formData.deadline,
                 client: formData.client,
-                projectId: formData.projectId || undefined // Start using undefined
+                projectId: formData.projectId || undefined
             });
         } else {
             // Create
             addTask({
                 title: formData.title,
                 subtasks: formData.subtasks || [],
-                status: (formData.status as Status) || 'in-progress',
+                status: statusToSave as Status,
                 priority: formData.priority || 'low',
                 projectId: formData.projectId || undefined,
                 deadline: formData.deadline,
@@ -219,14 +230,7 @@ export const TaskForm: React.FC = () => {
                 autoFocus={!id}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                        e.preventDefault();
-                        // Optional: defocus or add new line? 
-                        // User requested "Multiline writing", so we should ALLOW newline?
-                        // "Написание задачи в несколько строк" -> Yes, allow Enter = Newline.
-                        // So remove preventDefault.
-                        // But usually Enter submits? The User said "Multiline".
-                        // So Enter should insert \n.
-                        setFormData({ ...formData, title: formData.title + '\n' });
+                        // Allow new line
                     }
                 }}
             />
@@ -282,7 +286,6 @@ export const TaskForm: React.FC = () => {
                                                 className={styles.subtaskItem}
                                                 style={provided.draggableProps.style}
                                             >
-                                                {/* Drag Handle */}
                                                 <div {...provided.dragHandleProps} style={{ padding: '0 8px 0 0', cursor: 'grab', color: 'var(--color-text-secondary)', opacity: 0.5 }}>
                                                     <GripVertical size={20} />
                                                 </div>
@@ -310,9 +313,6 @@ export const TaskForm: React.FC = () => {
                                                         color: sub.completed ? 'var(--color-text-secondary)' : 'var(--color-text-primary)'
                                                     }}
                                                     rows={1}
-                                                    // Auto-resize on mount/update is handled by the onChange event (imperfect for existing ones)
-                                                    // We can add a ref callback logic if strictly needed, but React often re-renders.
-                                                    // Simple fix: ref={el => el && (el.style.height = el.scrollHeight + 'px')}
                                                     ref={el => {
                                                         if (el) {
                                                             el.style.height = 'auto';
@@ -366,41 +366,84 @@ export const TaskForm: React.FC = () => {
                     <ChevronDown size={16} className={styles.menuRightIcon} />
                 </div>
 
-                <div className={styles.menuItem}>
-                    <div className={styles.menuLeftIcon}>
-                        {formData.client ? (
-                            <div className={styles.avatarIcon} style={{ background: generateAvatarColor(formData.client), color: 'white' }}>
-                                {getInitials(formData.client)}
-                            </div>
-                        ) : <User size={20} color="#007AFF" />}
+                {/* Status Logic */}
+                {!isCustomStatusMode ? (
+                    <div className={styles.menuItem}>
+                        <div className={styles.menuLeftIcon}>
+                            {/* Show empty if empty */}
+                            {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
+                        </div>
+                        <select
+                            className={styles.rowSelect}
+                            value={formData.status || ''}
+                            onChange={e => {
+                                if (e.target.value === 'custom') {
+                                    setIsCustomStatusMode(true);
+                                    setFormData({ ...formData, status: '' });
+                                } else {
+                                    setFormData({ ...formData, status: e.target.value as Status })
+                                }
+                            }}
+                        >
+                            <option value="">{t('noStatus') || 'Нет статуса'}</option>
+                            {availableStatuses.map(s => (
+                                <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
+                            ))}
+                            <option value="custom">{t('custom') || 'Свой статус...'}</option>
+                        </select>
+                        <ChevronDown size={16} className={styles.menuRightIcon} />
                     </div>
-                    <select
-                        className={styles.rowSelect}
-                        value={formData.client || ''}
-                        onChange={e => setFormData({ ...formData, client: e.target.value })}
-                    >
-                        <option value="">{formData.client || t('client')}</option>
-                        {clients.map(c => (
-                            <option key={c.id} value={c.name}>{c.name}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={16} className={styles.menuRightIcon} />
-                </div>
+                ) : (
+                    <div className={styles.menuItem} style={{ padding: '8px 16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 8 }}>
+                            <Edit2 size={16} color="var(--color-accent)" />
+                            <input
+                                className={styles.input}
+                                style={{ background: 'transparent', padding: '8px 0', borderRadius: 0 }}
+                                value={formData.status || ''}
+                                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                placeholder={t('enterStatus') || "Введите статус..."}
+                                autoFocus
+                            />
+                            <button onClick={() => setIsCustomStatusMode(false)} style={{ border: 'none', background: 'none' }}>
+                                <X size={16} color="var(--color-text-secondary)" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
 
-                <div className={styles.menuItem}>
-                    <div className={styles.menuLeftIcon}>
-                        {formData.status ? getStatusIcon(formData.status as Status, 20) : <div style={{ width: 20 }} />}
-                    </div>
-                    <select
-                        className={styles.rowSelect}
-                        value={formData.status || ''}
-                        onChange={e => setFormData({ ...formData, status: e.target.value as Status })}
+            {/* Client Section (Moved to Bottom) - Horizontal Scroll */}
+            <div className={styles.clientSection}>
+                <div className={styles.sectionTitle}>{t('client') || 'Клиент'}</div>
+                <div className={styles.clientScrollList}>
+                    {/* Allow Deselect Option */}
+                    <div
+                        className={`${styles.clientCard} ${!formData.client ? styles.selectedClient : ''}`}
+                        onClick={() => setFormData({ ...formData, client: '' })}
                     >
-                        {availableStatuses.map(s => (
-                            <option key={s} value={s}>{getStatusLabel(s as Status, t)}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={16} className={styles.menuRightIcon} />
+                        <div className={styles.clientAvatarLarge} style={{ background: 'var(--bg-input)', color: 'var(--color-text-secondary)' }}>
+                            <User size={24} />
+                        </div>
+                        <span className={styles.clientName}>{t('none') || 'Нет'}</span>
+                    </div>
+
+                    {clients.map(c => (
+                        <div
+                            key={c.id}
+                            className={`${styles.clientCard} ${formData.client === c.name ? styles.selectedClient : ''}`}
+                            onClick={() => setFormData({ ...formData, client: c.name })}
+                        >
+                            {c.avatar_url ? (
+                                <div className={styles.clientAvatarLarge} style={{ backgroundImage: `url(${c.avatar_url})` }} />
+                            ) : (
+                                <div className={styles.clientAvatarLarge} style={{ background: generateAvatarColor(c.name) }}>
+                                    {getInitials(c.name)}
+                                </div>
+                            )}
+                            <span className={styles.clientName}>{c.name}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
 

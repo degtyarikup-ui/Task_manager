@@ -68,9 +68,11 @@ function Layout() {
   // Smaller gradient for specific pages
   const isSmallGradient = ['/clients', '/profile', '/calculator'].some(path => location.pathname.startsWith(path));
 
+  const isTaskForm = location.pathname === '/tasks/new' || (location.pathname.startsWith('/tasks/') && location.pathname !== '/tasks');
+
   return (
     <div className={styles.appContainer}>
-      <div className={styles.topGradient} style={{ height: isSmallGradient ? '12px' : '40px' }} />
+      {!isTaskForm && <div className={styles.topGradient} style={{ height: isSmallGradient ? '12px' : '40px' }} />}
       <main className={styles.mainContent}>
         <Routes>
           <Route path="/" element={<Navigate to="/tasks" replace />} />
