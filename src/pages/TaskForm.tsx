@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical, Circle } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical, Circle, Trash2 } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -19,7 +19,7 @@ export const TaskForm: React.FC = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    const { tasks, addTask, updateTask, projects, clients, availableStatuses, language, userId, isPremium, addCustomStatus } = useStore();
+    const { tasks, addTask, updateTask, projects, clients, availableStatuses, language, userId, isPremium, addCustomStatus, deleteCustomStatus } = useStore();
     const locale = language === 'ru' ? ru : enUS;
 
     const [formData, setFormData] = useState<Partial<Task>>({
@@ -476,13 +476,44 @@ export const TaskForm: React.FC = () => {
                 </button>
 
                 {/* Available Statuses */}
-                {availableStatuses.map(s => (
-                    <button key={s} className={sheetStyles.option} onClick={() => { setFormData({ ...formData, status: s as Status }); setIsStatusSheetOpen(false); }}>
-                        {getStatusIcon(s as Status, 20)}
-                        {getStatusLabel(s as Status, t)}
-                        {formData.status === s && <Check size={16} style={{ marginLeft: 'auto', color: 'var(--color-accent)' }} />}
-                    </button>
-                ))}
+                {availableStatuses.map(s => {
+                    const isDefault = ['in-progress', 'on-hold', 'completed'].includes(s);
+                    return (
+                        <div key={s} style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 8 }}>
+                            <button
+                                className={sheetStyles.option}
+                                style={{ flex: 1 }}
+                                onClick={() => { setFormData({ ...formData, status: s as Status }); setIsStatusSheetOpen(false); }}
+                            >
+                                {getStatusIcon(s as Status, 20)}
+                                {getStatusLabel(s as Status, t)}
+                                {formData.status === s && <Check size={16} style={{ marginLeft: 'auto', color: 'var(--color-accent)' }} />}
+                            </button>
+                            {!isDefault && (
+                                <button
+                                    onClick={() => {
+                                        // Confirm delete
+                                        // Simple confirm.
+                                        // We can use native confirm for now or implement Modal later.
+                                        if (window.confirm((t('deleteStatusConfirm') || 'Delete status') + '?')) {
+                                            deleteCustomStatus(s);
+                                            if (formData.status === s) setFormData(prev => ({ ...prev, status: '' }));
+                                        }
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        padding: 10,
+                                        color: '#FF3B30', // Danger color
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            )}
+                        </div>
+                    );
+                })}
 
                 <div className={sheetStyles.separator} />
 
