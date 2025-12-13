@@ -148,8 +148,8 @@ export const Calculator: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.title}>{t('aiCalculator')}</div>
-                <div className={styles.subtitle}>{t('aiCalculatorDesc')}</div>
+                <h1 className={styles.title}>{t('aiCalculator')}</h1>
+                <p className={styles.subtitle}>{t('aiCalculatorDesc')}</p>
             </header>
 
             <div className={styles.formGroup} style={{ animationDelay: '0.1s' }}>
@@ -243,6 +243,7 @@ export const Calculator: React.FC = () => {
                         value={rate}
                         onChange={(e) => setRate(Number(e.target.value))}
                     />
+                    <div className={styles.rangeValue}>${rate}</div>
                 </div>
 
                 <button

@@ -10,27 +10,28 @@
 }
 
 .header {
-    margin-bottom: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    margin-bottom: 24px;
     text-align: center;
+    /* Removed flex/column/align/gap/animation from old calculator style to match Clients strictly */
+    /* Clients uses: margin-bottom: 24px; text-align: center; */
     animation: slideDown 0.5s ease;
+    /* Keeping animation though */
 }
 
 .title {
     font-size: 20px;
     font-weight: 600;
     color: var(--color-text-primary);
+    margin-bottom: 4px;
+    padding: 0 40px;
     line-height: 1.2;
 }
 
 .subtitle {
-    font-size: 15px;
+    font-size: 13px;
     color: var(--color-text-secondary);
-    max-width: 350px;
-    line-height: 1.5;
+    padding: 0 16px;
+    /* Added padding to be safe */
 }
 
 .formGroup {
@@ -142,6 +143,7 @@
 .rangeInput {
     flex: 1;
     -webkit-appearance: none;
+    appearance: none;
     height: 6px;
     background: var(--bg-input);
     border-radius: 3px;
