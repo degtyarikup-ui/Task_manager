@@ -1,9 +1,9 @@
 import React from 'react';
-import { Users, CircleUser, CircleCheck } from 'lucide-react';
+import { Users, CircleUser, CircleCheck, Calculator } from 'lucide-react';
 import { useTranslation } from '../i18n/useTranslation';
 import styles from './BottomNav.module.css';
 
-type Tab = 'tasks' | 'clients' | 'profile';
+type Tab = 'tasks' | 'clients' | 'profile' | 'calculator';
 
 interface BottomNavProps {
     activeTab: Tab;
@@ -33,6 +33,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
                     <Users size={24} />
                 </div>
                 <span className={styles.label}>{t('clients')}</span>
+            </button>
+
+            <button
+                className={`${styles.navItem} ${activeTab === 'calculator' ? styles.active : ''}`}
+                onClick={() => onTabChange('calculator')}
+            >
+                <div className={styles.iconWrapper}>
+                    <Calculator size={24} />
+                </div>
+                <span className={styles.label}>{t('calculator')}</span>
             </button>
 
             <button

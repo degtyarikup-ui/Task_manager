@@ -52,9 +52,10 @@ function BottomNavWrapper() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  let activeTab: 'tasks' | 'clients' | 'profile' = 'tasks';
+  let activeTab: 'tasks' | 'clients' | 'profile' | 'calculator' = 'tasks';
   if (location.pathname.startsWith('/clients')) activeTab = 'clients';
   if (location.pathname.startsWith('/profile')) activeTab = 'profile';
+  if (location.pathname.startsWith('/calculator')) activeTab = 'calculator';
 
   return <BottomNav activeTab={activeTab} onTabChange={(tab) => navigate('/' + tab)} />;
 }
@@ -62,7 +63,7 @@ function BottomNavWrapper() {
 function Layout() {
   const location = useLocation();
   // Show Nav on main tabs and client details
-  const showBottomNav = ['/tasks', '/profile'].includes(location.pathname) || location.pathname.startsWith('/clients') || location.pathname === '/';
+  const showBottomNav = ['/tasks', '/profile', '/calculator'].includes(location.pathname) || location.pathname.startsWith('/clients') || location.pathname === '/';
 
   return (
     <div className={styles.appContainer}>

@@ -14,8 +14,7 @@ import {
     Copy,
     Check,
     Wallet,
-    HelpCircle,
-    Calculator
+    HelpCircle
 } from 'lucide-react';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { Modal } from '../components/Modal';
@@ -203,13 +202,6 @@ export const Profile: React.FC = () => {
                         <ChevronRight size={16} className={styles.menuValue} />
                     </button>
 
-                    <button className={styles.menuItem} onClick={() => navigate('/calculator')}>
-                        <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>
-                            <Calculator size={20} />
-                        </div>
-                        <div className={styles.menuLabel}>{t('aiCalculator')}</div>
-                        <ChevronRight size={16} className={styles.menuValue} />
-                    </button>
 
                     <button className={styles.menuItem} onClick={handleSupport}>
                         <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>

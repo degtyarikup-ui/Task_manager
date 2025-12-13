@@ -6,7 +6,7 @@
     min-height: 100vh;
     background: var(--bg-app);
     box-sizing: border-box;
-    padding-bottom: 120px;
+    padding-bottom: 160px;
 }
 
 .header {
@@ -20,144 +20,16 @@
     animation: slideDown 0.5s ease;
 }
 
-.iconWrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-}
-
-.title {
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--color-text-primary);
-    line-height: 1.2;
-}
-
-.subtitle {
-    font-size: 15px;
-    color: var(--color-text-secondary);
-    max-width: 350px;
-    line-height: 1.5;
-}
-
-.formGroup {
-    margin-bottom: 24px;
-    text-align: left;
-    animation: fadeIn 0.5s ease backwards;
-}
-
-.label {
-    display: block;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 12px;
-    margin-left: 4px;
-}
-
-.input {
-    width: 100%;
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--color-border);
-    background: var(--bg-card);
-    color: var(--color-text-primary);
-    font-size: 16px;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.2s;
-}
-
-.input:focus {
-    border-color: var(--color-accent);
-}
-
-/* Chip / Tab Styles - Hug content */
-.chipContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    /* Reduced gap */
-}
-
-.chip {
-    padding: 6px 12px;
-    /* Reduced padding */
-    border-radius: 12px;
-    background: var(--bg-card);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.chip.active {
-    background: var(--color-accent);
-    color: white;
-    border-color: var(--color-accent);
-    font-weight: 600;
-}
-
-.chip:active {
-    transform: scale(0.98);
-}
-
-/* Range Slider */
-.rangeContainer {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--bg-card);
-    padding: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--color-border);
-}
-
-.rangeInput {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 6px;
-    background: var(--bg-input);
-    border-radius: 3px;
-    outline: none;
-}
-
-.rangeInput::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 24px;
-    height: 24px;
-    background: var(--color-accent);
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-.rangeValue {
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--color-accent);
-    min-width: 40px;
-    text-align: right;
-}
-
+/* ... skipped intermediate ... */
 /* Fixed Footer for Button */
 .footer {
     position: fixed;
-    bottom: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom));
+    /* Above BottomNav */
     left: 0;
     right: 0;
-    padding: 24px;
+    padding: 16px 24px;
+    /* Reduced top padding */
     background: var(--bg-app);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--color-border);

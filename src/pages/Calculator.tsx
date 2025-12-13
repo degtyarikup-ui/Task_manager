@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../i18n/useTranslation';
 import { useStore } from '../context/StoreContext';
@@ -32,18 +32,6 @@ export const Calculator: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     // Handle Telegram Back Button
-    useEffect(() => {
-        const tg = (window as any).Telegram?.WebApp;
-        if (tg) {
-            tg.BackButton.show();
-            const handleBack = () => navigate(-1);
-            tg.BackButton.onClick(handleBack);
-            return () => {
-                tg.BackButton.offClick(handleBack);
-                tg.BackButton.hide();
-            };
-        }
-    }, [navigate]);
 
     const handleCalculate = async () => {
         let descToUse = description;
