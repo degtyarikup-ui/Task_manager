@@ -290,7 +290,7 @@ export const Tasks: React.FC = () => {
 
 
             <button className={styles.fab} onClick={() => {
-                navigate('/tasks/new');
+                navigate('/tasks/new', { state: { projectId: activeTab === 'all' ? undefined : activeTab } });
                 if (showTooltip) handleDismissTooltip();
             }}>
                 <Plus size={28} />

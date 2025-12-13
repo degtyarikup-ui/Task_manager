@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
@@ -18,6 +18,7 @@ import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-p
 export const TaskForm: React.FC = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { t } = useTranslation();
     const { tasks, addTask, updateTask, projects, clients, availableStatuses, language, userId, isPremium, addCustomStatus, deleteCustomStatus } = useStore();
     const locale = language === 'ru' ? ru : enUS;
@@ -29,7 +30,7 @@ export const TaskForm: React.FC = () => {
         priority: 'low',
         deadline: '',
         client: '',
-        projectId: ''
+        projectId: (location.state as any)?.projectId || ''
     });
 
     const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
@@ -49,6 +50,16 @@ export const TaskForm: React.FC = () => {
             titleRef.current.style.height = `${titleRef.current.scrollHeight}px`;
         }
     }, [formData.title]);
+
+    // Force focus on mount
+    useEffect(() => {
+        if (!id && titleRef.current) {
+            // Small delay to ensure route transition is done
+            setTimeout(() => {
+                titleRef.current?.focus();
+            }, 300);
+        }
+    }, [id]);
 
     // Load Task Data if Editing
     useEffect(() => {
