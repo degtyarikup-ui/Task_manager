@@ -6,6 +6,7 @@ import { TaskItem } from '../components/TaskItem';
 import { ChevronLeft } from 'lucide-react';
 import styles from './Tasks.module.css'; // Reuse basic styles
 import { generateAvatarColor, getInitials } from '../utils/colors';
+import { playSuccessSound } from '../utils/sound';
 import { ru, enUS } from 'date-fns/locale';
 import { Modal } from '../components/Modal';
 import { Calendar, AlertTriangle, List, Trash2, Plus, Check } from 'lucide-react';
@@ -177,6 +178,9 @@ export const ClientDetails: React.FC = () => {
         const task = tasks.find(t => t.id === id);
         if (task) {
             const newStatus = task.status === 'completed' ? 'in-progress' : 'completed';
+            if (newStatus === 'completed') {
+                playSuccessSound();
+            }
             updateTask(id, { status: newStatus });
         }
     };

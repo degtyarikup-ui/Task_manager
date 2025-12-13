@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
+import { playSuccessSound } from '../utils/sound';
 import { Modal } from '../components/Modal';
 import { Plus } from 'lucide-react';
 import type { Status, Project } from '../types';
@@ -75,6 +76,9 @@ export const Tasks: React.FC = () => {
         const task = tasks.find(t => t.id === id);
         if (task) {
             haptic.impact('light');
+            if (task.status !== 'completed') {
+                playSuccessSound();
+            }
             updateTask(id, {
                 status: task.status === 'completed' ? 'in-progress' : 'completed'
             });
