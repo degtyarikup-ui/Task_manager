@@ -31,19 +31,25 @@ serve(async (req) => {
         - Description: ${description}
         - Freelancer Hourly Rate: ${hourlyRate || 'Unknown'} (if unknown, use market average for beginners)
         - Experience Level: ${experience || 'Beginner'}
-        - Target Audience Currency: ${currency}
+        - Target Audience Currency: USD
 
         Task:
         1. Analyze the project requirements and complexity.
         2. Estimate the number of hours required (Min/Max).
-        3. Calculate a recommended price range (Min/Max) in ${currency}. If rate is provided, use it. If not, use generic beginner rates: $20/hr or 2000 RUB/hr.
+        3. Calculate a recommended price range (Min/Max) in USD.
         4. Provide a "Complexity Rating" (Low, Medium, High).
         5. Write a brief "Explanation" (max 3 sentences) explaining the main cost drivers.
+
+        IMPORTANT PRICING LOGIC:
+        - Ensure the Total Price roughly follows: Beginner < Intermediate < Expert.
+        - If the user provides a fixed Hourly Rate, you MUST adjust your Estimated Hours to satisfy this trend. 
+        - Assume a "Beginner" working at $X/hour is less efficient but might scope tasks smaller or bill fewer effective hours than a Pro.
+        - Do not let a Beginner quote be higher than an Intermediate quote for the same task description.
 
         Output Requirements:
         - Language: ${langName}
         - Return ONLY a valid JSON object.
-        - JSON Structure: { "minPrice": number, "maxPrice": number, "currency": "${currency}", "minHours": number, "maxHours": number, "complexity": "string", "explanation": "string" }
+        - JSON Structure: { "minPrice": number, "maxPrice": number, "currency": "USD", "minHours": number, "maxHours": number, "complexity": "string", "explanation": "string" }
         - Do not include markdown formatting.
         `;
 

@@ -195,14 +195,6 @@ export const Profile: React.FC = () => {
             <div className={styles.section}>
                 <div className={styles.sectionTitle}>{t('settings')}</div>
                 <div className={styles.menuGroup}>
-                    <button className={styles.menuItem} onClick={() => navigate('/calculator')}>
-                        <div className={styles.menuIcon} style={{ color: '#FFD700' }}>
-                            <Calculator size={20} />
-                        </div>
-                        <div className={styles.menuLabel}>{t('aiCalculator')}</div>
-                        <ChevronRight size={16} className={styles.menuValue} />
-                    </button>
-
                     <button className={styles.menuItem} onClick={() => navigate('/premium')}>
                         <div className={styles.menuIcon} style={{ color: 'var(--color-premium)' }}>
                             <Star size={20} />
@@ -210,6 +202,15 @@ export const Profile: React.FC = () => {
                         <div className={styles.menuLabel}>Premium</div>
                         <ChevronRight size={16} className={styles.menuValue} />
                     </button>
+
+                    <button className={styles.menuItem} onClick={() => navigate('/calculator')}>
+                        <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>
+                            <Calculator size={20} />
+                        </div>
+                        <div className={styles.menuLabel}>{t('aiCalculator')}</div>
+                        <ChevronRight size={16} className={styles.menuValue} />
+                    </button>
+
                     <button className={styles.menuItem} onClick={handleSupport}>
                         <div className={styles.menuIcon} style={{ color: 'var(--color-accent)' }}>
                             <HelpCircle size={20} />

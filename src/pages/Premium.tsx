@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 
-import { Star, BarChart2, ShieldCheck, Sparkles, Mic } from 'lucide-react';
+import { Star, BarChart2, ShieldCheck, Sparkles, Mic, Calculator } from 'lucide-react';
 import styles from './Premium.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -90,6 +90,7 @@ export const Premium: React.FC = () => {
             </div>
 
             <div className={styles.features}>
+                {/* 1. AI Assistant */}
                 <div className={styles.featureCard}>
                     <div className={styles.featureIcon} style={{ background: 'rgba(217, 70, 239, 0.1)', color: '#D946EF' }}>
                         <Sparkles size={24} />
@@ -100,6 +101,18 @@ export const Premium: React.FC = () => {
                     </div>
                 </div>
 
+                {/* 2. AI Calculator (New) */}
+                <div className={styles.featureCard}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
+                        <Calculator size={24} />
+                    </div>
+                    <div className={styles.featureText}>
+                        <h3>{t('featureCalculator')}</h3>
+                        <p>{t('featureCalculatorDesc')}</p>
+                    </div>
+                </div>
+
+                {/* 3. Advanced Stats */}
                 <div className={styles.featureCard}>
                     <div className={styles.featureIcon} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3B82F6' }}>
                         <BarChart2 size={24} />
@@ -110,16 +123,7 @@ export const Premium: React.FC = () => {
                     </div>
                 </div>
 
-                <div className={styles.featureCard}>
-                    <div className={styles.featureIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}>
-                        <ShieldCheck size={24} />
-                    </div>
-                    <div className={styles.featureText}>
-                        <h3>{t('supportDev')}</h3>
-                        <p>{t('supportDevDesc')}</p>
-                    </div>
-                </div>
-
+                {/* 4. Telegram Bot */}
                 <div className={styles.featureCard}>
                     <div className={styles.featureIcon} style={{ background: 'rgba(6, 182, 212, 0.1)', color: '#06B6D4' }}>
                         <Mic size={24} />
@@ -127,6 +131,17 @@ export const Premium: React.FC = () => {
                     <div className={styles.featureText}>
                         <h3>{t('featureBot')}</h3>
                         <p>{t('featureBotDesc')}</p>
+                    </div>
+                </div>
+
+                {/* 5. Support Development (Moved to last) */}
+                <div className={styles.featureCard}>
+                    <div className={styles.featureIcon} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}>
+                        <ShieldCheck size={24} />
+                    </div>
+                    <div className={styles.featureText}>
+                        <h3>{t('supportDev')}</h3>
+                        <p>{t('supportDevDesc')}</p>
                     </div>
                 </div>
             </div>
