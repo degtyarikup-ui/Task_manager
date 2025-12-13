@@ -145,7 +145,7 @@ export const TaskForm: React.FC = () => {
                     'Authorization': 'Bearer sb_publishable_ZikJgvMJx7lj9c7OmICtNg_ctMzFDDu'
                 },
                 body: JSON.stringify({
-                    taskTitle: formData.title,
+                    title: formData.title,
                     language: language
                 })
             });
