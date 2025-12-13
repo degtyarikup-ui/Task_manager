@@ -150,9 +150,9 @@ export const Calculator: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <h1 className={styles.title}>{t('aiCalculator')}</h1>
-                <p className={styles.subtitle}>{t('aiCalculatorDesc')}</p>
+            <header className={styles.header} style={{ marginTop: 4, marginBottom: 24, padding: '0 16px' }}>
+                <h1 className={styles.title} style={{ textAlign: 'left', width: '100%', padding: 0 }}>{t('aiCalculator')}</h1>
+                <p className={styles.subtitle} style={{ textAlign: 'left', width: '100%' }}>{t('aiCalculatorDesc')}</p>
             </header>
 
             <div className={styles.formGroup} style={{ animationDelay: '0.1s' }}>

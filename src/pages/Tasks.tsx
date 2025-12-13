@@ -228,7 +228,7 @@ export const Tasks: React.FC = () => {
             <div className={styles.fixedTop}>
                 <header className={styles.header}>
                     <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                        <h1 className={styles.title} style={{ marginBottom: 0, textAlign: 'left', flex: 1 }}>{t('tasks')}</h1>
+                        <h1 className={styles.title} style={{ marginBottom: 0, textAlign: 'left', flex: 1, padding: 0 }}>{t('tasks')}</h1>
                         {activeTab !== 'all' && (() => {
                             const project = projects.find(p => p.id === activeTab);
                             if (project) return <ProjectMembersHeader project={project} t={t as any} />;

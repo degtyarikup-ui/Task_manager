@@ -122,8 +122,8 @@ export const Profile: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <h1 className={styles.title}>{t('profile')}</h1>
+            <header className={styles.header} style={{ marginTop: 4, marginBottom: 24, padding: '0 16px' }}>
+                <h1 className={styles.title} style={{ textAlign: 'left', width: '100%', padding: 0 }}>{t('profile')}</h1>
             </header>
 
             {/* Profile Header */}
