@@ -1,5 +1,5 @@
 .container {
-    padding: 160px 16px 120px;
+    padding: 110px 16px 120px;
     /* More padding for bottom nav */
     max-width: 600px;
     margin: 0 auto;
@@ -9,19 +9,19 @@
 }
 
 :global(.platform-ios) .container {
-    padding-top: 148px;
+    padding-top: 80px;
 }
 
 :global(.platform-android) .container {
-    padding-top: 174px;
+    padding-top: 80px;
 }
 
 .detailsHeaderPadding {
-    padding-top: 48px !important;
+    padding-top: 24px !important;
 }
 
 :global(.platform-android) .detailsHeaderPadding {
-    padding-top: 100px !important;
+    padding-top: 24px !important;
 }
 
 .fixedTop {
@@ -33,16 +33,16 @@
     max-width: 600px;
     background-color: var(--bg-app);
     z-index: 200;
-    padding: 32px 16px 0;
+    padding: 16px 16px 0;
     box-sizing: border-box;
 }
 
 :global(.platform-ios) .fixedTop {
-    padding-top: 58px;
+    padding-top: 16px;
 }
 
 :global(.platform-android) .fixedTop {
-    padding-top: 64px;
+    padding-top: 16px;
 }
 
 .fixedTop::after {

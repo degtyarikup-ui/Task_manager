@@ -211,7 +211,7 @@ export const Calculator: React.FC = () => {
                         onChange={(e) => setSelectedTaskId(e.target.value)}
                     >
                         <option value="">{t('selectTaskPlaceholder')}</option>
-                        {tasks.map(task => (
+                        {tasks.filter(t => t.status !== 'completed').map(task => (
                             <option key={task.id} value={task.id}>
                                 {task.title.length > 50 ? task.title.substring(0, 50) + '...' : task.title}
                             </option>

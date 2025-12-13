@@ -1,6 +1,6 @@
 .container {
     padding: 16px;
-    padding-top: 64px;
+    padding-top: 16px;
     /* Fix User Issue: Task name overlaps with Telegram interface */
     padding-bottom: 120px;
     min-height: 100vh;

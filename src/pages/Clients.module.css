@@ -14,7 +14,7 @@
 }
 
 :global(.platform-android) .container {
-    padding-top: 60px;
+    padding-top: 16px;
 }
 
 .header {
@@ -151,7 +151,7 @@
     grid-column: 1 / -1;
     text-align: center;
     color: var(--color-text-secondary);
-    margin-top: 80px;
+    margin-top: 40px;
 }
 
 @keyframes fadeIn {
