@@ -284,11 +284,11 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     background-size: cover;
     background-position: center;
-    border: 2px solid transparent;
+    border: none;
 }
 
 .selectedClient .clientAvatarLarge {
-    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .clientName {
