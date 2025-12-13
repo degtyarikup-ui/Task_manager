@@ -240,7 +240,7 @@ export const Tasks: React.FC = () => {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 16px' }}>
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 16px', minHeight: 32 }}>
                     <h1 className={styles.title} style={{ marginBottom: 0, textAlign: 'left', flex: 1, padding: 0 }}>{t('tasks')}</h1>
                     {activeTab !== 'all' && (() => {
                         const project = projects.find(p => p.id === activeTab);
