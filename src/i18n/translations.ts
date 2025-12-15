@@ -20,6 +20,7 @@ export const translations = {
 
         // Task Tools
         deadline: 'Дедлайн',
+        time: 'Время',
         priority: 'Приоритет',
         status: 'Статус',
         client: 'Клиент',
@@ -230,6 +231,7 @@ export const translations = {
 
         // Task Tools
         deadline: 'Deadline',
+        time: 'Time',
         priority: 'Priority',
         status: 'Status',
         client: 'Client',

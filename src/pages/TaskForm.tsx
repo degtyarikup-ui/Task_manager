@@ -362,13 +362,18 @@ export const TaskForm: React.FC = () => {
                     </div>
 
                     {formData.deadline && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--color-border)', paddingLeft: 12, marginLeft: 8 }}>
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--color-border)', paddingLeft: 12, marginLeft: 8 }}>
                             <Clock size={16} color="var(--color-text-secondary)" />
+
+                            <span style={{ fontSize: 15, color: formData.deadline.includes('T') ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>
+                                {formData.deadline.includes('T') ? formData.deadline.split('T')[1].substring(0, 5) : t('time')}
+                            </span>
+
                             <input
                                 type="time"
                                 value={formData.deadline.includes('T') ? formData.deadline.split('T')[1].substring(0, 5) : ''}
                                 onChange={(e) => {
-                                    const time = e.target.value; // HH:mm
+                                    const time = e.target.value;
                                     const datePart = formData.deadline!.split('T')[0];
                                     if (!time) {
                                         setFormData({ ...formData, deadline: datePart });
@@ -377,21 +382,15 @@ export const TaskForm: React.FC = () => {
                                     }
                                 }}
                                 style={{
-                                    border: 'none',
-                                    background: 'transparent',
-                                    fontSize: 15,
-                                    color: 'var(--color-text-primary)',
-                                    fontFamily: 'inherit',
-                                    outline: 'none',
-                                    width: 80, // Sufficient for time
+                                    position: 'absolute',
+                                    inset: 0,
+                                    opacity: 0,
+                                    width: '100%',
+                                    height: '100%',
                                     cursor: 'pointer'
                                 }}
                             />
                         </div>
-                    )}
-
-                    {!formData.deadline && (
-                        <ChevronDown size={16} className={styles.menuRightIcon} style={{ pointerEvents: 'none' }} />
                     )}
                 </div>
 
