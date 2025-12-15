@@ -7,11 +7,17 @@ import extraStyles from '../pages/TasksExtra.module.css';
 
 export const formatDate = (dateString: string, locale: any) => {
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+
     const options: any = { locale: locale || ru };
+    // Heuristic: if string length > 10 it likely contains time (YYYY-MM-DDTHH:mm)
+    const showTime = dateString.length > 10;
+    const timeStr = showTime ? ' ' + format(date, 'HH:mm', options) : '';
+
     if (!isSameYear(date, new Date())) {
-        return format(date, 'd MMM yyyy', options);
+        return format(date, 'd MMM yyyy', options) + timeStr;
     }
-    return format(date, 'd MMM', options);
+    return format(date, 'd MMM', options) + timeStr;
 };
 
 // Priority Helpers

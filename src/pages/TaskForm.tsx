@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { haptic } from '../utils/haptics';
 import styles from './TaskForm.module.css';
-import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical, Circle, Trash2 } from 'lucide-react';
+import { Check, Plus, Calendar, AlertTriangle, List, Wand2, Loader2, X, ChevronDown, GripVertical, Circle, Trash2, Clock } from 'lucide-react';
 import { generateAvatarColor, getInitials } from '../utils/colors';
 import { formatDate, getStatusIcon, getStatusLabel, getIconClass } from '../utils/taskHelpers';
 import { ru, enUS } from 'date-fns/locale';
@@ -345,13 +345,55 @@ export const TaskForm: React.FC = () => {
             {/* Properties */}
             <div className={styles.section} style={{ background: 'var(--bg-card)', borderRadius: 16, overflow: 'hidden' }}>
                 {/* Deadline */}
-                <button className={styles.menuItem} onClick={() => setIsCalendarOpen(true)}>
-                    <div className={styles.menuIcon}>
+                {/* Deadline & Time */}
+                <div className={styles.menuItem} style={{ cursor: 'default', display: 'flex', alignItems: 'center', paddingRight: 16 }}>
+                    <div
+                        style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+                        onClick={() => setIsCalendarOpen(true)}
+                    >
                         <Calendar size={20} color="var(--color-accent)" />
-                        <span>{formData.deadline ? formatDate(formData.deadline, locale) : (t('deadline') || 'Дедлайн')}</span>
+                        {/* Use split mainly to show date part, or rely on formatDate which now shows time?
+                            If separate, use only date part for text. 
+                            Let's rely on formatDate but maybe only show date part for the text if split UI?
+                            With separate Time input, showing time in the text label is redundant.
+                            I will extract Date Part for label.
+                        */}
+                        <span>{formData.deadline ? formatDate(formData.deadline.split('T')[0], locale) : (t('deadline') || 'Дедлайн')}</span>
                     </div>
-                    <ChevronDown size={16} className={styles.menuRightIcon} />
-                </button>
+
+                    {formData.deadline && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, borderLeft: '1px solid var(--color-border)', paddingLeft: 12, marginLeft: 8 }}>
+                            <Clock size={16} color="var(--color-text-secondary)" />
+                            <input
+                                type="time"
+                                value={formData.deadline.includes('T') ? formData.deadline.split('T')[1].substring(0, 5) : ''}
+                                onChange={(e) => {
+                                    const time = e.target.value; // HH:mm
+                                    const datePart = formData.deadline!.split('T')[0];
+                                    if (!time) {
+                                        setFormData({ ...formData, deadline: datePart });
+                                    } else {
+                                        setFormData({ ...formData, deadline: `${datePart}T${time}` });
+                                    }
+                                }}
+                                style={{
+                                    border: 'none',
+                                    background: 'transparent',
+                                    fontSize: 15,
+                                    color: 'var(--color-text-primary)',
+                                    fontFamily: 'inherit',
+                                    outline: 'none',
+                                    width: 80, // Sufficient for time
+                                    cursor: 'pointer'
+                                }}
+                            />
+                        </div>
+                    )}
+
+                    {!formData.deadline && (
+                        <ChevronDown size={16} className={styles.menuRightIcon} style={{ pointerEvents: 'none' }} />
+                    )}
+                </div>
 
                 {/* Priority */}
                 <button className={styles.menuItem} onClick={togglePriority}>
@@ -427,8 +469,11 @@ export const TaskForm: React.FC = () => {
 
             {isCalendarOpen && (
                 <CustomCalendar
-                    selectedDate={formData.deadline || null}
-                    onChange={(date) => setFormData({ ...formData, deadline: date })}
+                    selectedDate={formData.deadline ? formData.deadline.split('T')[0] : null}
+                    onChange={(date) => {
+                        const timePart = formData.deadline && formData.deadline.includes('T') ? formData.deadline.split('T')[1] : '';
+                        setFormData({ ...formData, deadline: date + (timePart ? 'T' + timePart : '') });
+                    }}
                     onClose={() => setIsCalendarOpen(false)}
                     locale={locale}
                     todayLabel={t('today') || 'Today'}
