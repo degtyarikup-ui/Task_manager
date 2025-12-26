@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useTranslation } from '../i18n/useTranslation';
+import { supabase } from '../lib/supabase';
 
 import { Star, BarChart2, ShieldCheck, Sparkles, Mic, Calculator } from 'lucide-react';
 import styles from './Premium.module.css';
@@ -28,26 +29,16 @@ export const Premium: React.FC = () => {
     const handleBuyPremium = async () => {
         setIsLoading(true);
         try {
-            // Используем прямой fetch для диагностики
-            const response = await fetch('https://qysfycmynplwylnbnskw.supabase.co/functions/v1/telegram-payment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer sb_publishable_ZikJgvMJx7lj9c7OmICtNg_ctMzFDDu'
-                },
-                body: JSON.stringify({
+            // Use Supabase Client invoke for better CORS/Auth handling
+            const { data, error } = await supabase.functions.invoke('telegram-payment', {
+                body: {
                     action: 'create_invoice',
                     userId: userId,
                     language: language
-                })
+                }
             });
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(`Server Error ${response.status}: ${text}`);
-            }
-
-            const data = await response.json();
+            if (error) throw error;
 
             if (data?.invoiceLink) {
                 const tg = (window as any).Telegram?.WebApp;
@@ -69,7 +60,7 @@ export const Premium: React.FC = () => {
             }
         } catch (e: any) {
             console.error('Payment Error', e);
-            alert(`Debug Error: ${e.message}`);
+            alert(`Debug Error: ${e.message || e}`);
         } finally {
             setIsLoading(false);
         }
